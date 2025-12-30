@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Admin login for PSN Taraba State Welfare Registry">
+  <title>Admin Login - PSN Taraba Welfare Registry</title>
+  
+  <style>
+    /* ========== CSS Variables ========== */
+    :root {
+      --primary-color: #1e40af;
+      --primary-dark: #1e3a8a;
+      --danger-color: #dc2626;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --dark: #1f2937;
+      --gray: #6b7280;
+      --gray-light: #d1d5db;
+      --gray-lighter: #f3f4f6;
+      --white: #ffffff;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-2xl: 3rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      color: var(--dark);
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-md);
+    }
+
+    .container-sm {
+      max-width: 450px;
+    }
+
+    /* ========== Navbar ========== */
+    .navbar {
+      background-color: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-md) 0;
+    }
+
+    .navbar-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+
+    .navbar-brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .navbar-menu {
+      display: flex;
+      list-style: none;
+      gap: var(--spacing-lg);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .navbar-link {
+      color: var(--dark);
+      font-weight: 500;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-md);
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .navbar-link:hover {
+      background-color: var(--gray-lighter);
+    }
+
+    /* ========== Login Container ========== */
+    .login-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-2xl) 0;
+    }
+
+    .login-card {
+      background-color: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      padding: var(--spacing-2xl);
+      width: 100%;
+      max-width: 450px;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .login-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--spacing-md);
+      font-size: 2.5rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .login-title {
+      font-size: 1.75rem;
+      color: var(--dark);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .login-subtitle {
+      color: var(--gray);
+      font-size: 0.875rem;
+    }
+
+    .admin-badge {
+      display: inline-block;
+      background-color: var(--warning-color);
+      color: var(--white);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-md);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-top: var(--spacing-sm);
+    }
+
+    /* ========== Forms ========== */
+    .form-group {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+      color: var(--dark);
+      font-size: 0.875rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: var(--spacing-md);
+      border: 2px solid var(--gray-light);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-family: var(--font-sans);
+      transition: all 0.3s ease;
+      background-color: var(--white);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .form-input.error {
+      border-color: var(--danger-color);
+    }
+
+    .form-error {
+      color: var(--danger-color);
+      font-size: 0.875rem;
+      margin-top: var(--spacing-sm);
+      display: none;
+    }
+
+    .form-error.show {
+      display: block;
+    }
+
+    .form-help {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: var(--spacing-md);
+      font-size: 0.875rem;
+    }
+
+    .form-checkbox {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .form-checkbox input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .form-checkbox label {
+      cursor: pointer;
+      font-size: 0.875rem;
+      color: var(--gray);
+    }
+
+    /* ========== Buttons ========== */
+    .btn {
+      display: inline-block;
+      padding: var(--spacing-md) var(--spacing-xl);
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: var(--font-sans);
+      width: 100%;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: var(--white);
+      padding: var(--spacing-lg);
+      font-size: 1.125rem;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* ========== Alerts ========== */
+    .alert {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-lg);
+      border-left: 4px solid;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert-success {
+      background-color: #d1fae5;
+      border-left-color: var(--success-color);
+      color: #065f46;
+    }
+
+    .alert-error {
+      background-color: #fee2e2;
+      border-left-color: var(--danger-color);
+      color: #991b1b;
+    }
+
+    .alert-warning {
+      background-color: #fef3c7;
+      border-left-color: var(--warning-color);
+      color: #92400e;
+    }
+
+    /* ========== Loading Spinner ========== */
+    .spinner {
+      border: 3px solid var(--white);
+      border-top: 3px solid transparent;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: var(--spacing-sm);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .loading-overlay.show {
+      display: flex;
+    }
+
+    .loading-content {
+      background-color: var(--white);
+      padding: var(--spacing-xl);
+      border-radius: var(--radius-lg);
+      text-align: center;
+    }
+
+    .loading-spinner {
+      border: 4px solid var(--gray-light);
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto var(--spacing-md);
+    }
+
+    /* ========== Info Box ========== */
+    .info-box {
+      background-color: var(--gray-lighter);
+      border-left: 4px solid var(--primary-color);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .info-box-title {
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: var(--spacing-sm);
+      font-size: 0.875rem;
+    }
+
+    .info-box-text {
+      color: var(--gray);
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    /* ========== Divider ========== */
+    .divider {
+      text-align: center;
+      margin: var(--spacing-xl) 0;
+      position: relative;
+    }
+
+    .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: var(--gray-light);
+    }
+
+    .divider span {
+      background-color: var(--white);
+      padding: 0 var(--spacing-md);
+      position: relative;
+      color: var(--gray);
+      font-size: 0.875rem;
+    }
+
+    .member-link {
+      text-align: center;
+      color: var(--gray);
+      font-size: 0.875rem;
+    }
+
+    .member-link a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .member-link a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    /* ========== Utilities ========== */
+    .text-center {
+      text-align: center;
+    }
+
+    .mt-2 {
+      margin-top: var(--spacing-md);
+    }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 768px) {
+      .navbar-content {
+        flex-direction: column;
+      }
+
+      .navbar-menu {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        width: 100%;
+      }
+
+      .login-card {
+        padding: var(--spacing-lg);
+      }
+
+      .login-title {
+        font-size: 1.5rem;
+      }
+
+      .login-container {
+        padding: var(--spacing-md);
+      }
+
+      .form-help {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container navbar-content">
+      <a href="/" class="navbar-brand">PSN Taraba Welfare</a>
+      <ul class="navbar-menu">
+        <li><a href="/" class="navbar-link">Home</a></li>
+        <li><a href="/register.html" class="navbar-link">Register</a></li>
+        <li><a href="/login.html" class="navbar-link">Member Login</a></li>
+        <li><a href="/admin-login.html" class="navbar-link">Admin Login</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Login Container -->
+  <div class="login-container">
+    <div class="container container-sm">
+      <div class="login-card">
+        <!-- Login Header -->
+        <div class="login-header">
+          <div class="login-icon">🔐</div>
+          <h1 class="login-title">Admin Login</h1>
+          <span class="admin-badge">Welfare Officers Only</span>
+          <p class="login-subtitle" style="margin-top: 1rem;">
+            Secure access for PSN Taraba welfare team
+          </p>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+          <div class="info-box-title">⚠️ Authorized Access Only</div>
+          <div class="info-box-text">
+            This portal is restricted to authorized PSN Taraba State welfare officers. 
+            Unauthorized access attempts are logged and monitored.
+          </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertSuccess" class="alert alert-success">
+          <strong>Success!</strong> <span id="successMessage"></span>
+        </div>
+        <div id="alertError" class="alert alert-error">
+          <strong>Error!</strong> <span id="errorMessage"></span>
+        </div>
+        <div id="alertWarning" class="alert alert-warning">
+          <strong>Warning!</strong> <span id="warningMessage"></span>
+        </div>
+
+        <!-- Login Form -->
+        <form id="adminLoginForm">
+          <div class="form-group">
+            <label for="email" class="form-label">Admin Email Address</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              class="form-input" 
+              placeholder="admin@psntaraba.org"
+              required
+              autocomplete="email"
+            >
+            <span class="form-error" id="emailError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              class="form-input" 
+              placeholder="Enter your admin password"
+              required
+              autocomplete="current-password"
+            >
+            <span class="form-error" id="passwordError"></span>
+          </div>
+
+          <div class="form-help">
+            <div class="form-checkbox">
+              <input 
+                type="checkbox" 
+                id="rememberMe" 
+                name="rememberMe"
+              >
+              <label for="rememberMe">Remember me</label>
+            </div>
+          </div>
+
+          <button type="submit" id="loginBtn" class="btn btn-primary mt-2">
+            Login as Admin
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="divider">
+          <span>or</span>
+        </div>
+
+        <!-- Member Link -->
+        <div class="member-link">
+          Are you a member? <a href="/login.html">Login here</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p>Verifying credentials...</p>
+    </div>
+  </div>
+  <!-- JavaScript -->
+  <script>
+    // ========== Configuration ==========
+    const API_BASE_URL = 'http://localhost:5000/api';
+
+    // ========== Get Form Elements ==========
+    const form = document.getElementById('adminLoginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertError = document.getElementById('alertError');
+    const alertWarning = document.getElementById('alertWarning');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    const warningMessage = document.getElementById('warningMessage');
+
+    // ========== Validation Functions ==========
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email.toLowerCase());
+    }
+
+    // ========== Error Display Functions ==========
+    function showError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      const errorSpan = document.getElementById(fieldId + 'Error');
+      
+      if (field && errorSpan) {
+        field.classList.add('error');
+        errorSpan.textContent = message;
+        errorSpan.classList.add('show');
+      }
+    }
+
+    function clearError(fieldId) {
+      const field = document.getElementById(fieldId);
+      const errorSpan = document.getElementById(fieldId + 'Error');
+      
+      if (field && errorSpan) {
+        field.classList.remove('error');
+        errorSpan.classList.remove('show');
+        errorSpan.textContent = '';
+      }
+    }
+
+    function clearAllErrors() {
+      clearError('email');
+      clearError('password');
+    }
+
+    function showAlert(type, message) {
+      alertSuccess.classList.remove('show');
+      alertError.classList.remove('show');
+      alertWarning.classList.remove('show');
+      
+      if (type === 'success') {
+        successMessage.textContent = message;
+        alertSuccess.classList.add('show');
+      } else if (type === 'error') {
+        errorMessage.textContent = message;
+        alertError.classList.add('show');
+      } else if (type === 'warning') {
+        warningMessage.textContent = message;
+        alertWarning.classList.add('show');
+      }
+    }
+
+    // ========== Local Storage Functions ==========
+    function saveToLocalStorage(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (error) {
+        console.error('Error saving to localStorage:', error);
+      }
+    }
+
+    function getFromLocalStorage(key) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+      } catch (error) {
+        console.error('Error reading from localStorage:', error);
+        return null;
+      }
+    }
+
+    // ========== Form Validation ==========
+    function validateForm() {
+      clearAllErrors();
+      let isValid = true;
+
+      // Validate Email
+      const email = document.getElementById('email').value.trim();
+      if (!email) {
+        showError('email', 'Email is required');
+        isValid = false;
+      } else if (!validateEmail(email)) {
+        showError('email', 'Please enter a valid email address');
+        isValid = false;
+      }
+
+      // Validate Password
+      const password = document.getElementById('password').value;
+      if (!password) {
+        showError('password', 'Password is required');
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    // ========== Form Submission Handler ==========
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!validateForm()) {
+        return;
+      }
+
+      // Prepare login data
+      const loginData = {
+        email: document.getElementById('email').value.trim().toLowerCase(),
+        password: document.getElementById('password').value
+      };
+
+      const rememberMe = document.getElementById('rememberMe').checked;
+
+      // Show loading state
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = 'Verifying... <span class="spinner"></span>';
+      loadingOverlay.classList.add('show');
+
+      try {
+        console.log('Attempting admin login...');
+
+        const response = await fetch(`${API_BASE_URL}/auth/admin/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loginData)
+        });
+
+        const data = await response.json();
+        console.log('Admin login response:', data);
+
+        if (response.ok && data.success) {
+          // Login successful
+          showAlert('success', 'Login successful! Redirecting to admin dashboard...');
+          
+          // Save admin data and token to localStorage
+          saveToLocalStorage('psnToken', data.data.token);
+          saveToLocalStorage('psnUser', data.data.admin);
+          saveToLocalStorage('psnUserRole', 'admin');
+          
+          // Save email if remember me is checked
+          if (rememberMe) {
+            saveToLocalStorage('psnAdminRememberedEmail', loginData.email);
+          } else {
+            localStorage.removeItem('psnAdminRememberedEmail');
+          }
+          
+          // Redirect to admin dashboard after 1 second
+          setTimeout(() => {
+            window.location.href = '/admin-dashboard.html';
+          }, 1000);
+        } else {
+          // Login failed
+          if (data.message && data.message.includes('locked')) {
+            // Account locked
+            showAlert('warning', data.message);
+          } else if (data.message && data.message.includes('inactive')) {
+            // Account inactive
+            showAlert('error', 'Your admin account is inactive. Please contact the super admin.');
+          } else {
+            // Invalid credentials
+            showAlert('error', data.message || 'Invalid email or password. Please try again.');
+          }
+          
+          // Show field-specific errors if available
+          if (data.errors && Array.isArray(data.errors)) {
+            data.errors.forEach(error => {
+              if (error.field) {
+                showError(error.field, error.message);
+              }
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Admin login error:', error);
+        showAlert('error', 'Network error. Please check your internet connection and try again.');
+      } finally {
+        // Reset button state
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = 'Login as Admin';
+        loadingOverlay.classList.remove('show');
+      }
+    });
+
+    // ========== Real-time Field Validation ==========
+    
+    // Email validation on blur
+    document.getElementById('email').addEventListener('blur', function() {
+      const email = this.value.trim();
+      if (email && !validateEmail(email)) {
+        showError('email', 'Please enter a valid email address');
+      } else if (email) {
+        clearError('email');
+      }
+    });
+
+    // Clear errors when user starts typing
+    document.getElementById('email').addEventListener('input', function() {
+      if (this.value) {
+        clearError('email');
+        alertError.classList.remove('show');
+        alertWarning.classList.remove('show');
+      }
+    });
+
+    document.getElementById('password').addEventListener('input', function() {
+      if (this.value) {
+        clearError('password');
+        alertError.classList.remove('show');
+        alertWarning.classList.remove('show');
+      }
+    });
+
+    // ========== Load Remembered Email ==========
+    window.addEventListener('DOMContentLoaded', () => {
+      const rememberedEmail = getFromLocalStorage('psnAdminRememberedEmail');
+      
+      if (rememberedEmail) {
+        document.getElementById('email').value = rememberedEmail;
+        document.getElementById('rememberMe').checked = true;
+      }
+
+      // Check if admin is already logged in
+      const token = getFromLocalStorage('psnToken');
+      const userRole = getFromLocalStorage('psnUserRole');
+      
+      if (token && userRole === 'admin') {
+        console.log('Admin already logged in, redirecting to dashboard...');
+        window.location.href = '/admin-dashboard.html';
+      }
+
+      console.log('✅ Admin login form initialized successfully');
+    });
+
+    // ========== Enter Key Support ==========
+    document.getElementById('password').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        form.dispatchEvent(new Event('submit'));
+      }
+    });
+
+    // ========== Security Warning ==========
+    let warningShown = false;
+    
+    // Show warning if too many failed attempts (simulated)
+    let failedAttempts = 0;
+    
+    form.addEventListener('submit', () => {
+      // This will be tracked by the backend, but we can show client-side warning
+      if (failedAttempts >= 3 && !warningShown) {
+        showAlert('warning', 'Multiple failed login attempts detected. Your account may be locked after 5 failed attempts.');
+        warningShown = true;
+      }
+    });
+
+    // Track failed attempts
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'psnToken' && !e.newValue) {
+        // Token was removed (logout or failed login)
+        failedAttempts++;
+      }
+    });
+
+    console.log('✅ Admin login page loaded successfully');
+  </script>
+</body>
+</html>
