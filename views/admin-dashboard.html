@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Admin dashboard for PSN Taraba State Welfare Registry">
+  <title>Admin Dashboard - PSN Taraba Welfare Registry</title>
+  
+  <style>
+    /* ========== CSS Variables ========== */
+    :root {
+      --primary-color: #1e40af;
+      --primary-dark: #1e3a8a;
+      --primary-light: #3b82f6;
+      --secondary-color: #059669;
+      --danger-color: #dc2626;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --info-color: #3b82f6;
+      --dark: #1f2937;
+      --gray: #6b7280;
+      --gray-light: #d1d5db;
+      --gray-lighter: #f3f4f6;
+      --white: #ffffff;
+      --spacing-xs: 0.25rem;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-2xl: 3rem;
+      --radius-sm: 0.25rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: var(--gray-lighter);
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-md);
+    }
+
+    /* ========== Navbar ========== */
+    .navbar {
+      background-color: var(--white);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-md) 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+
+    .navbar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .navbar-brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .admin-badge {
+      background-color: var(--warning-color);
+      color: var(--white);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-md);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .navbar-user {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+    }
+
+    .user-info {
+      text-align: right;
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 0.875rem;
+    }
+
+    .user-role {
+      font-size: 0.75rem;
+      color: var(--gray);
+    }
+
+    .btn-logout {
+      padding: var(--spacing-sm) var(--spacing-md);
+      background-color: var(--danger-color);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.875rem;
+    }
+
+    .btn-logout:hover {
+      background-color: #b91c1c;
+      transform: translateY(-1px);
+    }
+
+    /* ========== Page Header ========== */
+    .page-header {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      color: var(--white);
+      padding: var(--spacing-xl) 0;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .page-header p {
+      margin: var(--spacing-sm) 0 0 0;
+      opacity: 0.9;
+    }
+
+    /* ========== Stats Grid ========== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .stat-card {
+      background-color: var(--white);
+      padding: var(--spacing-xl);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary-color);
+    }
+
+    .stat-card.success::before {
+      background: var(--success-color);
+    }
+
+    .stat-card.warning::before {
+      background: var(--warning-color);
+    }
+
+    .stat-card.danger::before {
+      background: var(--danger-color);
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      background-color: var(--gray-lighter);
+    }
+
+    .stat-icon.primary {
+      background-color: rgba(30, 64, 175, 0.1);
+    }
+
+    .stat-icon.success {
+      background-color: rgba(5, 150, 105, 0.1);
+    }
+
+    .stat-icon.warning {
+      background-color: rgba(245, 158, 11, 0.1);
+    }
+
+    .stat-icon.danger {
+      background-color: rgba(220, 38, 38, 0.1);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .stat-label {
+      color: var(--gray);
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .stat-change {
+      font-size: 0.75rem;
+      margin-top: var(--spacing-sm);
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+    }
+
+    .stat-change.positive {
+      background-color: rgba(5, 150, 105, 0.1);
+      color: var(--success-color);
+    }
+
+    /* ========== Cards ========== */
+    .card {
+      background-color: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-xl);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 2px solid var(--gray-lighter);
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin: 0;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+    }
+
+    /* ========== Buttons ========== */
+    .btn {
+      display: inline-block;
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: var(--font-sans);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: var(--white);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary-color);
+      color: var(--white);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #047857;
+    }
+
+    .btn-danger {
+      background-color: var(--danger-color);
+      color: var(--white);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background-color: #b91c1c;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      background-color: var(--primary-color);
+      color: var(--white);
+    }
+
+    .btn-sm {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.75rem;
+    }
+
+    /* ========== Alerts ========== */
+    .alert {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-lg);
+      border-left: 4px solid;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert-success {
+      background-color: #d1fae5;
+      border-left-color: var(--success-color);
+      color: #065f46;
+    }
+
+    .alert-error {
+      background-color: #fee2e2;
+      border-left-color: var(--danger-color);
+      color: #991b1b;
+    }
+
+    .alert-info {
+      background-color: #dbeafe;
+      border-left-color: var(--info-color);
+      color: #1e3a8a;
+    }
+
+    /* ========== Search & Filter ========== */
+    .search-bar {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 250px;
+      padding: var(--spacing-md);
+      border: 2px solid var(--gray-light);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .filter-select {
+      padding: var(--spacing-md);
+      border: 2px solid var(--gray-light);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      background-color: var(--white);
+      cursor: pointer;
+    }
+
+    /* ========== Table ========== */
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-lighter);
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--white);
+    }
+
+    .table thead {
+      background-color: var(--gray-lighter);
+    }
+
+    .table th {
+      padding: var(--spacing-md);
+      text-align: left;
+      font-weight: 700;
+      color: var(--dark);
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .table td {
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--gray-lighter);
+      font-size: 0.875rem;
+    }
+
+    .table tbody tr:hover {
+      background-color: var(--gray-lighter);
+    }
+
+    .table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-empty {
+      text-align: center;
+      padding: var(--spacing-2xl);
+      color: var(--gray);
+    }
+
+    /* ========== Badge ========== */
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+    }
+
+    .badge-success {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-warning {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-danger {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-info {
+      background-color: #dbeafe;
+      color: #1e3a8a;
+    }
+
+    /* ========== Loading States ========== */
+    .skeleton {
+      background: linear-gradient(90deg, var(--gray-lighter) 25%, #e5e7eb 50%, var(--gray-lighter) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+      border-radius: var(--radius-md);
+      height: 20px;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .loading-overlay.show {
+      display: flex;
+    }
+
+    .loading-content {
+      background-color: var(--white);
+      padding: var(--spacing-xl);
+      border-radius: var(--radius-lg);
+      text-align: center;
+    }
+
+    .loading-spinner {
+      border: 4px solid var(--gray-light);
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto var(--spacing-md);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ========== Pagination ========== */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-lg);
+    }
+
+    .pagination-btn {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border: 1px solid var(--gray-light);
+      background-color: var(--white);
+      color: var(--dark);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.875rem;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background-color: var(--primary-color);
+      color: var(--white);
+      border-color: var(--primary-color);
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-btn.active {
+      background-color: var(--primary-color);
+      color: var(--white);
+      border-color: var(--primary-color);
+    }
+
+    .pagination-info {
+      font-size: 0.875rem;
+      color: var(--gray);
+    }
+
+    /* ========== Utilities ========== */
+    .text-center {
+      text-align: center;
+    }
+
+    .text-muted {
+      color: var(--gray);
+    }
+
+    .mt-2 {
+      margin-top: var(--spacing-md);
+    }
+
+    .mb-3 {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .d-none {
+      display: none;
+    }
+
+    .d-flex {
+      display: flex;
+    }
+
+    .gap-2 {
+      gap: var(--spacing-md);
+    }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 768px) {
+      .navbar-content {
+        flex-direction: column;
+      }
+
+      .navbar-user {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: var(--spacing-md);
+      }
+
+      .page-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .table {
+        font-size: 0.75rem;
+      }
+
+      .table th,
+      .table td {
+        padding: var(--spacing-sm);
+      }
+
+      .search-bar {
+        flex-direction: column;
+      }
+
+      .search-input {
+        min-width: 100%;
+      }
+
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+      }
+
+      .card-actions {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container navbar-content">
+      <div class="navbar-left">
+        <a href="/admin-dashboard.html" class="navbar-brand">PSN Taraba Welfare</a>
+        <span class="admin-badge">Admin Panel</span>
+      </div>
+      <div class="navbar-user">
+        <div class="user-info">
+          <div class="user-name" id="adminName">Loading...</div>
+          <div class="user-role" id="adminRole">Administrator</div>
+        </div>
+        <button class="btn-logout" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="container">
+      <h1>Admin Dashboard</h1>
+      <p>Manage PSN Taraba State welfare system</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container" style="padding-bottom: 3rem;">
+    <!-- Alert Messages -->
+    <div id="alertSuccess" class="alert alert-success">
+      <strong>Success!</strong> <span id="successMessage"></span>
+    </div>
+    <div id="alertError" class="alert alert-error">
+      <strong>Error!</strong> <span id="errorMessage"></span>
+    </div>
+    <div id="alertInfo" class="alert alert-info">
+      <strong>Info!</strong> <span id="infoMessage"></span>
+    </div>
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">
+          <div>
+            <div class="stat-value" id="totalMembers">0</div>
+            <div class="stat-label">Total Members</div>
+          </div>
+          <div class="stat-icon primary">👥</div>
+        </div>
+        <div class="stat-change positive" id="memberChange">
+          <span>+0 this month</span>
+        </div>
+      </div>
+
+      <div class="stat-card success">
+        <div class="stat-header">
+          <div>
+            <div class="stat-value" id="activeMembers">0</div>
+            <div class="stat-label">Active Members</div>
+          </div>
+          <div class="stat-icon success">✓</div>
+        </div>
+        <div class="stat-change positive">
+          <span>All verified</span>
+        </div>
+      </div>
+
+      <div class="stat-card warning">
+        <div class="stat-header">
+          <div>
+            <div class="stat-value" id="upcomingEvents">0</div>
+            <div class="stat-label">Upcoming Events</div>
+          </div>
+          <div class="stat-icon warning">🎉</div>
+        </div>
+        <div class="stat-change positive">
+          <span>Next 30 days</span>
+        </div>
+      </div>
+
+      <div class="stat-card danger">
+        <div class="stat-header">
+          <div>
+            <div class="stat-value" id="todayEvents">0</div>
+            <div class="stat-label">Events Today</div>
+          </div>
+          <div class="stat-icon danger">📅</div>
+        </div>
+        <div class="stat-change positive">
+          <span>Requires attention</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <h2 class="card-title">Quick Actions</h2>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <button class="btn btn-primary" id="exportDataBtn">
+          📊 Export Member Data
+        </button>
+        <button class="btn btn-secondary" id="viewReportsBtn">
+          📈 View Reports
+        </button>
+        <button class="btn btn-outline" id="sendBulkReminderBtn">
+          📧 Send Bulk Reminder
+        </button>
+        <button class="btn btn-outline" id="systemSettingsBtn">
+          ⚙️ System Settings
+        </button>
+      </div>
+    </div>
+
+    <!-- Members List -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Registered Members</h2>
+        <div class="card-actions">
+          <button class="btn btn-primary btn-sm" id="refreshMembersBtn">
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Search and Filter -->
+      <div class="search-bar">
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="Search by name, email, or PSN number..."
+        >
+        <select id="filterLG" class="filter-select">
+          <option value="">All Local Governments</option>
+          <option value="Ardo Kola">Ardo Kola</option>
+          <option value="Bali">Bali</option>
+          <option value="Donga">Donga</option>
+          <option value="Gashaka">Gashaka</option>
+          <option value="Gassol">Gassol</option>
+          <option value="Ibi">Ibi</option>
+          <option value="Jalingo">Jalingo</option>
+          <option value="Karim Lamido">Karim Lamido</option>
+          <option value="Kurmi">Kurmi</option>
+          <option value="Lau">Lau</option>
+          <option value="Sardauna">Sardauna</option>
+          <option value="Takum">Takum</option>
+          <option value="Ussa">Ussa</option>
+          <option value="Wukari">Wukari</option>
+          <option value="Yorro">Yorro</option>
+          <option value="Zing">Zing</option>
+        </select>
+        <select id="filterStatus" class="filter-select">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+
+      <!-- Members Table -->
+      <div class="table-container">
+        <table class="table" id="membersTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>PSN Number</th>
+              <th>Local Government</th>
+              <th>Registration Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="membersTableBody">
+            <tr>
+              <td colspan="8" class="table-empty">Loading members...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination">
+        <button class="pagination-btn" id="prevPageBtn" disabled>← Previous</button>
+        <span class="pagination-info" id="pageInfo">Page 1 of 1</span>
+        <button class="pagination-btn" id="nextPageBtn" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Recent Activity</h2>
+      </div>
+      <div id="recentActivity">
+        <div style="padding: 2rem; text-align: center; color: var(--gray);">
+          <p>No recent activity</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p id="loadingText">Loading...</p>
+    </div>
+  </div>
+
+  <!-- Member Details Modal (Simple) -->
+  <div id="memberModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 2rem; border-radius: 0.75rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="margin: 0; font-size: 1.5rem;">Member Details</h2>
+        <button id="closeMemberModal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray);">×</button>
+      </div>
+      <div id="memberModalContent">
+        <!-- Member details will be loaded here -->
+      </div>
+    </div>
+  </div>
+  <!-- JavaScript -->
+  <script>
+    // ========== Configuration ==========
+    const API_BASE_URL = 'http://localhost:5000/api';
+
+    // ========== Global Variables ==========
+    let currentAdmin = null;
+    let authToken = null;
+    let allMembers = [];
+    let filteredMembers = [];
+    let currentPage = 1;
+    let membersPerPage = 10;
+
+    // ========== Get Elements ==========
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertError = document.getElementById('alertError');
+    const alertInfo = document.getElementById('alertInfo');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    const infoMessage = document.getElementById('infoMessage');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const refreshMembersBtn = document.getElementById('refreshMembersBtn');
+    const searchInput = document.getElementById('searchInput');
+    const filterLG = document.getElementById('filterLG');
+    const filterStatus = document.getElementById('filterStatus');
+    const exportDataBtn = document.getElementById('exportDataBtn');
+    const viewReportsBtn = document.getElementById('viewReportsBtn');
+    const sendBulkReminderBtn = document.getElementById('sendBulkReminderBtn');
+    const systemSettingsBtn = document.getElementById('systemSettingsBtn');
+    const memberModal = document.getElementById('memberModal');
+    const closeMemberModal = document.getElementById('closeMemberModal');
+
+    // ========== Local Storage Functions ==========
+    function getFromLocalStorage(key) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+      } catch (error) {
+        console.error('Error reading from localStorage:', error);
+        return null;
+      }
+    }
+
+    function removeFromLocalStorage(key) {
+      try {
+        localStorage.removeItem(key);
+      } catch (error) {
+        console.error('Error removing from localStorage:', error);
+      }
+    }
+
+    // ========== Alert Functions ==========
+    function showAlert(type, message) {
+      alertSuccess.classList.remove('show');
+      alertError.classList.remove('show');
+      alertInfo.classList.remove('show');
+      
+      if (type === 'success') {
+        successMessage.textContent = message;
+        alertSuccess.classList.add('show');
+      } else if (type === 'error') {
+        errorMessage.textContent = message;
+        alertError.classList.add('show');
+      } else if (type === 'info') {
+        infoMessage.textContent = message;
+        alertInfo.classList.add('show');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      setTimeout(() => {
+        alertSuccess.classList.remove('show');
+        alertError.classList.remove('show');
+        alertInfo.classList.remove('show');
+      }, 5000);
+    }
+
+    // ========== Loading Functions ==========
+    function showLoading(text = 'Loading...') {
+      loadingText.textContent = text;
+      loadingOverlay.classList.add('show');
+    }
+
+    function hideLoading() {
+      loadingOverlay.classList.remove('show');
+    }
+
+    // ========== Authentication Check ==========
+    function checkAuthentication() {
+      authToken = getFromLocalStorage('psnToken');
+      currentAdmin = getFromLocalStorage('psnUser');
+      const userRole = getFromLocalStorage('psnUserRole');
+
+      if (!authToken || !currentAdmin || userRole !== 'admin') {
+        console.log('Not authenticated as admin, redirecting to login...');
+        window.location.href = '/admin-login.html';
+        return false;
+      }
+
+      return true;
+    }
+
+    // ========== API Request Helper ==========
+    async function apiRequest(endpoint, options = {}) {
+      try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+          ...options,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,
+            ...options.headers
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.status === 401) {
+          showAlert('error', 'Session expired. Please login again.');
+          setTimeout(() => {
+            logout();
+          }, 2000);
+          return null;
+        }
+
+        return { response, data };
+      } catch (error) {
+        console.error('API request error:', error);
+        showAlert('error', 'Network error. Please check your connection.');
+        return null;
+      }
+    }
+
+    // ========== Format Date Functions ==========
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    }
+
+    function formatDateTime(dateString) {
+      const date = new Date(dateString);
+      const options = { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      return date.toLocaleDateString('en-US', options);
+    }
+
+    // ========== Load Admin Data ==========
+    async function loadAdminData() {
+      try {
+        const result = await apiRequest('/auth/me');
+        
+        if (result && result.data.success) {
+          currentAdmin = result.data.data.user;
+          
+          document.getElementById('adminName').textContent = currentAdmin.fullName;
+          document.getElementById('adminRole').textContent = currentAdmin.role || 'Administrator';
+          
+          return true;
+        } else {
+          showAlert('error', 'Failed to load admin data');
+          return false;
+        }
+      } catch (error) {
+        console.error('Error loading admin data:', error);
+        showAlert('error', 'Failed to load admin data');
+        return false;
+      }
+    }
+
+    // ========== Load Members (Placeholder - No API Yet) ==========
+    async function loadMembers() {
+      try {
+        // Since we don't have a members list API yet, we'll create placeholder data
+        // In production, this would be: const result = await apiRequest('/admin/members');
+        
+        // Simulate loading
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Placeholder data - in production, this comes from API
+        allMembers = [
+          {
+            _id: '1',
+            fullName: 'Ahmed Ibrahim',
+            email: 'ahmed.ibrahim@example.com',
+            phoneNumber: '08012345678',
+            psnMembershipNumber: 'PSN12345',
+            localGovernment: 'Jalingo',
+            registrationDate: new Date().toISOString(),
+            isActive: true
+          },
+          {
+            _id: '2',
+            fullName: 'Fatima Suleiman',
+            email: 'fatima.suleiman@example.com',
+            phoneNumber: '08098765432',
+            psnMembershipNumber: 'PSN12346',
+            localGovernment: 'Wukari',
+            registrationDate: new Date().toISOString(),
+            isActive: true
+          }
+        ];
+
+        filteredMembers = [...allMembers];
+        updateStats();
+        displayMembers();
+        
+        return true;
+      } catch (error) {
+        console.error('Error loading members:', error);
+        showAlert('error', 'Failed to load members');
+        return false;
+      }
+    }
+
+    // ========== Update Statistics ==========
+    function updateStats() {
+      const totalMembers = allMembers.length;
+      const activeMembers = allMembers.filter(m => m.isActive).length;
+      
+      document.getElementById('totalMembers').textContent = totalMembers;
+      document.getElementById('activeMembers').textContent = activeMembers;
+      document.getElementById('upcomingEvents').textContent = '0';
+      document.getElementById('todayEvents').textContent = '0';
+      document.getElementById('memberChange').innerHTML = `<span>+${totalMembers} this month</span>`;
+    }
+
+    // ========== Display Members ==========
+    function displayMembers() {
+      const tableBody = document.getElementById('membersTableBody');
+      
+      if (filteredMembers.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="8" class="table-empty">
+              <p>No members found</p>
+              <p class="text-muted" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                Try adjusting your search or filters
+              </p>
+            </td>
+          </tr>
+        `;
+        updatePagination();
+        return;
+      }
+
+      // Calculate pagination
+      const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
+      const startIndex = (currentPage - 1) * membersPerPage;
+      const endIndex = startIndex + membersPerPage;
+      const paginatedMembers = filteredMembers.slice(startIndex, endIndex);
+
+      // Display members
+      tableBody.innerHTML = paginatedMembers.map(member => `
+        <tr>
+          <td><strong>${member.fullName}</strong></td>
+          <td>${member.email}</td>
+          <td>${member.phoneNumber}</td>
+          <td><span class="badge badge-info">${member.psnMembershipNumber}</span></td>
+          <td>${member.localGovernment}</td>
+          <td>${formatDate(member.registrationDate)}</td>
+          <td>
+            <span class="badge ${member.isActive ? 'badge-success' : 'badge-danger'}">
+              ${member.isActive ? 'Active' : 'Inactive'}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-primary" onclick="viewMemberDetails('${member._id}')">
+              View
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      updatePagination();
+    }
+
+    // ========== Update Pagination ==========
+    function updatePagination() {
+      const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
+      const pageInfo = document.getElementById('pageInfo');
+      const prevBtn = document.getElementById('prevPageBtn');
+      const nextBtn = document.getElementById('nextPageBtn');
+
+      pageInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+    }
+
+    // ========== Search and Filter ==========
+    function applyFilters() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      const lgFilter = filterLG.value;
+      const statusFilter = filterStatus.value;
+
+      filteredMembers = allMembers.filter(member => {
+        const matchesSearch = !searchTerm || 
+          member.fullName.toLowerCase().includes(searchTerm) ||
+          member.email.toLowerCase().includes(searchTerm) ||
+          member.psnMembershipNumber.toLowerCase().includes(searchTerm);
+
+        const matchesLG = !lgFilter || member.localGovernment === lgFilter;
+
+        const matchesStatus = !statusFilter || 
+          (statusFilter === 'active' && member.isActive) ||
+          (statusFilter === 'inactive' && !member.isActive);
+
+        return matchesSearch && matchesLG && matchesStatus;
+      });
+
+      currentPage = 1;
+      displayMembers();
+    }
+
+    // ========== View Member Details ==========
+    window.viewMemberDetails = function(memberId) {
+      const member = allMembers.find(m => m._id === memberId);
+      
+      if (!member) {
+        showAlert('error', 'Member not found');
+        return;
+      }
+
+      const modalContent = document.getElementById('memberModalContent');
+      modalContent.innerHTML = `
+        <div style="display: grid; gap: 1rem;">
+          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Full Name</div>
+            <div style="font-weight: 600;">${member.fullName}</div>
+          </div>
+          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Email</div>
+            <div style="font-weight: 600;">${member.email}</div>
+          </div>
+          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Phone Number</div>
+            <div style="font-weight: 600;">${member.phoneNumber}</div>
+          </div>
+          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">PSN Membership Number</div>
+            <div style="font-weight: 600;">${member.psnMembershipNumber}</div>
+          </div>
+          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Local Government</div>
+            <div style="font-weight: 600;">${member.localGovernment}</div>
+          </div>
+          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Registration Date</div>
+            <div style="font-weight: 600;">${formatDate(member.registrationDate)}</div>
+          </div>
+          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Status</div>
+            <div>
+              <span class="badge ${member.isActive ? 'badge-success' : 'badge-danger'}">
+                ${member.isActive ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      memberModal.style.display = 'flex';
+    };
+
+    // ========== Close Modal ==========
+    closeMemberModal.addEventListener('click', () => {
+      memberModal.style.display = 'none';
+    });
+
+    memberModal.addEventListener('click', (e) => {
+      if (e.target === memberModal) {
+        memberModal.style.display = 'none';
+      }
+    });
+
+    // ========== Export Data ==========
+    exportDataBtn.addEventListener('click', () => {
+      if (allMembers.length === 0) {
+        showAlert('info', 'No data to export');
+        return;
+      }
+
+      // Create CSV content
+      const headers = ['Name', 'Email', 'Phone', 'PSN Number', 'Local Government', 'Registration Date', 'Status'];
+      const csvContent = [
+        headers.join(','),
+        ...allMembers.map(m => [
+          m.fullName,
+          m.email,
+          m.phoneNumber,
+          m.psnMembershipNumber,
+          m.localGovernment,
+          formatDate(m.registrationDate),
+          m.isActive ? 'Active' : 'Inactive'
+        ].join(','))
+      ].join('\n');
+
+      // Download CSV
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `psn-members-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+
+      showAlert('success', 'Member data exported successfully');
+    });
+
+    // ========== Quick Action Placeholders ==========
+    viewReportsBtn.addEventListener('click', () => {
+      showAlert('info', 'Reports feature coming soon!');
+    });
+
+    sendBulkReminderBtn.addEventListener('click', () => {
+      showAlert('info', 'Bulk reminder feature coming soon!');
+    });
+
+    systemSettingsBtn.addEventListener('click', () => {
+      showAlert('info', 'System settings feature coming soon!');
+    });
+
+    // ========== Pagination Handlers ==========
+    document.getElementById('prevPageBtn').addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        displayMembers();
+      }
+    });
+
+    document.getElementById('nextPageBtn').addEventListener('click', () => {
+      const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        displayMembers();
+      }
+    });
+
+    // ========== Search and Filter Event Listeners ==========
+    searchInput.addEventListener('input', applyFilters);
+    filterLG.addEventListener('change', applyFilters);
+    filterStatus.addEventListener('change', applyFilters);
+
+    // ========== Refresh Members ==========
+    refreshMembersBtn.addEventListener('click', async () => {
+      showLoading('Refreshing members...');
+      await loadMembers();
+      hideLoading();
+      showAlert('success', 'Members list refreshed');
+    });
+
+    // ========== Logout Function ==========
+    function logout() {
+      removeFromLocalStorage('psnToken');
+      removeFromLocalStorage('psnUser');
+      removeFromLocalStorage('psnUserRole');
+      window.location.href = '/admin-login.html';
+    }
+
+    logoutBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to logout?')) {
+        logout();
+      }
+    });
+
+    // ========== Initialize Dashboard ==========
+    async function initializeDashboard() {
+      if (!checkAuthentication()) {
+        return;
+      }
+
+      console.log('✅ Admin authenticated, loading dashboard...');
+
+      showLoading('Loading admin dashboard...');
+
+      try {
+        const adminLoaded = await loadAdminData();
+        
+        if (!adminLoaded) {
+          hideLoading();
+          return;
+        }
+
+        await loadMembers();
+
+        showAlert('success', `Welcome back, ${currentAdmin.fullName}!`);
+
+      } catch (error) {
+        console.error('Dashboard initialization error:', error);
+        showAlert('error', 'Failed to load dashboard. Please try refreshing the page.');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // ========== Page Load ==========
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('Admin dashboard page loaded');
+      initializeDashboard();
+    });
+
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        checkAuthentication();
+      }
+    });
+
+    console.log('✅ Admin dashboard script loaded successfully');
+  </script>
+</body>
+</html>
