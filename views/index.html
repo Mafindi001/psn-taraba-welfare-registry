@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PSN Taraba State Welfare Digital Registry - Automated welfare management system for pharmacists">
+  <title>PSN Taraba Welfare Registry - Home</title>
+  
+  <style>
+    /* ========== CSS Variables ========== */
+    :root {
+      --primary-color: #1e40af;
+      --primary-dark: #1e3a8a;
+      --primary-light: #3b82f6;
+      --secondary-color: #059669;
+      --secondary-dark: #047857;
+      --danger-color: #dc2626;
+      --warning-color: #f59e0b;
+      --success-color: #10b981;
+      --info-color: #3b82f6;
+      
+      --dark: #1f2937;
+      --gray-dark: #4b5563;
+      --gray: #6b7280;
+      --gray-light: #d1d5db;
+      --gray-lighter: #f3f4f6;
+      --white: #ffffff;
+      
+      --spacing-xs: 0.25rem;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-2xl: 3rem;
+      
+      --radius-sm: 0.25rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    /* ========== Reset & Base Styles ========== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: var(--gray-lighter);
+      min-height: 100vh;
+    }
+
+    /* ========== Typography ========== */
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: var(--spacing-md);
+      color: var(--dark);
+    }
+
+    h1 { font-size: 2.25rem; }
+    h2 { font-size: 1.875rem; }
+    h3 { font-size: 1.5rem; }
+    h4 { font-size: 1.25rem; }
+
+    p {
+      margin-bottom: var(--spacing-md);
+    }
+
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    /* ========== Container ========== */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-md);
+    }
+
+    .container-sm {
+      max-width: 600px;
+    }
+
+    /* ========== Navbar ========== */
+    .navbar {
+      background-color: var(--white);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-md) 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+
+    .navbar-brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .navbar-brand:hover {
+      color: var(--primary-dark);
+      text-decoration: none;
+    }
+
+    .navbar-menu {
+      display: flex;
+      list-style: none;
+      gap: var(--spacing-lg);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .navbar-link {
+      color: var(--dark);
+      font-weight: 500;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-md);
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .navbar-link:hover {
+      background-color: var(--gray-lighter);
+      text-decoration: none;
+    }
+
+    /* ========== Hero Section ========== */
+    .hero {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      color: var(--white);
+      padding: var(--spacing-2xl) 0;
+      text-align: center;
+    }
+
+    .hero h1 {
+      color: var(--white);
+      margin-bottom: var(--spacing-lg);
+      font-size: 2.5rem;
+    }
+
+    .hero p {
+      font-size: 1.125rem;
+      margin-bottom: var(--spacing-xl);
+      opacity: 0.9;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ========== Buttons ========== */
+    .btn {
+      display: inline-block;
+      padding: var(--spacing-md) var(--spacing-xl);
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: var(--font-sans);
+    }
+
+    .btn:hover {
+      text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-white {
+      background-color: white;
+      color: var(--primary-color);
+    }
+
+    .btn-white:hover {
+      background-color: var(--gray-lighter);
+      color: var(--primary-dark);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 2px solid white;
+      color: white;
+    }
+
+    .btn-outline:hover {
+      background-color: white;
+      color: var(--primary-color);
+    }
+
+    .btn-lg {
+      padding: var(--spacing-lg) var(--spacing-2xl);
+      font-size: 1.125rem;
+    }
+
+    .btn-block {
+      display: block;
+      width: 100%;
+    }
+
+    /* ========== Cards ========== */
+    .card {
+      background-color: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-xl);
+      margin-bottom: var(--spacing-lg);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    /* ========== Grid ========== */
+    .grid {
+      display: grid;
+      gap: var(--spacing-lg);
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* ========== Sections ========== */
+    .section {
+      padding: 3rem 0;
+    }
+
+    .section-white {
+      background-color: white;
+    }
+
+    /* ========== Utility Classes ========== */
+    .text-center {
+      text-align: center;
+    }
+
+    .text-muted {
+      color: var(--gray);
+    }
+
+    .mb-4 {
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .mt-3 {
+      margin-top: var(--spacing-lg);
+    }
+
+    /* ========== Feature Icons ========== */
+    .feature-icon {
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .icon-primary {
+      color: var(--primary-color);
+    }
+
+    .icon-secondary {
+      color: var(--secondary-color);
+    }
+
+    .icon-warning {
+      color: var(--warning-color);
+    }
+
+    /* ========== Lists ========== */
+    .feature-list {
+      list-style: disc;
+      margin-left: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-list li {
+      margin-bottom: 0.5rem;
+    }
+
+    /* ========== Footer ========== */
+    .footer {
+      background-color: var(--dark);
+      color: var(--white);
+      padding: var(--spacing-xl) 0;
+      margin-top: var(--spacing-2xl);
+      text-align: center;
+    }
+
+    .footer p {
+      margin: 0;
+      opacity: 0.8;
+    }
+
+    .footer-small {
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+
+    /* ========== Responsive Design ========== */
+    @media (max-width: 768px) {
+      .navbar-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .navbar-menu {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        width: 100%;
+      }
+
+      .navbar-link {
+        display: block;
+        width: 100%;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 1.875rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn-lg {
+        padding: var(--spacing-md) var(--spacing-lg);
+      }
+
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: var(--spacing-md);
+      }
+    }
+
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container navbar-content">
+      <a href="/" class="navbar-brand">PSN Taraba Welfare</a>
+      <ul class="navbar-menu">
+        <li><a href="/" class="navbar-link">Home</a></li>
+        <li><a href="/register.html" class="navbar-link">Register</a></li>
+        <li><a href="/login.html" class="navbar-link">Member Login</a></li>
+        <li><a href="/admin-login.html" class="navbar-link">Admin Login</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1>Welcome to PSN Taraba State Welfare Registry</h1>
+      <p>A secure, digital platform for managing pharmacist welfare and celebrations</p>
+      <div class="hero-buttons">
+        <a href="/register.html" class="btn btn-lg btn-white">Register Now</a>
+        <a href="/login.html" class="btn btn-lg btn-outline">Member Login</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section">
+    <div class="container">
+      <h2 class="text-center mb-4">Platform Features</h2>
+      
+      <div class="grid grid-3">
+        <!-- Feature 1 -->
+        <div class="card">
+          <div class="feature-icon icon-primary">🔒</div>
+          <h3 class="text-center">Secure Registration</h3>
+          <p class="text-center text-muted">
+            Register once with your PSN membership details. Your data is encrypted and protected according to NDPA guidelines.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="card">
+          <div class="feature-icon icon-secondary">🎉</div>
+          <h3 class="text-center">Automated Reminders</h3>
+          <p class="text-center text-muted">
+            Never miss a celebration! Receive email reminders 24 hours before birthdays, anniversaries, and special dates.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="card">
+          <div class="feature-icon icon-warning">📊</div>
+          <h3 class="text-center">Welfare Dashboard</h3>
+          <p class="text-center text-muted">
+            Manage your profile, track special dates, and stay connected with PSN Taraba State Chapter.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="card">
+        <h2 class="text-center">About This Platform</h2>
+        <p>
+          The PSN Taraba State Welfare Digital Registry is an official platform developed to strengthen 
+          the welfare system of the Pharmaceutical Society of Nigeria (PSN) Taraba State Chapter.
+        </p>
+        <p>
+          This system enables all registered pharmacists in Taraba State to:
+        </p>
+        <ul class="feature-list">
+          <li>Self-register and maintain their welfare profile</li>
+          <li>Add important dates (birthdays, anniversaries, etc.)</li>
+          <li>Receive automated celebration reminders</li>
+          <li>Update personal and next-of-kin information</li>
+          <li>Stay connected with the PSN welfare department</li>
+        </ul>
+        <p class="text-muted" style="font-size: 0.875rem;">
+          <strong>Data Protection:</strong> All data collected is handled in compliance with the 
+          Nigeria Data Protection Act (NDPA) and is used solely for PSN welfare purposes.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="section">
+    <div class="container container-sm text-center">
+      <div class="card">
+        <h2>Get Started Today</h2>
+        <p>Join your fellow pharmacists in Taraba State and never miss another celebration.</p>
+        <a href="/register.html" class="btn btn-primary btn-lg btn-block">Register as a Member</a>
+        <p class="mt-3 text-muted">
+          Already registered? <a href="/login.html">Login here</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2024 Pharmaceutical Society of Nigeria (PSN) Taraba State Chapter</p>
+      <p class="footer-small">
+        All rights reserved | Built with care for PSN Taraba pharmacists
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Register as a member of PSN Taraba State Welfare Registry">
+  <title>Member Registration - PSN Taraba Welfare Registry</title>
+  
+  <style>
+    /* ========== CSS Variables ========== */
+    :root {
+      --primary-color: #1e40af;
+      --primary-dark: #1e3a8a;
+      --danger-color: #dc2626;
+      --success-color: #10b981;
+      --dark: #1f2937;
+      --gray: #6b7280;
+      --gray-light: #d1d5db;
+      --gray-lighter: #f3f4f6;
+      --white: #ffffff;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: var(--gray-lighter);
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-md);
+    }
+
+    .container-sm {
+      max-width: 700px;
+    }
+
+    /* ========== Navbar ========== */
+    .navbar {
+      background-color: var(--white);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-md) 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+
+    .navbar-brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .navbar-menu {
+      display: flex;
+      list-style: none;
+      gap: var(--spacing-lg);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .navbar-link {
+      color: var(--dark);
+      font-weight: 500;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-md);
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .navbar-link:hover {
+      background-color: var(--gray-lighter);
+    }
+
+    /* ========== Page Header ========== */
+    .page-header {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      color: var(--white);
+      padding: var(--spacing-xl) 0;
+      text-align: center;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .page-header p {
+      margin: var(--spacing-sm) 0 0 0;
+      opacity: 0.9;
+    }
+
+    /* ========== Cards ========== */
+    .card {
+      background-color: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-xl);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    /* ========== Forms ========== */
+    .form-section {
+      margin-bottom: var(--spacing-xl);
+      padding-bottom: var(--spacing-xl);
+      border-bottom: 2px solid var(--gray-lighter);
+    }
+
+    .form-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .form-section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+      color: var(--dark);
+      font-size: 0.875rem;
+    }
+
+    .form-label-required::after {
+      content: ' *';
+      color: var(--danger-color);
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: var(--spacing-md);
+      border: 2px solid var(--gray-light);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-family: var(--font-sans);
+      transition: all 0.3s ease;
+      background-color: var(--white);
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .form-input.error,
+    .form-select.error {
+      border-color: var(--danger-color);
+    }
+
+    .form-error {
+      color: var(--danger-color);
+      font-size: 0.875rem;
+      margin-top: var(--spacing-sm);
+      display: none;
+    }
+
+    .form-error.show {
+      display: block;
+    }
+
+    .form-help {
+      color: var(--gray);
+      font-size: 0.875rem;
+      margin-top: var(--spacing-sm);
+      display: block;
+    }
+
+    .form-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-md);
+      background-color: var(--gray-lighter);
+      border-radius: var(--radius-md);
+      border: 2px solid var(--gray-light);
+    }
+
+    .form-checkbox input[type="checkbox"] {
+      margin-top: 4px;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .form-checkbox label {
+      cursor: pointer;
+      font-size: 0.875rem;
+      flex: 1;
+    }
+
+    /* ========== Buttons ========== */
+    .btn {
+      display: inline-block;
+      padding: var(--spacing-md) var(--spacing-xl);
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: var(--font-sans);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: var(--white);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-block {
+      display: block;
+      width: 100%;
+    }
+
+    .btn-lg {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      font-size: 1.125rem;
+    }
+
+    /* ========== Alerts ========== */
+    .alert {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-lg);
+      border-left: 4px solid;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert-success {
+      background-color: #d1fae5;
+      border-left-color: var(--success-color);
+      color: #065f46;
+    }
+
+    .alert-error {
+      background-color: #fee2e2;
+      border-left-color: var(--danger-color);
+      color: #991b1b;
+    }
+
+    /* ========== Loading Spinner ========== */
+    .spinner {
+      border: 3px solid var(--gray-light);
+      border-top: 3px solid var(--primary-color);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: var(--spacing-sm);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .loading-overlay.show {
+      display: flex;
+    }
+
+    .loading-content {
+      background-color: var(--white);
+      padding: var(--spacing-xl);
+      border-radius: var(--radius-lg);
+      text-align: center;
+    }
+
+    .loading-spinner {
+      border: 4px solid var(--gray-light);
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto var(--spacing-md);
+    }
+
+    /* ========== Utilities ========== */
+    .text-center {
+      text-align: center;
+    }
+
+    .text-muted {
+      color: var(--gray);
+    }
+
+    .mt-2 {
+      margin-top: var(--spacing-md);
+    }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .navbar-content {
+        flex-direction: column;
+      }
+
+      .navbar-menu {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        width: 100%;
+      }
+
+      .card {
+        padding: var(--spacing-md);
+      }
+
+      .page-header h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container navbar-content">
+      <a href="/" class="navbar-brand">PSN Taraba Welfare</a>
+      <ul class="navbar-menu">
+        <li><a href="/" class="navbar-link">Home</a></li>
+        <li><a href="/register.html" class="navbar-link">Register</a></li>
+        <li><a href="/login.html" class="navbar-link">Member Login</a></li>
+        <li><a href="/admin-login.html" class="navbar-link">Admin Login</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="container">
+      <h1>Member Registration</h1>
+      <p>Join PSN Taraba State Welfare Registry</p>
+    </div>
+  </div>
+
+  <!-- Registration Form -->
+  <div class="container container-sm" style="padding-bottom: 3rem;">
+    <div class="card">
+      <!-- Alert Messages -->
+      <div id="alertSuccess" class="alert alert-success">
+        <strong>Success!</strong> <span id="successMessage"></span>
+      </div>
+      <div id="alertError" class="alert alert-error">
+        <strong>Error!</strong> <span id="errorMessage"></span>
+      </div>
+
+      <form id="registrationForm">
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h3 class="form-section-title">Personal Information</h3>
+          
+          <div class="form-group">
+            <label for="fullName" class="form-label form-label-required">Full Name</label>
+            <input 
+              type="text" 
+              id="fullName" 
+              name="fullName" 
+              class="form-input" 
+              placeholder="Enter your full name"
+              required
+            >
+            <span class="form-error" id="fullNameError"></span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email" class="form-label form-label-required">Email Address</label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                class="form-input" 
+                placeholder="your.email@example.com"
+                required
+              >
+              <span class="form-error" id="emailError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="phoneNumber" class="form-label form-label-required">Phone Number</label>
+              <input 
+                type="tel" 
+                id="phoneNumber" 
+                name="phoneNumber" 
+                class="form-input" 
+                placeholder="08012345678"
+                required
+              >
+              <span class="form-help">Format: 08012345678</span>
+              <span class="form-error" id="phoneNumberError"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="dateOfBirth" class="form-label form-label-required">Date of Birth</label>
+            <input 
+              type="date" 
+              id="dateOfBirth" 
+              name="dateOfBirth" 
+              class="form-input"
+              required
+            >
+            <span class="form-error" id="dateOfBirthError"></span>
+          </div>
+        </div>
+
+        <!-- Password Section -->
+        <div class="form-section">
+          <h3 class="form-section-title">Account Security</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="password" class="form-label form-label-required">Password</label>
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                class="form-input" 
+                placeholder="Enter password"
+                required
+              >
+              <span class="form-help">Minimum 8 characters, include uppercase, lowercase, and number</span>
+              <span class="form-error" id="passwordError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword" class="form-label form-label-required">Confirm Password</label>
+              <input 
+                type="password" 
+                id="confirmPassword" 
+                name="confirmPassword" 
+                class="form-input" 
+                placeholder="Confirm password"
+                required
+              >
+              <span class="form-error" id="confirmPasswordError"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PSN Information Section -->
+        <div class="form-section">
+          <h3 class="form-section-title">PSN Membership Details</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="psnMembershipNumber" class="form-label form-label-required">PSN Membership Number</label>
+              <input 
+                type="text" 
+                id="psnMembershipNumber" 
+                name="psnMembershipNumber" 
+                class="form-input" 
+                placeholder="PSN12345"
+                required
+              >
+              <span class="form-error" id="psnMembershipNumberError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="psnYearOfInduction" class="form-label form-label-required">Year of Induction</label>
+              <input 
+                type="number" 
+                id="psnYearOfInduction" 
+                name="psnYearOfInduction" 
+                class="form-input" 
+                placeholder="2020"
+                min="1960"
+                max="2024"
+                required
+              >
+              <span class="form-error" id="psnYearOfInductionError"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Work & Location Section -->
+        <div class="form-section">
+          <h3 class="form-section-title">Work & Location Details</h3>
+          
+          <div class="form-group">
+            <label for="placeOfWork" class="form-label">Place of Work</label>
+            <input 
+              type="text" 
+              id="placeOfWork" 
+              name="placeOfWork" 
+              class="form-input" 
+              placeholder="Hospital/Pharmacy name (optional)"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="localGovernment" class="form-label form-label-required">Local Government</label>
+            <select id="localGovernment" name="localGovernment" class="form-select" required>
+              <option value="">Select Local Government</option>
+              <option value="Ardo Kola">Ardo Kola</option>
+              <option value="Bali">Bali</option>
+              <option value="Donga">Donga</option>
+              <option value="Gashaka">Gashaka</option>
+              <option value="Gassol">Gassol</option>
+              <option value="Ibi">Ibi</option>
+              <option value="Jalingo">Jalingo</option>
+              <option value="Karim Lamido">Karim Lamido</option>
+              <option value="Kurmi">Kurmi</option>
+              <option value="Lau">Lau</option>
+              <option value="Sardauna">Sardauna</option>
+              <option value="Takum">Takum</option>
+              <option value="Ussa">Ussa</option>
+              <option value="Wukari">Wukari</option>
+              <option value="Yorro">Yorro</option>
+              <option value="Zing">Zing</option>
+            </select>
+            <span class="form-error" id="localGovernmentError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="residentialAddress" class="form-label">Residential Address</label>
+            <input 
+              type="text" 
+              id="residentialAddress" 
+              name="residentialAddress" 
+              class="form-input" 
+              placeholder="Your residential address (optional)"
+            >
+          </div>
+        </div>
+
+        <!-- Next of Kin Section -->
+        <div class="form-section">
+          <h3 class="form-section-title">Next of Kin Information</h3>
+          
+          <div class="form-group">
+            <label for="nextOfKinName" class="form-label form-label-required">Next of Kin Name</label>
+            <input 
+              type="text" 
+              id="nextOfKinName" 
+              name="nextOfKinName" 
+              class="form-input" 
+              placeholder="Full name of next of kin"
+              required
+            >
+            <span class="form-error" id="nextOfKinNameError"></span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nextOfKinRelationship" class="form-label form-label-required">Relationship</label>
+              <input 
+                type="text" 
+                id="nextOfKinRelationship" 
+                name="nextOfKinRelationship" 
+                class="form-input" 
+                placeholder="e.g., Spouse, Sibling, Parent"
+                required
+              >
+              <span class="form-error" id="nextOfKinRelationshipError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="nextOfKinPhoneNumber" class="form-label form-label-required">Next of Kin Phone</label>
+              <input 
+                type="tel" 
+                id="nextOfKinPhoneNumber" 
+                name="nextOfKinPhoneNumber" 
+                class="form-input" 
+                placeholder="08012345678"
+                required
+              >
+              <span class="form-error" id="nextOfKinPhoneNumberError"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Consent Section -->
+        <div class="form-section">
+          <h3 class="form-section-title">Data Consent</h3>
+          
+          <div class="form-checkbox">
+            <input 
+              type="checkbox" 
+              id="dataConsent" 
+              name="dataConsent" 
+              required
+            >
+            <label for="dataConsent">
+              I hereby consent to PSN Taraba State Chapter collecting, storing, and using my personal data 
+              for welfare purposes in accordance with the Nigeria Data Protection Act (NDPA). I understand 
+              that my data will be used solely for welfare management, celebration reminders, and emergency 
+              contact purposes. I can request to view, update, or delete my data at any time.
+            </label>
+          </div>
+          <span class="form-error" id="dataConsentError"></span>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submitBtn" class="btn btn-primary btn-block btn-lg">
+          Register Now
+        </button>
+
+        <p class="text-center text-muted mt-2">
+          Already have an account? <a href="/login.html">Login here</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p>Creating your account...</p>
+    </div>
+  </div>
+  <!-- JavaScript -->
+  <script>
+    // ========== Configuration ==========
+    const API_BASE_URL = 'http://localhost:5000/api';
+
+    // ========== Get Form Elements ==========
+    const form = document.getElementById('registrationForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertError = document.getElementById('alertError');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // ========== Validation Functions ==========
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email.toLowerCase());
+    }
+
+    function validatePhone(phone) {
+      const re = /^(\+234|0)[789][01]\d{8}$/;
+      return re.test(phone);
+    }
+
+    function validatePassword(password) {
+      return password.length >= 8 && 
+             /[a-z]/.test(password) && 
+             /[A-Z]/.test(password) && 
+             /\d/.test(password);
+    }
+
+    function calculateAge(dateOfBirth) {
+      const today = new Date();
+      const birthDate = new Date(dateOfBirth);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      
+      return age;
+    }
+
+    // ========== Error Display Functions ==========
+    function showError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      const errorSpan = document.getElementById(fieldId + 'Error');
+      
+      if (field && errorSpan) {
+        field.classList.add('error');
+        errorSpan.textContent = message;
+        errorSpan.classList.add('show');
+      }
+    }
+
+    function clearError(fieldId) {
+      const field = document.getElementById(fieldId);
+      const errorSpan = document.getElementById(fieldId + 'Error');
+      
+      if (field && errorSpan) {
+        field.classList.remove('error');
+        errorSpan.classList.remove('show');
+        errorSpan.textContent = '';
+      }
+    }
+
+    function clearAllErrors() {
+      const errorFields = [
+        'fullName', 'email', 'phoneNumber', 'dateOfBirth', 
+        'password', 'confirmPassword', 'psnMembershipNumber', 
+        'psnYearOfInduction', 'localGovernment', 'nextOfKinName', 
+        'nextOfKinRelationship', 'nextOfKinPhoneNumber', 'dataConsent'
+      ];
+      
+      errorFields.forEach(field => clearError(field));
+    }
+
+    function showAlert(type, message) {
+      alertSuccess.classList.remove('show');
+      alertError.classList.remove('show');
+      
+      if (type === 'success') {
+        successMessage.textContent = message;
+        alertSuccess.classList.add('show');
+      } else {
+        errorMessage.textContent = message;
+        alertError.classList.add('show');
+      }
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ========== Form Validation ==========
+    function validateForm() {
+      clearAllErrors();
+      let isValid = true;
+
+      // Validate Full Name
+      const fullName = document.getElementById('fullName').value.trim();
+      if (!fullName) {
+        showError('fullName', 'Full name is required');
+        isValid = false;
+      } else if (fullName.length < 3) {
+        showError('fullName', 'Full name must be at least 3 characters');
+        isValid = false;
+      } else if (fullName.length > 100) {
+        showError('fullName', 'Full name cannot exceed 100 characters');
+        isValid = false;
+      }
+
+      // Validate Email
+      const email = document.getElementById('email').value.trim();
+      if (!email) {
+        showError('email', 'Email is required');
+        isValid = false;
+      } else if (!validateEmail(email)) {
+        showError('email', 'Please enter a valid email address');
+        isValid = false;
+      }
+
+      // Validate Phone Number
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
+      if (!phoneNumber) {
+        showError('phoneNumber', 'Phone number is required');
+        isValid = false;
+      } else if (!validatePhone(phoneNumber)) {
+        showError('phoneNumber', 'Please enter a valid Nigerian phone number (e.g., 08012345678)');
+        isValid = false;
+      }
+
+      // Validate Date of Birth
+      const dateOfBirth = document.getElementById('dateOfBirth').value;
+      if (!dateOfBirth) {
+        showError('dateOfBirth', 'Date of birth is required');
+        isValid = false;
+      } else {
+        const age = calculateAge(dateOfBirth);
+        if (age < 18) {
+          showError('dateOfBirth', 'You must be at least 18 years old to register');
+          isValid = false;
+        } else if (age > 100) {
+          showError('dateOfBirth', 'Please enter a valid date of birth');
+          isValid = false;
+        }
+      }
+
+      // Validate Password
+      const password = document.getElementById('password').value;
+      if (!password) {
+        showError('password', 'Password is required');
+        isValid = false;
+      } else if (!validatePassword(password)) {
+        showError('password', 'Password must be at least 8 characters with uppercase, lowercase, and number');
+        isValid = false;
+      }
+
+      // Validate Confirm Password
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      if (!confirmPassword) {
+        showError('confirmPassword', 'Please confirm your password');
+        isValid = false;
+      } else if (password !== confirmPassword) {
+        showError('confirmPassword', 'Passwords do not match');
+        isValid = false;
+      }
+
+      // Validate PSN Membership Number
+      const psnMembershipNumber = document.getElementById('psnMembershipNumber').value.trim();
+      if (!psnMembershipNumber) {
+        showError('psnMembershipNumber', 'PSN membership number is required');
+        isValid = false;
+      }
+
+      // Validate Year of Induction
+      const psnYearOfInduction = document.getElementById('psnYearOfInduction').value;
+      const currentYear = new Date().getFullYear();
+      if (!psnYearOfInduction) {
+        showError('psnYearOfInduction', 'Year of induction is required');
+        isValid = false;
+      } else if (psnYearOfInduction < 1960 || psnYearOfInduction > currentYear) {
+        showError('psnYearOfInduction', `Year must be between 1960 and ${currentYear}`);
+        isValid = false;
+      }
+
+      // Validate Local Government
+      const localGovernment = document.getElementById('localGovernment').value;
+      if (!localGovernment) {
+        showError('localGovernment', 'Please select your local government');
+        isValid = false;
+      }
+
+      // Validate Next of Kin Name
+      const nextOfKinName = document.getElementById('nextOfKinName').value.trim();
+      if (!nextOfKinName) {
+        showError('nextOfKinName', 'Next of kin name is required');
+        isValid = false;
+      }
+
+      // Validate Next of Kin Relationship
+      const nextOfKinRelationship = document.getElementById('nextOfKinRelationship').value.trim();
+      if (!nextOfKinRelationship) {
+        showError('nextOfKinRelationship', 'Relationship is required');
+        isValid = false;
+      }
+
+      // Validate Next of Kin Phone Number
+      const nextOfKinPhoneNumber = document.getElementById('nextOfKinPhoneNumber').value.trim();
+      if (!nextOfKinPhoneNumber) {
+        showError('nextOfKinPhoneNumber', 'Next of kin phone number is required');
+        isValid = false;
+      }
+
+      // Validate Data Consent
+      const dataConsent = document.getElementById('dataConsent').checked;
+      if (!dataConsent) {
+        showError('dataConsent', 'You must consent to data collection to register');
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    // ========== Form Submission Handler ==========
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!validateForm()) {
+        showAlert('error', 'Please fix the errors in the form before submitting');
+        return;
+      }
+
+      // Prepare form data
+      const formData = {
+        fullName: document.getElementById('fullName').value.trim(),
+        email: document.getElementById('email').value.trim().toLowerCase(),
+        password: document.getElementById('password').value,
+        confirmPassword: document.getElementById('confirmPassword').value,
+        phoneNumber: document.getElementById('phoneNumber').value.trim(),
+        dateOfBirth: document.getElementById('dateOfBirth').value,
+        psnMembershipNumber: document.getElementById('psnMembershipNumber').value.trim().toUpperCase(),
+        psnYearOfInduction: parseInt(document.getElementById('psnYearOfInduction').value),
+        placeOfWork: document.getElementById('placeOfWork').value.trim() || undefined,
+        residentialAddress: document.getElementById('residentialAddress').value.trim() || undefined,
+        localGovernment: document.getElementById('localGovernment').value,
+        nextOfKin: {
+          name: document.getElementById('nextOfKinName').value.trim(),
+          relationship: document.getElementById('nextOfKinRelationship').value.trim(),
+          phoneNumber: document.getElementById('nextOfKinPhoneNumber').value.trim()
+        },
+        dataConsent: document.getElementById('dataConsent').checked
+      };
+
+      // Show loading state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Registering... <span class="spinner"></span>';
+      loadingOverlay.classList.add('show');
+
+      try {
+        console.log('Submitting registration...');
+
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        console.log('Response:', data);
+
+        if (response.ok && data.success) {
+          showAlert('success', 'Registration successful! Redirecting to login page...');
+          form.reset();
+          
+          setTimeout(() => {
+            window.location.href = '/login.html';
+          }, 2000);
+        } else {
+          if (data.errors && Array.isArray(data.errors)) {
+            data.errors.forEach(error => {
+              if (error.field) {
+                let fieldId = error.field;
+                if (fieldId === 'nextOfKin.name') fieldId = 'nextOfKinName';
+                if (fieldId === 'nextOfKin.relationship') fieldId = 'nextOfKinRelationship';
+                if (fieldId === 'nextOfKin.phoneNumber') fieldId = 'nextOfKinPhoneNumber';
+                
+                showError(fieldId, error.message);
+              }
+            });
+            showAlert('error', data.message || 'Please fix the errors in the form');
+          } else {
+            showAlert('error', data.message || 'Registration failed. Please try again.');
+          }
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        showAlert('error', 'Network error. Please check your internet connection and try again.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Register Now';
+        loadingOverlay.classList.remove('show');
+      }
+    });
+
+    // ========== Real-time Field Validation ==========
+    
+    document.getElementById('email').addEventListener('blur', function() {
+      const email = this.value.trim();
+      if (email && !validateEmail(email)) {
+        showError('email', 'Please enter a valid email address');
+      } else if (email) {
+        clearError('email');
+      }
+    });
+
+    document.getElementById('phoneNumber').addEventListener('blur', function() {
+      const phone = this.value.trim();
+      if (phone && !validatePhone(phone)) {
+        showError('phoneNumber', 'Please enter a valid Nigerian phone number');
+      } else if (phone) {
+        clearError('phoneNumber');
+      }
+    });
+
+    document.getElementById('password').addEventListener('input', function() {
+      const password = this.value;
+      if (password && !validatePassword(password)) {
+        showError('password', 'Password must be at least 8 characters with uppercase, lowercase, and number');
+      } else if (password) {
+        clearError('password');
+      }
+    });
+
+    document.getElementById('confirmPassword').addEventListener('input', function() {
+      const password = document.getElementById('password').value;
+      const confirmPassword = this.value;
+      
+      if (confirmPassword && confirmPassword !== password) {
+        showError('confirmPassword', 'Passwords do not match');
+      } else if (confirmPassword) {
+        clearError('confirmPassword');
+      }
+    });
+
+    document.getElementById('nextOfKinPhoneNumber').addEventListener('blur', function() {
+      const phone = this.value.trim();
+      if (phone && !validatePhone(phone)) {
+        showError('nextOfKinPhoneNumber', 'Please enter a valid phone number');
+      } else if (phone) {
+        clearError('nextOfKinPhoneNumber');
+      }
+    });
+
+    const formInputs = form.querySelectorAll('input, select');
+    formInputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        clearError(this.id);
+      });
+    });
+
+    console.log('✅ Registration form initialized successfully');
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
