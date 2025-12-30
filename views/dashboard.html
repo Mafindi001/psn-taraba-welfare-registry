@@ -379,6 +379,93 @@
       color: #1e3a8a;
     }
 
+    /* ========== Modal Styles ========== */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--white);
+      padding: var(--spacing-xl);
+      border-radius: var(--radius-lg);
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 1.5rem;
+      color: var(--dark);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray);
+      line-height: 1;
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+      font-size: 0.875rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: var(--spacing-md);
+      border: 2px solid var(--gray-light);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-family: var(--font-sans);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .form-check {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      cursor: pointer;
+    }
+
+    .form-check-input {
+      width: 18px;
+      height: 18px;
+    }
+
     /* ========== Loading States ========== */
     .skeleton {
       background: linear-gradient(90deg, var(--gray-lighter) 25%, #e5e7eb 50%, var(--gray-lighter) 75%);
@@ -453,6 +540,10 @@
       display: none;
     }
 
+    .d-block {
+      display: block;
+    }
+
     /* ========== Responsive ========== */
     @media (max-width: 768px) {
       .navbar-content {
@@ -487,6 +578,11 @@
       .table th,
       .table td {
         padding: var(--spacing-sm);
+      }
+
+      .modal-content {
+        padding: var(--spacing-md);
+        width: 95%;
       }
     }
   </style>
@@ -623,6 +719,63 @@
     </div>
   </div>
 
+  <!-- Special Date Modal -->
+  <div class="modal" id="specialDateModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Special Date</h2>
+        <button class="modal-close" id="closeModalBtn">×</button>
+      </div>
+      
+      <form id="addSpecialDateForm">
+        <div class="form-group">
+          <label class="form-label">Event Type <span style="color: red;">*</span></label>
+          <select id="eventLabel" class="form-control" required>
+            <option value="">Select event type</option>
+            <option value="Birthday">Birthday</option>
+            <option value="Wedding Anniversary">Wedding Anniversary</option>
+            <option value="Work Anniversary">Work Anniversary</option>
+            <option value="Induction Anniversary">Induction Anniversary</option>
+            <option value="Other Celebration">Other Celebration</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="customLabelDiv" style="display: none;">
+          <label class="form-label">Custom Event Name</label>
+          <input type="text" id="customLabel" class="form-control" placeholder="e.g., Graduation Day">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Event Date <span style="color: red;">*</span></label>
+          <input type="date" id="eventDate" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-check">
+            <input type="checkbox" id="isRecurring" class="form-check-input" checked>
+            <span>Repeat annually</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-check">
+            <input type="checkbox" id="sendReminder" class="form-check-input" checked>
+            <span>Send me reminders</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Notes (Optional)</label>
+          <textarea id="notes" rows="3" class="form-control" placeholder="Add any notes about this event..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">
+          Add Special Date
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Loading Overlay -->
   <div id="loadingOverlay" class="loading-overlay">
     <div class="loading-content">
@@ -630,20 +783,325 @@
       <p id="loadingText">Loading...</p>
     </div>
   </div>
-  npm run dev
-```
 
-2. **Go to login page:**
-```
-   http://localhost:5000/login.html
-```
+  <!-- JavaScript Section -->
+  <script>
+    // ========== Global Variables ==========
+    let specialDates = [];
 
-3. **Login with your test account:**
-   - Email: `ahmed.ibrahim@example.com`
-   - Password: `TestPass123`
+    // ========== DOM Elements ==========
+    const specialDateModal = document.getElementById('specialDateModal');
+    const addDateBtn = document.getElementById('addDateBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const addSpecialDateForm = document.getElementById('addSpecialDateForm');
+    const eventLabelSelect = document.getElementById('eventLabel');
+    const customLabelDiv = document.getElementById('customLabelDiv');
+    const loadingOverlay = document.getElementById('loadingOverlay');
 
-### Step 2: View Dashboard
+    // ========== Alert Functions ==========
+    function showAlert(type, message) {
+      const alertElement = document.getElementById(`alert${type.charAt(0).toUpperCase() + type.slice(1)}`);
+      const messageElement = alertElement.querySelector('span');
+      
+      messageElement.textContent = message;
+      alertElement.classList.add('show');
+      
+      setTimeout(() => {
+        alertElement.classList.remove('show');
+      }, 5000);
+    }
 
-After successful login, you should be redirected to:
-```
-http://localhost:5000/dashboard.html
+    // ========== Modal Functions ==========
+    function openSpecialDateModal() {
+      specialDateModal.classList.add('show');
+      addSpecialDateForm.reset();
+      customLabelDiv.style.display = 'none';
+    }
+
+    function closeSpecialDateModal() {
+      specialDateModal.classList.remove('show');
+    }
+
+    // ========== Calculate Days Until Event ==========
+    function calculateDaysUntil(dateString, isRecurring) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const eventDate = new Date(dateString);
+      eventDate.setHours(0, 0, 0, 0);
+      
+      // For recurring events, adjust to current/next year
+      if (isRecurring) {
+        eventDate.setFullYear(today.getFullYear());
+        
+        if (eventDate < today) {
+          eventDate.setFullYear(today.getFullYear() + 1);
+        }
+      }
+      
+      const diffTime = eventDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      return diffDays;
+    }
+
+    // ========== Format Date for Display ==========
+    function formatDateForDisplay(dateString) {
+      const date = new Date(dateString);
+      const options = { month: 'short', day: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    }
+
+    // ========== Update Special Dates Stats ==========
+    function updateSpecialDatesStats() {
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      
+      // Calculate total dates
+      document.getElementById('totalDates').textContent = specialDates.length;
+      
+      // Calculate upcoming dates this month
+      const upcomingThisMonth = specialDates.filter(date => {
+        const eventDate = new Date(date.eventDate);
+        return eventDate.getMonth() === currentMonth && 
+               calculateDaysUntil(date.eventDate, date.isRecurring) >= 0;
+      }).length;
+      
+      document.getElementById('upcomingDates').textContent = upcomingThisMonth;
+      
+      // Calculate days to next event
+      if (specialDates.length > 0) {
+        const nextEvent = specialDates.reduce((closest, date) => {
+          const daysUntil = calculateDaysUntil(date.eventDate, date.isRecurring);
+          if (daysUntil >= 0) {
+            return daysUntil < closest ? daysUntil : closest;
+          }
+          return closest;
+        }, Infinity);
+        
+        if (nextEvent !== Infinity) {
+          document.getElementById('nextEvent').textContent = nextEvent;
+        } else {
+          document.getElementById('nextEvent').textContent = '-';
+        }
+      } else {
+        document.getElementById('nextEvent').textContent = '-';
+      }
+    }
+
+    // ========== Load Special Dates (Placeholder) ==========
+    async function loadSpecialDates() {
+      // This is a placeholder since we haven't created the special dates API yet
+      // For now, we'll show a message
+      
+      const tableBody = document.getElementById('datesTableBody');
+      
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="5" class="table-empty">
+            <p style="margin-bottom: 1rem;">No special dates added yet.</p>
+            <p class="text-muted" style="font-size: 0.875rem;">
+              Click "Add Special Date" to create your first special date for birthday, anniversary, or other celebrations.
+            </p>
+          </td>
+        </tr>
+      `;
+
+      // Update stats
+      document.getElementById('totalDates').textContent = '0';
+      document.getElementById('upcomingDates').textContent = '0';
+      document.getElementById('nextEvent').textContent = '-';
+    }
+
+    // ========== Display Special Dates in Table ==========
+    function displaySpecialDates() {
+      const tableBody = document.getElementById('datesTableBody');
+      
+      if (specialDates.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="table-empty">
+              <p style="margin-bottom: 1rem;">No special dates added yet.</p>
+              <p class="text-muted" style="font-size: 0.875rem;">
+                Click "Add Special Date" to create your first special date for birthday, anniversary, or other celebrations.
+              </p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      // Sort by upcoming dates
+      const sortedDates = [...specialDates].sort((a, b) => {
+        const daysA = calculateDaysUntil(a.eventDate, a.isRecurring);
+        const daysB = calculateDaysUntil(b.eventDate, b.isRecurring);
+        return daysA - daysB;
+      });
+
+      tableBody.innerHTML = sortedDates.map(date => {
+        const daysUntil = calculateDaysUntil(date.eventDate, date.isRecurring);
+        const displayLabel = date.eventLabel === 'Other Celebration' && date.customLabel 
+          ? date.customLabel 
+          : date.eventLabel;
+
+        let daysText = '';
+        let badgeClass = '';
+        
+        if (daysUntil === 0) {
+          daysText = 'Today!';
+          badgeClass = 'badge-danger';
+        } else if (daysUntil === 1) {
+          daysText = 'Tomorrow';
+          badgeClass = 'badge-warning';
+        } else if (daysUntil <= 7) {
+          daysText = `${daysUntil} days`;
+          badgeClass = 'badge-warning';
+        } else if (daysUntil <= 30) {
+          daysText = `${daysUntil} days`;
+          badgeClass = 'badge-info';
+        } else {
+          daysText = `${daysUntil} days`;
+          badgeClass = 'badge-success';
+        }
+
+        return `
+          <tr>
+            <td><strong>${displayLabel}</strong></td>
+            <td>${formatDateForDisplay(date.eventDate)}</td>
+            <td>
+              <span class="badge ${date.isRecurring ? 'badge-success' : 'badge-info'}">
+                ${date.isRecurring ? 'Yes' : 'No'}
+              </span>
+            </td>
+            <td>
+              <span class="badge ${badgeClass}">${daysText}</span>
+            </td>
+            <td>
+              <button class="btn btn-sm" style="background-color: var(--secondary-color); color: white; margin-right: 0.5rem;" onclick="editSpecialDate('${date._id}')">
+                Edit
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteSpecialDate('${date._id}')">
+                Delete
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ========== Form Submission ==========
+    async function handleAddSpecialDate(event) {
+      event.preventDefault();
+      
+      const formData = {
+        eventLabel: eventLabelSelect.value,
+        eventDate: document.getElementById('eventDate').value,
+        isRecurring: document.getElementById('isRecurring').checked,
+        sendReminder: document.getElementById('sendReminder').checked,
+        notes: document.getElementById('notes').value
+      };
+      
+      if (formData.eventLabel === 'Other Celebration') {
+        formData.customLabel = document.getElementById('customLabel').value;
+      }
+      
+      // Validate form
+      if (!formData.eventLabel || !formData.eventDate) {
+        showAlert('error', 'Please fill in all required fields');
+        return;
+      }
+      
+      // Show loading
+      loadingOverlay.classList.add('show');
+      
+      try {
+        // Placeholder for API call
+        // const response = await fetch('/api/special-dates', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify(formData)
+        // });
+        
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // For now, add to local array
+        const newDate = {
+          _id: Date.now().toString(),
+          ...formData,
+          createdAt: new Date().toISOString()
+        };
+        
+        specialDates.push(newDate);
+        displaySpecialDates();
+        updateSpecialDatesStats();
+        
+        showAlert('success', 'Special date added successfully!');
+        closeSpecialDateModal();
+      } catch (error) {
+        console.error('Error adding special date:', error);
+        showAlert('error', 'Failed to add special date. Please try again.');
+      } finally {
+        loadingOverlay.classList.remove('show');
+      }
+    }
+
+    // ========== Event Listeners ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load initial data
+      loadSpecialDates();
+      
+      // Set current date as default for date picker
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('eventDate').value = today;
+      document.getElementById('eventDate').min = '1900-01-01';
+      document.getElementById('eventDate').max = '2100-12-31';
+    });
+
+    // Modal event listeners
+    addDateBtn.addEventListener('click', openSpecialDateModal);
+    closeModalBtn.addEventListener('click', closeSpecialDateModal);
+    specialDateModal.addEventListener('click', (e) => {
+      if (e.target === specialDateModal) {
+        closeSpecialDateModal();
+      }
+    });
+
+    // Event label change listener
+    eventLabelSelect.addEventListener('change', () => {
+      if (eventLabelSelect.value === 'Other Celebration') {
+        customLabelDiv.style.display = 'block';
+      } else {
+        customLabelDiv.style.display = 'none';
+      }
+    });
+
+    // Form submission
+    addSpecialDateForm.addEventListener('submit', handleAddSpecialDate);
+
+    // Logout button
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to logout?')) {
+        // Redirect to logout or clear session
+        window.location.href = '/login.html';
+      }
+    });
+
+    // ========== Placeholder Functions ==========
+    function editSpecialDate(id) {
+      showAlert('info', 'Edit functionality coming soon!');
+      console.log('Edit special date:', id);
+    }
+
+    function deleteSpecialDate(id) {
+      if (confirm('Are you sure you want to delete this special date?')) {
+        // Placeholder for delete functionality
+        specialDates = specialDates.filter(date => date._id !== id);
+        displaySpecialDates();
+        updateSpecialDatesStats();
+        showAlert('success', 'Special date deleted successfully!');
+      }
+    }
+  </script>
+</body>
+</html>

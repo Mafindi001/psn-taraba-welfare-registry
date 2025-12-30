@@ -64,6 +64,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // API routes
 app.use('/api/auth', authRoutes);
+// API routes
+app.use('/api/auth', authRoutes);
+const memberRoutes = require('./routes/members');
+app.use('/api/members', memberRoutes);
 
 // Root route
 app.get('/', (req, res) => {
