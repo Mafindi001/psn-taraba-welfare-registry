@@ -330,15 +330,6 @@
       background-color: #047857;
     }
 
-    .btn-danger {
-      background-color: var(--danger-color);
-      color: var(--white);
-    }
-
-    .btn-danger:hover:not(:disabled) {
-      background-color: #b91c1c;
-    }
-
     .btn-outline {
       background-color: transparent;
       border: 2px solid var(--primary-color);
@@ -580,12 +571,6 @@
       cursor: not-allowed;
     }
 
-    .pagination-btn.active {
-      background-color: var(--primary-color);
-      color: var(--white);
-      border-color: var(--primary-color);
-    }
-
     .pagination-info {
       font-size: 0.875rem;
       color: var(--gray);
@@ -610,14 +595,6 @@
 
     .d-none {
       display: none;
-    }
-
-    .d-flex {
-      display: flex;
-    }
-
-    .gap-2 {
-      gap: var(--spacing-md);
     }
 
     /* ========== Responsive ========== */
@@ -720,20 +697,24 @@
       <div class="stat-card">
         <div class="stat-header">
           <div>
-            <div class="stat-value" id="totalMembers">0</div>
+            <div class="stat-value" id="totalMembers">
+              <div class="skeleton" style="width: 60px;"></div>
+            </div>
             <div class="stat-label">Total Members</div>
           </div>
           <div class="stat-icon primary">👥</div>
         </div>
         <div class="stat-change positive" id="memberChange">
-          <span>+0 this month</span>
+          <span>Loading...</span>
         </div>
       </div>
 
       <div class="stat-card success">
         <div class="stat-header">
           <div>
-            <div class="stat-value" id="activeMembers">0</div>
+            <div class="stat-value" id="activeMembers">
+              <div class="skeleton" style="width: 60px;"></div>
+            </div>
             <div class="stat-label">Active Members</div>
           </div>
           <div class="stat-icon success">✓</div>
@@ -746,7 +727,9 @@
       <div class="stat-card warning">
         <div class="stat-header">
           <div>
-            <div class="stat-value" id="upcomingEvents">0</div>
+            <div class="stat-value" id="upcomingEvents">
+              <div class="skeleton" style="width: 60px;"></div>
+            </div>
             <div class="stat-label">Upcoming Events</div>
           </div>
           <div class="stat-icon warning">🎉</div>
@@ -759,7 +742,9 @@
       <div class="stat-card danger">
         <div class="stat-header">
           <div>
-            <div class="stat-value" id="todayEvents">0</div>
+            <div class="stat-value" id="todayEvents">
+              <div class="skeleton" style="width: 60px;"></div>
+            </div>
             <div class="stat-label">Events Today</div>
           </div>
           <div class="stat-icon danger">📅</div>
@@ -779,8 +764,8 @@
         <button class="btn btn-primary" id="exportDataBtn">
           📊 Export Member Data
         </button>
-        <button class="btn btn-secondary" id="viewReportsBtn">
-          📈 View Reports
+        <button class="btn btn-secondary" id="viewCelebrationsBtn">
+          🎉 View Celebrations
         </button>
         <button class="btn btn-outline" id="sendBulkReminderBtn">
           📧 Send Bulk Reminder
@@ -788,6 +773,37 @@
         <button class="btn btn-outline" id="systemSettingsBtn">
           ⚙️ System Settings
         </button>
+      </div>
+    </div>
+
+    <!-- Upcoming Celebrations -->
+    <div class="card" id="celebrationsCard">
+      <div class="card-header">
+        <h2 class="card-title">Upcoming Celebrations (Next 30 Days)</h2>
+        <div class="card-actions">
+          <button class="btn btn-primary btn-sm" id="refreshCelebrationsBtn">
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="table" id="celebrationsTable">
+          <thead>
+            <tr>
+              <th>Member Name</th>
+              <th>Event</th>
+              <th>Date</th>
+              <th>Days Until</th>
+              <th>Contact</th>
+            </tr>
+          </thead>
+          <tbody id="celebrationsTableBody">
+            <tr>
+              <td colspan="5" class="table-empty">Loading celebrations...</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -866,18 +882,6 @@
         <button class="pagination-btn" id="nextPageBtn" disabled>Next →</button>
       </div>
     </div>
-
-    <!-- Recent Activity -->
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">Recent Activity</h2>
-      </div>
-      <div id="recentActivity">
-        <div style="padding: 2rem; text-align: center; color: var(--gray);">
-          <p>No recent activity</p>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Loading Overlay -->
@@ -888,7 +892,7 @@
     </div>
   </div>
 
-  <!-- Member Details Modal (Simple) -->
+  <!-- Member Details Modal -->
   <div id="memberModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
     <div style="background: white; padding: 2rem; border-radius: 0.75rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -897,6 +901,19 @@
       </div>
       <div id="memberModalContent">
         <!-- Member details will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Celebrations Modal -->
+  <div id="celebrationsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 2rem; border-radius: 0.75rem; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="margin: 0; font-size: 1.5rem;">All Upcoming Celebrations</h2>
+        <button id="closeCelebrationsModal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray);">×</button>
+      </div>
+      <div id="celebrationsModalContent">
+        <!-- Celebrations will be loaded here -->
       </div>
     </div>
   </div>
@@ -910,8 +927,9 @@
     let authToken = null;
     let allMembers = [];
     let filteredMembers = [];
+    let allCelebrations = [];
     let currentPage = 1;
-    let membersPerPage = 10;
+    let totalPages = 1;
 
     // ========== Get Elements ==========
     const loadingOverlay = document.getElementById('loadingOverlay');
@@ -924,15 +942,18 @@
     const infoMessage = document.getElementById('infoMessage');
     const logoutBtn = document.getElementById('logoutBtn');
     const refreshMembersBtn = document.getElementById('refreshMembersBtn');
+    const refreshCelebrationsBtn = document.getElementById('refreshCelebrationsBtn');
     const searchInput = document.getElementById('searchInput');
     const filterLG = document.getElementById('filterLG');
     const filterStatus = document.getElementById('filterStatus');
     const exportDataBtn = document.getElementById('exportDataBtn');
-    const viewReportsBtn = document.getElementById('viewReportsBtn');
+    const viewCelebrationsBtn = document.getElementById('viewCelebrationsBtn');
     const sendBulkReminderBtn = document.getElementById('sendBulkReminderBtn');
     const systemSettingsBtn = document.getElementById('systemSettingsBtn');
     const memberModal = document.getElementById('memberModal');
     const closeMemberModal = document.getElementById('closeMemberModal');
+    const celebrationsModal = document.getElementById('celebrationsModal');
+    const closeCelebrationsModal = document.getElementById('closeCelebrationsModal');
 
     // ========== Local Storage Functions ==========
     function getFromLocalStorage(key) {
@@ -1041,15 +1062,9 @@
       return date.toLocaleDateString('en-US', options);
     }
 
-    function formatDateTime(dateString) {
+    function formatDateShort(dateString) {
       const date = new Date(dateString);
-      const options = { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      };
+      const options = { month: 'short', day: 'numeric' };
       return date.toLocaleDateString('en-US', options);
     }
 
@@ -1076,68 +1091,77 @@
       }
     }
 
-    // ========== Load Members (Placeholder - No API Yet) ==========
-    async function loadMembers() {
+    // ========== Load Dashboard Statistics ==========
+    async function loadDashboardStats() {
       try {
-        // Since we don't have a members list API yet, we'll create placeholder data
-        // In production, this would be: const result = await apiRequest('/admin/members');
+        const result = await apiRequest('/admin/stats');
         
-        // Simulate loading
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Placeholder data - in production, this comes from API
-        allMembers = [
-          {
-            _id: '1',
-            fullName: 'Ahmed Ibrahim',
-            email: 'ahmed.ibrahim@example.com',
-            phoneNumber: '08012345678',
-            psnMembershipNumber: 'PSN12345',
-            localGovernment: 'Jalingo',
-            registrationDate: new Date().toISOString(),
-            isActive: true
-          },
-          {
-            _id: '2',
-            fullName: 'Fatima Suleiman',
-            email: 'fatima.suleiman@example.com',
-            phoneNumber: '08098765432',
-            psnMembershipNumber: 'PSN12346',
-            localGovernment: 'Wukari',
-            registrationDate: new Date().toISOString(),
-            isActive: true
-          }
-        ];
-
-        filteredMembers = [...allMembers];
-        updateStats();
-        displayMembers();
-        
-        return true;
+        if (result && result.data.success) {
+          const stats = result.data.data;
+          
+          document.getElementById('totalMembers').textContent = stats.totalMembers;
+          document.getElementById('activeMembers').textContent = stats.activeMembers;
+          document.getElementById('upcomingEvents').textContent = stats.upcomingEvents;
+          document.getElementById('todayEvents').textContent = stats.todayEvents;
+          document.getElementById('memberChange').innerHTML = 
+            `<span>+${stats.newMembersThisMonth} this month</span>`;
+          
+          return true;
+        } else {
+          // Set to 0 if failed
+          document.getElementById('totalMembers').textContent = '0';
+          document.getElementById('activeMembers').textContent = '0';
+          document.getElementById('upcomingEvents').textContent = '0';
+          document.getElementById('todayEvents').textContent = '0';
+          return false;
+        }
       } catch (error) {
-        console.error('Error loading members:', error);
-        showAlert('error', 'Failed to load members');
+        console.error('Error loading stats:', error);
         return false;
       }
     }
 
-    // ========== Update Statistics ==========
-    function updateStats() {
-      const totalMembers = allMembers.length;
-      const activeMembers = allMembers.filter(m => m.isActive).length;
-      
-      document.getElementById('totalMembers').textContent = totalMembers;
-      document.getElementById('activeMembers').textContent = activeMembers;
-      document.getElementById('upcomingEvents').textContent = '0';
-      document.getElementById('todayEvents').textContent = '0';
-      document.getElementById('memberChange').innerHTML = `<span>+${totalMembers} this month</span>`;
+    // ========== Load Members from API ==========
+    async function loadMembers() {
+      try {
+        const searchTerm = searchInput.value.trim();
+        const lg = filterLG.value;
+        const status = filterStatus.value;
+
+        const queryParams = new URLSearchParams({
+          page: currentPage,
+          limit: 10,
+          ...(searchTerm && { search: searchTerm }),
+          ...(lg && { localGovernment: lg }),
+          ...(status && { status })
+        });
+
+        const result = await apiRequest(`/admin/members?${queryParams}`);
+        
+        if (result && result.data.success) {
+          allMembers = result.data.data.members;
+          totalPages = result.data.pages || 1;
+          displayMembers();
+          updatePagination();
+          return true;
+        } else {
+          allMembers = [];
+          displayMembers();
+          return false;
+        }
+      } catch (error) {
+        console.error('Error loading members:', error);
+        allMembers = [];
+        displayMembers();
+        return false;
+      }
     }
 
     // ========== Display Members ==========
     function displayMembers() {
       const tableBody = document.getElementById('membersTableBody');
       
-      if (filteredMembers.length === 0) {
+      if (allMembers.length === 0) {
         tableBody.innerHTML = `
           <tr>
             <td colspan="8" class="table-empty">
@@ -1148,18 +1172,10 @@
             </td>
           </tr>
         `;
-        updatePagination();
         return;
       }
 
-      // Calculate pagination
-      const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
-      const startIndex = (currentPage - 1) * membersPerPage;
-      const endIndex = startIndex + membersPerPage;
-      const paginatedMembers = filteredMembers.slice(startIndex, endIndex);
-
-      // Display members
-      tableBody.innerHTML = paginatedMembers.map(member => `
+      tableBody.innerHTML = allMembers.map(member => `
         <tr>
           <td><strong>${member.fullName}</strong></td>
           <td>${member.email}</td>
@@ -1179,105 +1195,241 @@
           </td>
         </tr>
       `).join('');
-
-      updatePagination();
     }
 
     // ========== Update Pagination ==========
     function updatePagination() {
-      const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
       const pageInfo = document.getElementById('pageInfo');
       const prevBtn = document.getElementById('prevPageBtn');
       const nextBtn = document.getElementById('nextPageBtn');
 
-      pageInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+      pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
       prevBtn.disabled = currentPage === 1;
       nextBtn.disabled = currentPage === totalPages || totalPages === 0;
     }
 
-    // ========== Search and Filter ==========
-    function applyFilters() {
-      const searchTerm = searchInput.value.toLowerCase().trim();
-      const lgFilter = filterLG.value;
-      const statusFilter = filterStatus.value;
-
-      filteredMembers = allMembers.filter(member => {
-        const matchesSearch = !searchTerm || 
-          member.fullName.toLowerCase().includes(searchTerm) ||
-          member.email.toLowerCase().includes(searchTerm) ||
-          member.psnMembershipNumber.toLowerCase().includes(searchTerm);
-
-        const matchesLG = !lgFilter || member.localGovernment === lgFilter;
-
-        const matchesStatus = !statusFilter || 
-          (statusFilter === 'active' && member.isActive) ||
-          (statusFilter === 'inactive' && !member.isActive);
-
-        return matchesSearch && matchesLG && matchesStatus;
-      });
-
-      currentPage = 1;
-      displayMembers();
+    // ========== Load Upcoming Celebrations ==========
+    async function loadCelebrations() {
+      try {
+        const result = await apiRequest('/admin/celebrations?days=30');
+        
+        if (result && result.data.success) {
+          allCelebrations = result.data.data.celebrations;
+          displayCelebrations();
+          return true;
+        } else {
+          allCelebrations = [];
+          displayCelebrations();
+          return false;
+        }
+      } catch (error) {
+        console.error('Error loading celebrations:', error);
+        allCelebrations = [];
+        displayCelebrations();
+        return false;
+      }
     }
 
-    // ========== View Member Details ==========
-    window.viewMemberDetails = function(memberId) {
-      const member = allMembers.find(m => m._id === memberId);
+    // ========== Display Celebrations ==========
+    function displayCelebrations() {
+      const tableBody = document.getElementById('celebrationsTableBody');
       
-      if (!member) {
-        showAlert('error', 'Member not found');
+      if (allCelebrations.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="table-empty">
+              <p>No upcoming celebrations in the next 30 days</p>
+            </td>
+          </tr>
+        `;
         return;
       }
 
-      const modalContent = document.getElementById('memberModalContent');
-      modalContent.innerHTML = `
-        <div style="display: grid; gap: 1rem;">
-          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Full Name</div>
-            <div style="font-weight: 600;">${member.fullName}</div>
-          </div>
-          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Email</div>
-            <div style="font-weight: 600;">${member.email}</div>
-          </div>
-          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Phone Number</div>
-            <div style="font-weight: 600;">${member.phoneNumber}</div>
-          </div>
-          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">PSN Membership Number</div>
-            <div style="font-weight: 600;">${member.psnMembershipNumber}</div>
-          </div>
-          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Local Government</div>
-            <div style="font-weight: 600;">${member.localGovernment}</div>
-          </div>
-          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Registration Date</div>
-            <div style="font-weight: 600;">${formatDate(member.registrationDate)}</div>
-          </div>
-          <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-            <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Status</div>
-            <div>
-              <span class="badge ${member.isActive ? 'badge-success' : 'badge-danger'}">
-                ${member.isActive ? 'Active' : 'Inactive'}
-              </span>
-            </div>
-          </div>
-        </div>
-      `;
+      // Show only first 5 in dashboard
+      const displayCelebrations = allCelebrations.slice(0, 5);
 
-      memberModal.style.display = 'flex';
+      tableBody.innerHTML = displayCelebrations.map(celebration => {
+        const displayLabel = celebration.eventLabel === 'Other Celebration' && celebration.customLabel 
+          ? celebration.customLabel 
+          : celebration.eventLabel;
+
+        let daysText = '';
+        let badgeClass = '';
+        
+        if (celebration.daysUntil === 0) {
+          daysText = 'Today!';
+          badgeClass = 'badge-danger';
+        } else if (celebration.daysUntil === 1) {
+          daysText = 'Tomorrow';
+          badgeClass = 'badge-warning';
+        } else if (celebration.daysUntil <= 7) {
+          daysText = `${celebration.daysUntil} days`;
+          badgeClass = 'badge-warning';
+        } else {
+          daysText = `${celebration.daysUntil} days`;
+          badgeClass = 'badge-info';
+        }
+
+        return `
+          <tr>
+            <td><strong>${celebration.member?.fullName || 'N/A'}</strong></td>
+            <td>${displayLabel}</td>
+            <td>${formatDateShort(celebration.eventDate)}</td>
+            <td><span class="badge ${badgeClass}">${daysText}</span></td>
+            <td>
+              <a href="tel:${celebration.member?.phoneNumber}" style="color: var(--primary-color);">
+                ${celebration.member?.phoneNumber || 'N/A'}
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ========== View Member Details ==========
+    window.viewMemberDetails = async function(memberId) {
+      showLoading('Loading member details...');
+
+      try {
+        const result = await apiRequest(`/admin/members/${memberId}`);
+        
+        if (result && result.data.success) {
+          const member = result.data.data.member;
+          
+          const modalContent = document.getElementById('memberModalContent');
+          modalContent.innerHTML = `
+            <div style="display: grid; gap: 1rem;">
+              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Full Name</div>
+                <div style="font-weight: 600;">${member.fullName}</div>
+              </div>
+              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Email</div>
+                <div style="font-weight: 600;">${member.email}</div>
+              </div>
+              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Phone Number</div>
+                <div style="font-weight: 600;">${member.phoneNumber}</div>
+              </div>
+              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Date of Birth</div>
+                <div style="font-weight: 600;">${member.dateOfBirth ? formatDate(member.dateOfBirth) : 'N/A'}</div>
+              </div>
+              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">PSN Membership Number</div>
+                <div style="font-weight: 600;">${member.psnMembershipNumber}</div>
+              </div>
+              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Year of Induction</div>
+                <div style="font-weight: 600;">${member.psnYearOfInduction}</div>
+              </div>
+              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Local Government</div>
+                <div style="font-weight: 600;">${member.localGovernment}</div>
+              </div>
+              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Place of Work</div>
+                <div style="font-weight: 600;">${member.placeOfWork || 'Not specified'}</div>
+              </div>
+              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Next of Kin</div>
+                <div style="font-weight: 600;">${member.nextOfKin?.name || 'N/A'}</div>
+                <div style="font-size: 0.875rem; color: var(--gray); margin-top: 0.5rem;">
+                  ${member.nextOfKin?.relationship || ''} - ${member.nextOfKin?.phoneNumber || ''}
+                </div>
+              </div>
+              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Registration Date</div>
+                <div style="font-weight: 600;">${formatDate(member.registrationDate)}</div>
+              </div>
+              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
+                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Status</div>
+                <div>
+                  <span class="badge ${member.isActive ? 'badge-success' : 'badge-danger'}">
+                    ${member.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          `;
+
+          memberModal.style.display = 'flex';
+        } else {
+          showAlert('error', 'Failed to load member details');
+        }
+      } catch (error) {
+        console.error('View member error:', error);
+        showAlert('error', 'Failed to load member details');
+      } finally {
+        hideLoading();
+      }
     };
 
-    // ========== Close Modal ==========
+    // ========== View All Celebrations ==========
+    viewCelebrationsBtn.addEventListener('click', () => {
+      const modalContent = document.getElementById('celebrationsModalContent');
+      
+      if (allCelebrations.length === 0) {
+        modalContent.innerHTML = '<p class="text-center text-muted">No upcoming celebrations</p>';
+      } else {
+        modalContent.innerHTML = `
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Member Name</th>
+                  <th>Event</th>
+                  <th>Date</th>
+                  <th>Days Until</th>
+                  <th>Contact</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${allCelebrations.map(celebration => {
+                  const displayLabel = celebration.eventLabel === 'Other Celebration' && celebration.customLabel 
+                    ? celebration.customLabel 
+                    : celebration.eventLabel;
+
+                  let badgeClass = celebration.daysUntil === 0 ? 'badge-danger' :
+                                   celebration.daysUntil <= 7 ? 'badge-warning' : 'badge-info';
+
+                  return `
+                    <tr>
+                      <td><strong>${celebration.member?.fullName || 'N/A'}</strong></td>
+                      <td>${displayLabel}</td>
+                      <td>${formatDateShort(celebration.eventDate)}</td>
+                      <td><span class="badge ${badgeClass}">${celebration.daysUntil} days</span></td>
+                      <td>${celebration.member?.phoneNumber || 'N/A'}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+      
+      celebrationsModal.style.display = 'flex';
+    });
+
+    // ========== Close Modals ==========
     closeMemberModal.addEventListener('click', () => {
       memberModal.style.display = 'none';
+    });
+
+    closeCelebrationsModal.addEventListener('click', () => {
+      celebrationsModal.style.display = 'none';
     });
 
     memberModal.addEventListener('click', (e) => {
       if (e.target === memberModal) {
         memberModal.style.display = 'none';
+      }
+    });
+
+    celebrationsModal.addEventListener('click', (e) => {
+      if (e.target === celebrationsModal) {
+        celebrationsModal.style.display = 'none';
       }
     });
 
@@ -1288,7 +1440,6 @@
         return;
       }
 
-      // Create CSV content
       const headers = ['Name', 'Email', 'Phone', 'PSN Number', 'Local Government', 'Registration Date', 'Status'];
       const csvContent = [
         headers.join(','),
@@ -1303,7 +1454,6 @@
         ].join(','))
       ].join('\n');
 
-      // Download CSV
       const blob = new Blob([csvContent], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1316,10 +1466,6 @@
     });
 
     // ========== Quick Action Placeholders ==========
-    viewReportsBtn.addEventListener('click', () => {
-      showAlert('info', 'Reports feature coming soon!');
-    });
-
     sendBulkReminderBtn.addEventListener('click', () => {
       showAlert('info', 'Bulk reminder feature coming soon!');
     });
@@ -1332,29 +1478,50 @@
     document.getElementById('prevPageBtn').addEventListener('click', () => {
       if (currentPage > 1) {
         currentPage--;
-        displayMembers();
+        loadMembers();
       }
     });
 
     document.getElementById('nextPageBtn').addEventListener('click', () => {
-      const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
       if (currentPage < totalPages) {
         currentPage++;
-        displayMembers();
+        loadMembers();
       }
     });
 
     // ========== Search and Filter Event Listeners ==========
-    searchInput.addEventListener('input', applyFilters);
-    filterLG.addEventListener('change', applyFilters);
-    filterStatus.addEventListener('change', applyFilters);
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        currentPage = 1;
+        loadMembers();
+      }, 500);
+    });
 
-    // ========== Refresh Members ==========
+    filterLG.addEventListener('change', () => {
+      currentPage = 1;
+      loadMembers();
+    });
+
+    filterStatus.addEventListener('change', () => {
+      currentPage = 1;
+      loadMembers();
+    });
+
+    // ========== Refresh Handlers ==========
     refreshMembersBtn.addEventListener('click', async () => {
       showLoading('Refreshing members...');
       await loadMembers();
       hideLoading();
       showAlert('success', 'Members list refreshed');
+    });
+
+    refreshCelebrationsBtn.addEventListener('click', async () => {
+      showLoading('Refreshing celebrations...');
+      await loadCelebrations();
+      hideLoading();
+      showAlert('success', 'Celebrations refreshed');
     });
 
     // ========== Logout Function ==========
@@ -1389,7 +1556,11 @@
           return;
         }
 
-        await loadMembers();
+        await Promise.all([
+          loadDashboardStats(),
+          loadMembers(),
+          loadCelebrations()
+        ]);
 
         showAlert('success', `Welcome back, ${currentAdmin.fullName}!`);
 

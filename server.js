@@ -68,6 +68,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/auth', authRoutes);
 const memberRoutes = require('./routes/members');
 app.use('/api/members', memberRoutes);
+const adminRoutes = require('./routes/admin');
+app.use('/api/admin', adminRoutes);
 
 // Root route
 app.get('/', (req, res) => {
