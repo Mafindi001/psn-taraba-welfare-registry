@@ -395,15 +395,15 @@
   </style>
 </head>
 <body>
-  <!-- Navigation -->
+  <!-- Navigation - FIXED -->
   <nav class="navbar">
     <div class="container navbar-content">
       <a href="/" class="navbar-brand">PSN Taraba Welfare</a>
       <ul class="navbar-menu">
         <li><a href="/" class="navbar-link">Home</a></li>
-        <li><a href="views/register.html" class="navbar-link">Register</a></li>
-        <li><a href="views/login.html" class="navbar-link">Member Login</a></li>
-        <li><a href="views/admin-login.html" class="navbar-link">Admin Login</a></li>
+        <li><a href="/register" class="navbar-link">Register</a></li>
+        <li><a href="/login" class="navbar-link">Member Login</a></li>
+        <li><a href="/admin-login" class="navbar-link">Admin Login</a></li>
       </ul>
     </div>
   </nav>
@@ -680,7 +680,7 @@
         </button>
 
         <p class="text-center text-muted mt-2">
-          Already registered? <a href="views/login.html">Login here</a>
+          Already registered? <a href="/login">Login here</a>
         </p>
       </form>
     </div>
@@ -693,10 +693,11 @@
       <p>Creating your account...</p>
     </div>
   </div>
+  
   <!-- JavaScript -->
   <script>
-    // ========== Configuration ==========
-    const API_BASE_URL = 'http://localhost:5000/api';
+    // ========== Configuration - FIXED ==========
+   const API_BASE_URL = window.location.origin + '/api';
 
     // ========== Get Form Elements ==========
     const form = document.getElementById('registrationForm');
@@ -936,8 +937,8 @@
         dateOfBirth: document.getElementById('dateOfBirth').value,
         psnMembershipNumber: document.getElementById('psnMembershipNumber').value.trim().toUpperCase(),
         psnYearOfInduction: parseInt(document.getElementById('psnYearOfInduction').value),
-        placeOfWork: document.getElementById('placeOfWork').value.trim() || undefined,
-        residentialAddress: document.getElementById('residentialAddress').value.trim() || undefined,
+        placeOfWork: document.getElementById('placeOfWork').value.trim() || '',
+        residentialAddress: document.getElementById('residentialAddress').value.trim() || '',
         localGovernment: document.getElementById('localGovernment').value,
         nextOfKin: {
           name: document.getElementById('nextOfKinName').value.trim(),
@@ -954,6 +955,7 @@
 
       try {
         console.log('Submitting registration...');
+        console.log('API URL:', `${API_BASE_URL}/auth/register`);
 
         const response = await fetch(`${API_BASE_URL}/auth/register`, {
           method: 'POST',
@@ -969,9 +971,17 @@
         if (response.ok && data.success) {
           showAlert('success', 'Registration successful! Redirecting to login page...');
           form.reset();
-          
+          if (response.ok && data.success) {
+  showAlert('success', 'Registration successful! Redirecting to login page...');
+  form.reset();
+  
+  setTimeout(() => {
+    window.location.href = '/login?registered=true';
+  }, 2000);
+}
+
           setTimeout(() => {
-            window.location.href = '/login.html';
+            window.location.href = '/login';
           }, 2000);
         } else {
           if (data.errors && Array.isArray(data.errors)) {
@@ -1059,5 +1069,4 @@
     console.log('✅ Registration form initialized successfully');
   </script>
 </body>
-</html><!DOCTYPE html>
-<html lang="en">
+</html>

@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Admin dashboard for PSN Taraba State Welfare Registry">
   <title>Admin Dashboard - PSN Taraba Welfare Registry</title>
   
   <style>
@@ -11,29 +10,28 @@
     :root {
       --primary-color: #1e40af;
       --primary-dark: #1e3a8a;
-      --primary-light: #3b82f6;
-      --secondary-color: #059669;
-      --danger-color: #dc2626;
+      --secondary-color: #7c3aed;
       --success-color: #10b981;
       --warning-color: #f59e0b;
+      --danger-color: #dc2626;
       --info-color: #3b82f6;
       --dark: #1f2937;
       --gray: #6b7280;
       --gray-light: #d1d5db;
       --gray-lighter: #f3f4f6;
       --white: #ffffff;
-      --spacing-xs: 0.25rem;
       --spacing-sm: 0.5rem;
       --spacing-md: 1rem;
       --spacing-lg: 1.5rem;
       --spacing-xl: 2rem;
       --spacing-2xl: 3rem;
-      --radius-sm: 0.25rem;
-      --radius-md: 0.5rem;
-      --radius-lg: 0.75rem;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+      --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.2);
       --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
@@ -49,26 +47,149 @@
       color: var(--dark);
       background-color: var(--gray-lighter);
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    .container {
-      width: 100%;
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 var(--spacing-md);
+    /* ========== Layout ========== */
+    .admin-container {
+      display: flex;
+      min-height: 100vh;
     }
 
-    /* ========== Navbar ========== */
-    .navbar {
+    /* ========== Sidebar ========== */
+    .sidebar {
+      width: 250px;
+      background: linear-gradient(135deg, var(--dark) 0%, #111827 100%);
+      color: var(--white);
+      padding: var(--spacing-xl) 0;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 0 var(--spacing-xl) var(--spacing-xl);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .admin-avatar {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .admin-info {
+      margin-top: var(--spacing-md);
+    }
+
+    .admin-name {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .admin-role {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* ========== Sidebar Menu ========== */
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .menu-item {
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .menu-link {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md) var(--spacing-xl);
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .menu-link:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--white);
+      border-left-color: var(--primary-color);
+    }
+
+    .menu-link.active {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: var(--white);
+      border-left-color: var(--primary-color);
+    }
+
+    .menu-icon {
+      width: 20px;
+      text-align: center;
+    }
+
+    .menu-text {
+      flex: 1;
+    }
+
+    .menu-badge {
+      background-color: var(--danger-color);
+      color: var(--white);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .menu-divider {
+      height: 1px;
+      background-color: rgba(255, 255, 255, 0.1);
+      margin: var(--spacing-lg) var(--spacing-xl);
+    }
+
+    .menu-section {
+      padding: var(--spacing-md) var(--spacing-xl);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* ========== Main Content ========== */
+    .main-content {
+      flex: 1;
+      margin-left: 250px;
+      padding: var(--spacing-xl);
+      transition: margin-left 0.3s ease;
+    }
+
+    /* ========== Topbar ========== */
+    .topbar {
       background-color: var(--white);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg) var(--spacing-xl);
+      margin-bottom: var(--spacing-xl);
       box-shadow: var(--shadow-md);
-      padding: var(--spacing-md) 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    .navbar-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -76,188 +197,177 @@
       gap: var(--spacing-md);
     }
 
-    .navbar-left {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-    }
-
-    .navbar-brand {
-      font-size: 1.25rem;
+    .page-title {
+      font-size: 1.5rem;
       font-weight: 700;
-      color: var(--primary-color);
-      text-decoration: none;
-    }
-
-    .admin-badge {
-      background-color: var(--warning-color);
-      color: var(--white);
-      padding: 0.25rem 0.75rem;
-      border-radius: var(--radius-md);
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .navbar-user {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-lg);
-    }
-
-    .user-info {
-      text-align: right;
-    }
-
-    .user-name {
-      font-weight: 600;
       color: var(--dark);
+    }
+
+    .page-subtitle {
+      color: var(--gray);
       font-size: 0.875rem;
     }
 
-    .user-role {
-      font-size: 0.75rem;
-      color: var(--gray);
+    .topbar-actions {
+      display: flex;
+      gap: var(--spacing-md);
+      align-items: center;
     }
 
-    .btn-logout {
-      padding: var(--spacing-sm) var(--spacing-md);
-      background-color: var(--danger-color);
-      color: var(--white);
-      border: none;
+    .btn {
+      padding: var(--spacing-sm) var(--spacing-lg);
       border-radius: var(--radius-md);
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
+      border: none;
+      font-family: var(--font-sans);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      text-decoration: none;
+    }
+
+    .btn-sm {
+      padding: var(--spacing-sm) var(--spacing-md);
       font-size: 0.875rem;
     }
 
-    .btn-logout:hover {
-      background-color: #b91c1c;
-      transform: translateY(-1px);
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: var(--white);
     }
 
-    /* ========== Page Header ========== */
-    .page-header {
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-success {
+      background-color: var(--success-color);
       color: var(--white);
-      padding: var(--spacing-xl) 0;
+    }
+
+    .btn-success:hover {
+      background-color: #059669;
+    }
+
+    .btn-danger {
+      background-color: var(--danger-color);
+      color: var(--white);
+    }
+
+    .btn-danger:hover {
+      background-color: #b91c1c;
+    }
+
+    .btn-warning {
+      background-color: var(--warning-color);
+      color: var(--white);
+    }
+
+    .btn-warning:hover {
+      background-color: #d97706;
+    }
+
+    .btn-secondary {
+      background-color: var(--gray);
+      color: var(--white);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--dark);
+    }
+
+    .btn-logout {
+      background-color: rgba(220, 38, 38, 0.1);
+      color: var(--danger-color);
+      border: 1px solid rgba(220, 38, 38, 0.2);
+    }
+
+    .btn-logout:hover {
+      background-color: var(--danger-color);
+      color: var(--white);
+    }
+
+    /* ========== Dashboard Grid ========== */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--spacing-lg);
       margin-bottom: var(--spacing-xl);
     }
 
-    .page-header h1 {
-      margin: 0;
-      font-size: 2rem;
-    }
-
-    .page-header p {
-      margin: var(--spacing-sm) 0 0 0;
-      opacity: 0.9;
-    }
-
-    /* ========== Stats Grid ========== */
+    /* ========== Stats Cards ========== */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: var(--spacing-lg);
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md);
       margin-bottom: var(--spacing-xl);
     }
 
     .stat-card {
       background-color: var(--white);
-      padding: var(--spacing-xl);
       border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
       box-shadow: var(--shadow-md);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+      transition: transform 0.3s ease;
     }
 
     .stat-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-2px);
       box-shadow: var(--shadow-lg);
     }
 
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 4px;
-      height: 100%;
-      background: var(--primary-color);
-    }
-
-    .stat-card.success::before {
-      background: var(--success-color);
-    }
-
-    .stat-card.warning::before {
-      background: var(--warning-color);
-    }
-
-    .stat-card.danger::before {
-      background: var(--danger-color);
-    }
-
-    .stat-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: var(--spacing-md);
-    }
-
     .stat-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: var(--radius-md);
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.5rem;
-      background-color: var(--gray-lighter);
     }
 
-    .stat-icon.primary {
-      background-color: rgba(30, 64, 175, 0.1);
+    .stat-icon.members { background-color: #dbeafe; color: var(--primary-color); }
+    .stat-icon.verified { background-color: #d1fae5; color: var(--success-color); }
+    .stat-icon.pending { background-color: #fef3c7; color: var(--warning-color); }
+    .stat-icon.active { background-color: #ede9fe; color: var(--secondary-color); }
+
+    .stat-info {
+      flex: 1;
     }
 
-    .stat-icon.success {
-      background-color: rgba(5, 150, 105, 0.1);
-    }
-
-    .stat-icon.warning {
-      background-color: rgba(245, 158, 11, 0.1);
-    }
-
-    .stat-icon.danger {
-      background-color: rgba(220, 38, 38, 0.1);
-    }
-
-    .stat-value {
-      font-size: 2rem;
+    .stat-number {
+      font-size: 1.75rem;
       font-weight: 700;
-      color: var(--dark);
-      margin-bottom: var(--spacing-xs);
+      margin-bottom: var(--spacing-sm);
     }
 
     .stat-label {
-      color: var(--gray);
       font-size: 0.875rem;
-      font-weight: 500;
+      color: var(--gray);
     }
 
-    .stat-change {
+    .stat-trend {
       font-size: 0.75rem;
-      margin-top: var(--spacing-sm);
-      padding: 0.25rem 0.5rem;
-      border-radius: var(--radius-sm);
-      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
     }
 
-    .stat-change.positive {
-      background-color: rgba(5, 150, 105, 0.1);
+    .stat-trend.positive {
+      background-color: #d1fae5;
       color: var(--success-color);
+    }
+
+    .stat-trend.negative {
+      background-color: #fee2e2;
+      color: var(--danger-color);
     }
 
     /* ========== Cards ========== */
@@ -279,10 +389,9 @@
     }
 
     .card-title {
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       font-weight: 700;
-      color: var(--dark);
-      margin: 0;
+      color: var(--primary-color);
     }
 
     .card-actions {
@@ -290,60 +399,232 @@
       gap: var(--spacing-sm);
     }
 
-    /* ========== Buttons ========== */
-    .btn {
-      display: inline-block;
-      padding: var(--spacing-sm) var(--spacing-md);
-      font-size: 0.875rem;
+    /* ========== Tables ========== */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th {
+      background-color: var(--gray-lighter);
+      padding: var(--spacing-md);
+      text-align: left;
       font-weight: 600;
-      text-align: center;
-      text-decoration: none;
-      border: none;
+      color: var(--dark);
+      border-bottom: 2px solid var(--gray-light);
+    }
+
+    .table td {
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--gray-lighter);
+      vertical-align: middle;
+    }
+
+    .table tr:hover {
+      background-color: var(--gray-lighter);
+    }
+
+    .table .status {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .table .status.active {
+      background-color: #d1fae5;
+      color: var(--success-color);
+    }
+
+    .table .status.pending {
+      background-color: #fef3c7;
+      color: var(--warning-color);
+    }
+
+    .table .status.inactive {
+      background-color: #f3f4f6;
+      color: var(--gray);
+    }
+
+    .table-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+    }
+
+    /* ========== Forms ========== */
+    .form-group {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+      color: var(--dark);
+      font-size: 0.875rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: var(--spacing-md);
+      border: 2px solid var(--gray-light);
       border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-family: var(--font-sans);
+      transition: all 0.3s ease;
+      background-color: var(--white);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .form-control.error {
+      border-color: var(--danger-color);
+    }
+
+    .form-error {
+      color: var(--danger-color);
+      font-size: 0.875rem;
+      margin-top: var(--spacing-sm);
+      display: none;
+    }
+
+    .form-error.show {
+      display: block;
+    }
+
+    .form-help {
+      color: var(--gray);
+      font-size: 0.875rem;
+      margin-top: var(--spacing-sm);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-md);
+    }
+
+    /* ========== Modal ========== */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: var(--spacing-md);
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background-color: var(--white);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalFadeIn 0.3s ease;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      border-bottom: 2px solid var(--gray-lighter);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray);
+      transition: color 0.3s ease;
+    }
+
+    .modal-close:hover {
+      color: var(--dark);
+    }
+
+    .modal-body {
+      padding: var(--spacing-xl);
+    }
+
+    .modal-footer {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      border-top: 2px solid var(--gray-lighter);
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-md);
+    }
+
+    /* ========== Tabs ========== */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid var(--gray-lighter);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .tab {
+      padding: var(--spacing-md) var(--spacing-lg);
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-weight: 600;
+      color: var(--gray);
       cursor: pointer;
       transition: all 0.3s ease;
-      font-family: var(--font-sans);
     }
 
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .btn-primary {
-      background-color: var(--primary-color);
-      color: var(--white);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background-color: var(--primary-dark);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .btn-secondary {
-      background-color: var(--secondary-color);
-      color: var(--white);
-    }
-
-    .btn-secondary:hover:not(:disabled) {
-      background-color: #047857;
-    }
-
-    .btn-outline {
-      background-color: transparent;
-      border: 2px solid var(--primary-color);
+    .tab:hover {
       color: var(--primary-color);
     }
 
-    .btn-outline:hover:not(:disabled) {
-      background-color: var(--primary-color);
-      color: var(--white);
+    .tab.active {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
     }
 
-    .btn-sm {
-      padding: 0.375rem 0.75rem;
-      font-size: 0.75rem;
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
     }
 
     /* ========== Alerts ========== */
@@ -371,136 +652,19 @@
       color: #991b1b;
     }
 
-    .alert-info {
-      background-color: #dbeafe;
-      border-left-color: var(--info-color);
-      color: #1e3a8a;
-    }
-
-    /* ========== Search & Filter ========== */
-    .search-bar {
-      display: flex;
-      gap: var(--spacing-md);
-      margin-bottom: var(--spacing-lg);
-      flex-wrap: wrap;
-    }
-
-    .search-input {
-      flex: 1;
-      min-width: 250px;
-      padding: var(--spacing-md);
-      border: 2px solid var(--gray-light);
-      border-radius: var(--radius-md);
-      font-size: 0.875rem;
-      transition: all 0.3s ease;
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
-    }
-
-    .filter-select {
-      padding: var(--spacing-md);
-      border: 2px solid var(--gray-light);
-      border-radius: var(--radius-md);
-      font-size: 0.875rem;
-      background-color: var(--white);
-      cursor: pointer;
-    }
-
-    /* ========== Table ========== */
-    .table-container {
-      overflow-x: auto;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--gray-lighter);
-    }
-
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: var(--white);
-    }
-
-    .table thead {
-      background-color: var(--gray-lighter);
-    }
-
-    .table th {
-      padding: var(--spacing-md);
-      text-align: left;
-      font-weight: 700;
-      color: var(--dark);
-      font-size: 0.875rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .table td {
-      padding: var(--spacing-md);
-      border-bottom: 1px solid var(--gray-lighter);
-      font-size: 0.875rem;
-    }
-
-    .table tbody tr:hover {
-      background-color: var(--gray-lighter);
-    }
-
-    .table tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    .table-empty {
-      text-align: center;
-      padding: var(--spacing-2xl);
-      color: var(--gray);
-    }
-
-    /* ========== Badge ========== */
-    .badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      border-radius: var(--radius-sm);
-      text-transform: uppercase;
-    }
-
-    .badge-success {
-      background-color: #d1fae5;
-      color: #065f46;
-    }
-
-    .badge-warning {
+    .alert-warning {
       background-color: #fef3c7;
+      border-left-color: var(--warning-color);
       color: #92400e;
     }
 
-    .badge-danger {
-      background-color: #fee2e2;
-      color: #991b1b;
-    }
-
-    .badge-info {
+    .alert-info {
       background-color: #dbeafe;
-      color: #1e3a8a;
+      border-left-color: var(--info-color);
+      color: #1e40af;
     }
 
-    /* ========== Loading States ========== */
-    .skeleton {
-      background: linear-gradient(90deg, var(--gray-lighter) 25%, #e5e7eb 50%, var(--gray-lighter) 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s ease-in-out infinite;
-      border-radius: var(--radius-md);
-      height: 20px;
-    }
-
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
+    /* ========== Loading ========== */
     .loading-overlay {
       position: fixed;
       top: 0;
@@ -540,469 +704,1186 @@
       100% { transform: rotate(360deg); }
     }
 
+    /* ========== Responsive ========== */
+    @media (max-width: 1024px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .mobile-menu-toggle {
+        display: block;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        padding: var(--spacing-md);
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .topbar-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .table-actions {
+        flex-direction: column;
+      }
+    }
+
+    /* ========== Utilities ========== */
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .mb-2 { margin-bottom: var(--spacing-md); }
+    .mt-2 { margin-top: var(--spacing-md); }
+    .d-none { display: none; }
+    .d-flex { display: flex; }
+    .justify-between { justify-content: space-between; }
+    .align-center { align-items: center; }
+
+    /* ========== Mobile Menu Toggle ========== */
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--dark);
+      cursor: pointer;
+      padding: var(--spacing-sm);
+    }
+
+    /* ========== Search Box ========== */
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 400px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: var(--spacing-md) var(--spacing-lg) var(--spacing-md) 40px;
+      border: 2px solid var(--gray-light);
+      border-radius: var(--radius-lg);
+      font-size: 0.875rem;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: var(--spacing-md);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+    }
+
     /* ========== Pagination ========== */
     .pagination {
       display: flex;
       justify-content: center;
-      align-items: center;
       gap: var(--spacing-sm);
-      margin-top: var(--spacing-lg);
+      margin-top: var(--spacing-xl);
     }
 
-    .pagination-btn {
+    .page-item {
+      list-style: none;
+    }
+
+    .page-link {
+      display: block;
       padding: var(--spacing-sm) var(--spacing-md);
       border: 1px solid var(--gray-light);
-      background-color: var(--white);
-      color: var(--dark);
       border-radius: var(--radius-md);
-      cursor: pointer;
+      color: var(--dark);
+      text-decoration: none;
       transition: all 0.3s ease;
-      font-size: 0.875rem;
     }
 
-    .pagination-btn:hover:not(:disabled) {
+    .page-link:hover {
+      background-color: var(--gray-lighter);
+    }
+
+    .page-link.active {
       background-color: var(--primary-color);
       color: var(--white);
       border-color: var(--primary-color);
     }
 
-    .pagination-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    /* ========== Badge ========== */
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .pagination-info {
-      font-size: 0.875rem;
-      color: var(--gray);
+    .badge-success {
+      background-color: #d1fae5;
+      color: var(--success-color);
     }
 
-    /* ========== Utilities ========== */
-    .text-center {
-      text-align: center;
+    .badge-warning {
+      background-color: #fef3c7;
+      color: var(--warning-color);
     }
 
-    .text-muted {
-      color: var(--gray);
+    .badge-danger {
+      background-color: #fee2e2;
+      color: var(--danger-color);
     }
 
-    .mt-2 {
-      margin-top: var(--spacing-md);
-    }
-
-    .mb-3 {
-      margin-bottom: var(--spacing-lg);
-    }
-
-    .d-none {
-      display: none;
-    }
-
-    /* ========== Responsive ========== */
-    @media (max-width: 768px) {
-      .navbar-content {
-        flex-direction: column;
-      }
-
-      .navbar-user {
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .card {
-        padding: var(--spacing-md);
-      }
-
-      .page-header h1 {
-        font-size: 1.5rem;
-      }
-
-      .table {
-        font-size: 0.75rem;
-      }
-
-      .table th,
-      .table td {
-        padding: var(--spacing-sm);
-      }
-
-      .search-bar {
-        flex-direction: column;
-      }
-
-      .search-input {
-        min-width: 100%;
-      }
-
-      .card-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-md);
-      }
-
-      .card-actions {
-        width: 100%;
-        flex-direction: column;
-      }
-
-      .btn {
-        width: 100%;
-      }
+    .badge-info {
+      background-color: #dbeafe;
+      color: var(--info-color);
     }
   </style>
 </head>
 <body>
-  <!-- Navigation -->
-  <nav class="navbar">
-    <div class="container navbar-content">
-      <div class="navbar-left">
-        <a href="/admin-dashboard.html" class="navbar-brand">PSN Taraba Welfare</a>
-        <span class="admin-badge">Admin Panel</span>
-      </div>
-      <div class="navbar-user">
-        <div class="user-info">
-          <div class="user-name" id="adminName">Loading...</div>
-          <div class="user-role" id="adminRole">Administrator</div>
-        </div>
-        <button class="btn-logout" id="logoutBtn">Logout</button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Page Header -->
-  <div class="page-header">
-    <div class="container">
-      <h1>Admin Dashboard</h1>
-      <p>Manage PSN Taraba State welfare system</p>
-    </div>
-  </div>
-
-  <!-- Main Content -->
-  <div class="container" style="padding-bottom: 3rem;">
-    <!-- Alert Messages -->
-    <div id="alertSuccess" class="alert alert-success">
-      <strong>Success!</strong> <span id="successMessage"></span>
-    </div>
-    <div id="alertError" class="alert alert-error">
-      <strong>Error!</strong> <span id="errorMessage"></span>
-    </div>
-    <div id="alertInfo" class="alert alert-info">
-      <strong>Info!</strong> <span id="infoMessage"></span>
-    </div>
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-header">
-          <div>
-            <div class="stat-value" id="totalMembers">
-              <div class="skeleton" style="width: 60px;"></div>
-            </div>
-            <div class="stat-label">Total Members</div>
-          </div>
-          <div class="stat-icon primary">👥</div>
-        </div>
-        <div class="stat-change positive" id="memberChange">
-          <span>Loading...</span>
-        </div>
-      </div>
-
-      <div class="stat-card success">
-        <div class="stat-header">
-          <div>
-            <div class="stat-value" id="activeMembers">
-              <div class="skeleton" style="width: 60px;"></div>
-            </div>
-            <div class="stat-label">Active Members</div>
-          </div>
-          <div class="stat-icon success">✓</div>
-        </div>
-        <div class="stat-change positive">
-          <span>All verified</span>
-        </div>
-      </div>
-
-      <div class="stat-card warning">
-        <div class="stat-header">
-          <div>
-            <div class="stat-value" id="upcomingEvents">
-              <div class="skeleton" style="width: 60px;"></div>
-            </div>
-            <div class="stat-label">Upcoming Events</div>
-          </div>
-          <div class="stat-icon warning">🎉</div>
-        </div>
-        <div class="stat-change positive">
-          <span>Next 30 days</span>
-        </div>
-      </div>
-
-      <div class="stat-card danger">
-        <div class="stat-header">
-          <div>
-            <div class="stat-value" id="todayEvents">
-              <div class="skeleton" style="width: 60px;"></div>
-            </div>
-            <div class="stat-label">Events Today</div>
-          </div>
-          <div class="stat-icon danger">📅</div>
-        </div>
-        <div class="stat-change positive">
-          <span>Requires attention</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="card mb-3">
-      <div class="card-header">
-        <h2 class="card-title">Quick Actions</h2>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-        <button class="btn btn-primary" id="exportDataBtn">
-          📊 Export Member Data
-        </button>
-        <button class="btn btn-secondary" id="viewCelebrationsBtn">
-          🎉 View Celebrations
-        </button>
-        <button class="btn btn-outline" id="sendBulkReminderBtn">
-          📧 Send Bulk Reminder
-        </button>
-        <button class="btn btn-outline" id="systemSettingsBtn">
-          ⚙️ System Settings
-        </button>
-      </div>
-    </div>
-
-    <!-- Upcoming Celebrations -->
-    <div class="card" id="celebrationsCard">
-      <div class="card-header">
-        <h2 class="card-title">Upcoming Celebrations (Next 30 Days)</h2>
-        <div class="card-actions">
-          <button class="btn btn-primary btn-sm" id="refreshCelebrationsBtn">
-            🔄 Refresh
-          </button>
-        </div>
-      </div>
-
-      <div class="table-container">
-        <table class="table" id="celebrationsTable">
-          <thead>
-            <tr>
-              <th>Member Name</th>
-              <th>Event</th>
-              <th>Date</th>
-              <th>Days Until</th>
-              <th>Contact</th>
-            </tr>
-          </thead>
-          <tbody id="celebrationsTableBody">
-            <tr>
-              <td colspan="5" class="table-empty">Loading celebrations...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Members List -->
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">Registered Members</h2>
-        <div class="card-actions">
-          <button class="btn btn-primary btn-sm" id="refreshMembersBtn">
-            🔄 Refresh
-          </button>
-        </div>
-      </div>
-
-      <!-- Search and Filter -->
-      <div class="search-bar">
-        <input 
-          type="text" 
-          id="searchInput" 
-          class="search-input" 
-          placeholder="Search by name, email, or PSN number..."
-        >
-        <select id="filterLG" class="filter-select">
-          <option value="">All Local Governments</option>
-          <option value="Ardo Kola">Ardo Kola</option>
-          <option value="Bali">Bali</option>
-          <option value="Donga">Donga</option>
-          <option value="Gashaka">Gashaka</option>
-          <option value="Gassol">Gassol</option>
-          <option value="Ibi">Ibi</option>
-          <option value="Jalingo">Jalingo</option>
-          <option value="Karim Lamido">Karim Lamido</option>
-          <option value="Kurmi">Kurmi</option>
-          <option value="Lau">Lau</option>
-          <option value="Sardauna">Sardauna</option>
-          <option value="Takum">Takum</option>
-          <option value="Ussa">Ussa</option>
-          <option value="Wukari">Wukari</option>
-          <option value="Yorro">Yorro</option>
-          <option value="Zing">Zing</option>
-        </select>
-        <select id="filterStatus" class="filter-select">
-          <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-      </div>
-
-      <!-- Members Table -->
-      <div class="table-container">
-        <table class="table" id="membersTable">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>PSN Number</th>
-              <th>Local Government</th>
-              <th>Registration Date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="membersTableBody">
-            <tr>
-              <td colspan="8" class="table-empty">Loading members...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div class="pagination" id="pagination">
-        <button class="pagination-btn" id="prevPageBtn" disabled>← Previous</button>
-        <span class="pagination-info" id="pageInfo">Page 1 of 1</span>
-        <button class="pagination-btn" id="nextPageBtn" disabled>Next →</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Loading Overlay -->
   <div id="loadingOverlay" class="loading-overlay">
     <div class="loading-content">
       <div class="loading-spinner"></div>
-      <p id="loadingText">Loading...</p>
+      <p id="loadingText">Loading admin dashboard...</p>
     </div>
   </div>
 
-  <!-- Member Details Modal -->
-  <div id="memberModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
-    <div style="background: white; padding: 2rem; border-radius: 0.75rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <h2 style="margin: 0; font-size: 1.5rem;">Member Details</h2>
-        <button id="closeMemberModal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray);">×</button>
+  <!-- Admin Container -->
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/admin-dashboard" class="admin-brand">
+          <div class="admin-avatar" id="adminAvatar">A</div>
+          <div>
+            <div>PSN Admin</div>
+            <small style="font-size: 0.75rem; opacity: 0.7;">Control Panel</small>
+          </div>
+        </a>
+        
+        <div class="admin-info">
+          <div class="admin-name" id="adminName">Loading...</div>
+          <div class="admin-role" id="adminRole">Super Admin</div>
+        </div>
       </div>
-      <div id="memberModalContent">
-        <!-- Member details will be loaded here -->
+
+      <ul class="sidebar-menu">
+        <div class="menu-section">Dashboard</div>
+        <li class="menu-item">
+          <a href="#" class="menu-link active" data-section="overview">
+            <span class="menu-icon">📊</span>
+            <span class="menu-text">Overview</span>
+          </a>
+        </li>
+        
+        <div class="menu-section">Members Management</div>
+        <li class="menu-item">
+          <a href="#" class="menu-link" data-section="members">
+            <span class="menu-icon">👥</span>
+            <span class="menu-text">All Members</span>
+            <span class="menu-badge" id="membersCount">0</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link" data-section="pending">
+            <span class="menu-icon">⏳</span>
+            <span class="menu-text">Pending Verification</span>
+            <span class="menu-badge" id="pendingCount">0</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link" data-section="add-member">
+            <span class="menu-icon">➕</span>
+            <span class="menu-text">Add New Member</span>
+          </a>
+        </li>
+        
+        <div class="menu-section">Welfare Management</div>
+        <li class="menu-item">
+          <a href="#" class="menu-link" data-section="welfare">
+            <span class="menu-icon">💰</span>
+            <span class="menu-text">Welfare Packages</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link" data-section="benefits">
+            <span class="menu-icon">🎁</span>
+            <span class="menu-text">Benefits Management</span>
+          </a>
+        </li>
+        
+        <div class="menu-section">Events & Communications</div>
+        <li class="menu-item">
+          <a href="#" class="menu-link" data-section="events">
+            <span class="menu-icon">📅</span>
+            <span class="menu-text">Events Calendar</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link" data-section="notifications">
+            <span class="menu-icon">🔔</span>
+            <span class="menu-text">Send Notifications</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link" data-section="broadcast">
+            <span class="menu-icon">📢</span>
+            <span class="menu-text">Broadcast Messages</span>
+          </a>
+        </li>
+        
+        <div class="menu-section">System Administration</div>
+        <li class="menu-item">
+          <a href="#" class="menu-link" data-section="settings">
+            <span class="menu-icon">⚙️</span>
+            <span class="menu-text">System Settings</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link" data-section="change-password">
+            <span class="menu-icon">🔒</span>
+            <span class="menu-text">Change Password</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#" class="menu-link" data-section="backup">
+            <span class="menu-icon">💾</span>
+            <span class="menu-text">Backup & Restore</span>
+          </a>
+        </li>
+        
+        <div class="menu-divider"></div>
+        
+        <li class="menu-item">
+          <a href="/" class="menu-link" target="_blank">
+            <span class="menu-icon">🌐</span>
+            <span class="menu-text">Public Website</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <button id="logoutBtn" class="menu-link" style="width: 100%; text-align: left; background: none; border: none; font-family: inherit;">
+            <span class="menu-icon">🚪</span>
+            <span class="menu-text">Logout</span>
+          </button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div>
+          <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            ☰
+          </button>
+          <h1 class="page-title" id="pageTitle">Admin Dashboard</h1>
+          <p class="page-subtitle" id="pageSubtitle">PSN Taraba Welfare Registry Management System</p>
+        </div>
+        
+        <div class="topbar-actions">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="globalSearch" placeholder="Search members, events...">
+          </div>
+          <button class="btn btn-primary" id="quickActionBtn">
+            ⚡ Quick Actions
+          </button>
+        </div>
+      </div>
+
+      <!-- Alert Messages -->
+      <div id="alertSuccess" class="alert alert-success">
+        <strong>Success!</strong> <span id="successMessage"></span>
+      </div>
+      <div id="alertError" class="alert alert-error">
+        <strong>Error!</strong> <span id="errorMessage"></span>
+      </div>
+      <div id="alertWarning" class="alert alert-warning">
+        <strong>Warning!</strong> <span id="warningMessage"></span>
+      </div>
+      <div id="alertInfo" class="alert alert-info">
+        <strong>Info!</strong> <span id="infoMessage"></span>
+      </div>
+
+      <!-- Dashboard Sections -->
+      
+      <!-- ========== OVERVIEW SECTION ========== -->
+      <div id="overviewSection" class="dashboard-section active">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon members">👥</div>
+            <div class="stat-info">
+              <div class="stat-number" id="totalMembers">0</div>
+              <div class="stat-label">Total Members</div>
+            </div>
+            <span class="stat-trend positive" id="membersTrend">+0%</span>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon verified">✅</div>
+            <div class="stat-info">
+              <div class="stat-number" id="verifiedMembers">0</div>
+              <div class="stat-label">Verified Members</div>
+            </div>
+            <span class="stat-trend positive" id="verifiedTrend">+0%</span>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon pending">⏳</div>
+            <div class="stat-info">
+              <div class="stat-number" id="pendingMembers">0</div>
+              <div class="stat-label">Pending Verification</div>
+            </div>
+            <span class="stat-trend negative" id="pendingTrend">+0</span>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon active">📊</div>
+            <div class="stat-info">
+              <div class="stat-number" id="activeMembers">0</div>
+              <div class="stat-label">Active This Month</div>
+            </div>
+            <span class="stat-trend positive" id="activeTrend">+0%</span>
+          </div>
+        </div>
+
+        <!-- Recent Activity & Quick Stats -->
+        <div class="dashboard-grid">
+          <!-- Recent Members -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">🆕 Recent Members</h3>
+              <div class="card-actions">
+                <button class="btn btn-sm btn-primary" onclick="switchSection('members')">View All</button>
+              </div>
+            </div>
+            <div class="table-container">
+              <table class="table" id="recentMembersTable">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Will be populated by JavaScript -->
+                  <tr>
+                    <td colspan="4" class="text-center">Loading recent members...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">⚡ Quick Actions</h3>
+            </div>
+            <div style="display: grid; gap: var(--spacing-md);">
+              <button class="btn btn-success" onclick="switchSection('add-member')">
+                <span>➕</span> Add New Member
+              </button>
+              <button class="btn btn-primary" onclick="switchSection('notifications')">
+                <span>🔔</span> Send Notification
+              </button>
+              <button class="btn btn-warning" onclick="switchSection('events')">
+                <span>📅</span> Create Event
+              </button>
+              <button class="btn btn-info" onclick="switchSection('welfare')">
+                <span>💰</span> Manage Welfare
+              </button>
+              <button class="btn btn-secondary" onclick="exportData()">
+                <span>📥</span> Export Data
+              </button>
+            </div>
+          </div>
+
+          <!-- System Status -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">🖥️ System Status</h3>
+            </div>
+            <div style="display: grid; gap: var(--spacing-md);">
+              <div class="d-flex justify-between align-center">
+                <span>Database</span>
+                <span class="badge badge-success">Online</span>
+              </div>
+              <div class="d-flex justify-between align-center">
+                <span>Server Uptime</span>
+                <span id="serverUptime">Loading...</span>
+              </div>
+              <div class="d-flex justify-between align-center">
+                <span>Last Backup</span>
+                <span id="lastBackup">Never</span>
+              </div>
+              <div class="d-flex justify-between align-center">
+                <span>Storage Usage</span>
+                <span id="storageUsage">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== MEMBERS SECTION ========== -->
+      <div id="membersSection" class="dashboard-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">👥 All Members</h3>
+            <div class="card-actions">
+              <button class="btn btn-sm btn-success" onclick="exportMembers()">
+                <span>📥</span> Export
+              </button>
+              <button class="btn btn-sm btn-primary" onclick="showAddMemberModal()">
+                <span>➕</span> Add Member
+              </button>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table class="table" id="membersTable">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>LGA</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Will be populated by JavaScript -->
+                <tr>
+                  <td colspan="7" class="text-center">Loading members...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="pagination" id="membersPagination">
+            <!-- Pagination will be added by JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== PENDING VERIFICATION SECTION ========== -->
+      <div id="pendingSection" class="dashboard-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">⏳ Pending Verification</h3>
+            <div class="card-actions">
+              <button class="btn btn-sm btn-success" onclick="verifyAllPending()">
+                <span>✅</span> Verify All
+              </button>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table class="table" id="pendingTable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>PSN Number</th>
+                  <th>Registration Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Will be populated by JavaScript -->
+                <tr>
+                  <td colspan="5" class="text-center">Loading pending members...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== ADD MEMBER SECTION ========== -->
+      <div id="addMemberSection" class="dashboard-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">➕ Add New Member</h3>
+            <div class="card-actions">
+              <button class="btn btn-sm btn-secondary" onclick="switchSection('members')">
+                <span>←</span> Back to Members
+              </button>
+            </div>
+          </div>
+          
+          <form id="addMemberForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" class="form-control" name="fullName" required>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Email Address *</label>
+                <input type="email" class="form-control" name="email" required>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Phone Number *</label>
+                <input type="tel" class="form-control" name="phoneNumber" required>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">PSN Membership Number *</label>
+                <input type="text" class="form-control" name="psnMembershipNumber" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Initial Password *</label>
+              <input type="password" class="form-control" name="password" required>
+              <div class="form-help">Member will use this to login initially</div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Local Government *</label>
+                <select class="form-control" name="localGovernment" required>
+                  <option value="">Select LGA</option>
+                  <option value="Ardo Kola">Ardo Kola</option>
+                  <option value="Bali">Bali</option>
+                  <option value="Donga">Donga</option>
+                  <option value="Gashaka">Gashaka</option>
+                  <option value="Gassol">Gassol</option>
+                  <option value="Ibi">Ibi</option>
+                  <option value="Jalingo">Jalingo</option>
+                  <option value="Karim Lamido">Karim Lamido</option>
+                  <option value="Kurmi">Kurmi</option>
+                  <option value="Lau">Lau</option>
+                  <option value="Sardauna">Sardauna</option>
+                  <option value="Takum">Takum</option>
+                  <option value="Ussa">Ussa</option>
+                  <option value="Wukari">Wukari</option>
+                  <option value="Yorro">Yorro</option>
+                  <option value="Zing">Zing</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Year of Induction *</label>
+                <input type="number" class="form-control" name="psnYearOfInduction" min="1960" max="2025" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Auto-Verify Member</label>
+              <div>
+                <label style="display: inline-flex; align-items: center; gap: var(--spacing-sm);">
+                  <input type="checkbox" name="autoVerify" checked>
+                  <span>Verify member immediately (skip pending verification)</span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Send Welcome Email</label>
+              <div>
+                <label style="display: inline-flex; align-items: center; gap: var(--spacing-sm);">
+                  <input type="checkbox" name="sendWelcomeEmail" checked>
+                  <span>Send welcome email with login credentials</span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="d-flex justify-between mt-2">
+              <button type="reset" class="btn btn-secondary">Clear Form</button>
+              <button type="submit" class="btn btn-primary">Create Member Account</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ========== CHANGE PASSWORD SECTION ========== -->
+      <div id="changePasswordSection" class="dashboard-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">🔒 Change Admin Password</h3>
+          </div>
+          
+          <form id="changePasswordForm">
+            <div class="form-group">
+              <label class="form-label">Current Password *</label>
+              <input type="password" class="form-control" name="currentPassword" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">New Password *</label>
+              <input type="password" class="form-control" name="newPassword" required>
+              <div class="form-help">Minimum 8 characters with uppercase, lowercase, and number</div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Confirm New Password *</label>
+              <input type="password" class="form-control" name="confirmPassword" required>
+            </div>
+            
+            <div class="d-flex justify-between mt-2">
+              <button type="button" class="btn btn-secondary" onclick="generatePassword()">
+                <span>🎲</span> Generate Strong Password
+              </button>
+              <button type="submit" class="btn btn-primary">Change Password</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+           <!-- ========== WELFARE MANAGEMENT SECTION ========== -->
+      <div id="welfareSection" class="dashboard-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">💰 Welfare Packages Management</h3>
+            <div class="card-actions">
+              <button class="btn btn-sm btn-primary" onclick="showAddWelfareModal()">
+                <span>➕</span> Add Package
+              </button>
+            </div>
+          </div>
+          
+          <div class="tabs" id="welfareTabs">
+            <button class="tab active" data-tab="active-welfare">Active Packages</button>
+            <button class="tab" data-tab="upcoming-welfare">Upcoming</button>
+            <button class="tab" data-tab="past-welfare">Past Packages</button>
+            <button class="tab" data-tab="all-welfare">All Packages</button>
+          </div>
+          
+          <div class="tab-content active" id="active-welfare">
+            <div class="table-container">
+              <table class="table" id="activeWelfareTable">
+                <thead>
+                  <tr>
+                    <th>Package Name</th>
+                    <th>Type</th>
+                    <th>Value</th>
+                    <th>Eligibility</th>
+                    <th>Distribution Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="7" class="text-center">Loading welfare packages...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div class="tab-content" id="upcoming-welfare">
+            <div class="table-container">
+              <table class="table" id="upcomingWelfareTable">
+                <thead>
+                  <tr>
+                    <th>Package Name</th>
+                    <th>Type</th>
+                    <th>Value</th>
+                    <th>Eligibility</th>
+                    <th>Distribution Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="6" class="text-center">Loading upcoming packages...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div class="tab-content" id="past-welfare">
+            <div class="table-container">
+              <table class="table" id="pastWelfareTable">
+                <thead>
+                  <tr>
+                    <th>Package Name</th>
+                    <th>Type</th>
+                    <th>Value</th>
+                    <th>Date Distributed</th>
+                    <th>Beneficiaries</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="6" class="text-center">Loading past packages...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div class="tab-content" id="all-welfare">
+            <div class="table-container">
+              <table class="table" id="allWelfareTable">
+                <thead>
+                  <tr>
+                    <th>Package Name</th>
+                    <th>Type</th>
+                    <th>Value</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="6" class="text-center">Loading all packages...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== EVENTS MANAGEMENT SECTION ========== -->
+      <div id="eventsSection" class="dashboard-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📅 Events Calendar Management</h3>
+            <div class="card-actions">
+              <button class="btn btn-sm btn-primary" onclick="showAddEventModal()">
+                <span>➕</span> Add Event
+              </button>
+              <button class="btn btn-sm btn-success" onclick="syncMemberEvents()">
+                <span>🔄</span> Sync Birthdays
+              </button>
+            </div>
+          </div>
+          
+          <div class="tabs" id="eventsTabs">
+            <button class="tab active" data-tab="upcoming-events">Upcoming Events</button>
+            <button class="tab" data-tab="past-events">Past Events</button>
+            <button class="tab" data-tab="member-events">Member Celebrations</button>
+            <button class="tab" data-tab="psn-events">PSN Organized Events</button>
+          </div>
+          
+          <div class="tab-content active" id="upcoming-events">
+            <div class="table-container">
+              <table class="table" id="upcomingEventsTable">
+                <thead>
+                  <tr>
+                    <th>Event Name</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>Venue</th>
+                    <th>Expected Attendance</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="6" class="text-center">Loading upcoming events...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div class="tab-content" id="member-events">
+            <div class="card mb-2">
+              <div class="card-header">
+                <h4 class="card-title">🎉 Member Celebrations (Next 30 Days)</h4>
+              </div>
+              <div class="table-container">
+                <table class="table" id="memberCelebrationsTable">
+                  <thead>
+                    <tr>
+                      <th>Member Name</th>
+                      <th>Event Type</th>
+                      <th>Date</th>
+                      <th>Days Until</th>
+                      <th>Contact</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td colspan="5" class="text-center">Loading member celebrations...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          <div class="tab-content" id="psn-events">
+            <div class="table-container">
+              <table class="table" id="psnEventsTable">
+                <thead>
+                  <tr>
+                    <th>Event Name</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="5" class="text-center">Loading PSN events...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+            <!-- ========== NOTIFICATIONS SECTION ========== -->
+      <div id="notificationsSection" class="dashboard-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">🔔 Send Notifications & Broadcast</h3>
+          </div>
+          
+          <form id="notificationForm">
+            <div class="form-group">
+              <label class="form-label">Notification Type *</label>
+              <select class="form-control" name="type" required>
+                <option value="">Select type</option>
+                <option value="announcement">General Announcement</option>
+                <option value="welfare">Welfare Update</option>
+                <option value="event">Event Reminder</option>
+                <option value="emergency">Emergency Alert</option>
+                <option value="birthday">Birthday Greeting</option>
+                <option value="dues">Dues Reminder</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Title *</label>
+              <input type="text" class="form-control" name="title" placeholder="Enter notification title" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Message *</label>
+              <textarea class="form-control" name="message" rows="5" placeholder="Enter your message here..." required></textarea>
+              <div class="form-help">Maximum 500 characters</div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Target Audience *</label>
+              <div>
+                <label style="display: block; margin-bottom: 8px;">
+                  <input type="radio" name="audience" value="all" checked> All Members
+                </label>
+                <label style="display: block; margin-bottom: 8px;">
+                  <input type="radio" name="audience" value="verified"> Verified Members Only
+                </label>
+                <label style="display: block; margin-bottom: 8px;">
+                  <input type="radio" name="audience" value="unverified"> Unverified Members Only
+                </label>
+                <label style="display: block; margin-bottom: 8px;">
+                  <input type="radio" name="audience" value="lga"> By Local Government
+                </label>
+                <select class="form-control" name="specificLGA" id="lgaSelect" style="margin-top: 8px; display: none;">
+                  <option value="">Select LGA</option>
+                  <option value="Ardo Kola">Ardo Kola</option>
+                  <option value="Bali">Bali</option>
+                  <option value="Donga">Donga</option>
+                  <option value="Gashaka">Gashaka</option>
+                  <option value="Gassol">Gassol</option>
+                  <option value="Ibi">Ibi</option>
+                  <option value="Jalingo">Jalingo</option>
+                  <option value="Karim Lamido">Karim Lamido</option>
+                  <option value="Kurmi">Kurmi</option>
+                  <option value="Lau">Lau</option>
+                  <option value="Sardauna">Sardauna</option>
+                  <option value="Takum">Takum</option>
+                  <option value="Ussa">Ussa</option>
+                  <option value="Wukari">Wukari</option>
+                  <option value="Yorro">Yorro</option>
+                  <option value="Zing">Zing</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Send Method</label>
+              <div>
+                <label style="display: inline-flex; align-items: center; gap: 8px; margin-right: 16px;">
+                  <input type="checkbox" name="methods" value="dashboard" checked> Dashboard Notification
+                </label>
+                <label style="display: inline-flex; align-items: center; gap: 8px; margin-right: 16px;">
+                  <input type="checkbox" name="methods" value="email"> Email (if available)
+                </label>
+                <label style="display: inline-flex; align-items: center; gap: 8px;">
+                  <input type="checkbox" name="methods" value="sms"> SMS (if phone available)
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Schedule Notification</label>
+              <div>
+                <label style="display: block; margin-bottom: 8px;">
+                  <input type="radio" name="schedule" value="now" checked> Send Immediately
+                </label>
+                <label style="display: block; margin-bottom: 8px;">
+                  <input type="radio" name="schedule" value="later"> Schedule for Later
+                </label>
+                <input type="datetime-local" class="form-control" name="scheduledTime" style="margin-top: 8px; display: none;">
+              </div>
+            </div>
+            
+            <div class="d-flex justify-between mt-2">
+              <button type="reset" class="btn btn-secondary">Clear Form</button>
+              <button type="submit" class="btn btn-primary">Send Notification</button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Recent Notifications -->
+        <div class="card mt-2">
+          <div class="card-header">
+            <h3 class="card-title">📋 Recent Notifications Sent</h3>
+          </div>
+          <div class="table-container">
+            <table class="table" id="recentNotificationsTable">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Type</th>
+                  <th>Sent To</th>
+                  <th>Date Sent</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="5" class="text-center">No notifications sent yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modals -->
+  
+  <!-- Edit Member Modal -->
+  <div class="modal" id="editMemberModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Member</h3>
+        <button class="modal-close" onclick="closeModal('editMemberModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editMemberForm">
+          <input type="hidden" id="editMemberId">
+          <!-- Form fields will be populated by JavaScript -->
+          <div id="editMemberFormContent">
+            Loading member details...
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('editMemberModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveMemberChanges()">Save Changes</button>
       </div>
     </div>
   </div>
 
-  <!-- Celebrations Modal -->
-  <div id="celebrationsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
-    <div style="background: white; padding: 2rem; border-radius: 0.75rem; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <h2 style="margin: 0; font-size: 1.5rem;">All Upcoming Celebrations</h2>
-        <button id="closeCelebrationsModal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray);">×</button>
+  <!-- Delete Confirmation Modal -->
+  <div class="modal" id="deleteConfirmModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirm Delete</h3>
+        <button class="modal-close" onclick="closeModal('deleteConfirmModal')">&times;</button>
       </div>
-      <div id="celebrationsModalContent">
-        <!-- Celebrations will be loaded here -->
+      <div class="modal-body">
+        <p>Are you sure you want to delete this member?</p>
+        <p><strong id="deleteMemberName">Unknown</strong></p>
+        <p class="text-danger">This action cannot be undone!</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('deleteConfirmModal')">Cancel</button>
+        <button class="btn btn-danger" onclick="confirmDeleteMember()">Delete Member</button>
       </div>
     </div>
   </div>
+
+  <!-- Quick Actions Modal -->
+  <div class="modal" id="quickActionsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">⚡ Quick Actions</h3>
+        <button class="modal-close" onclick="closeModal('quickActionsModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; gap: var(--spacing-md);">
+          <button class="btn btn-success" onclick="switchSection('add-member'); closeModal('quickActionsModal');">
+            <span>➕</span> Add New Member
+          </button>
+          <button class="btn btn-primary" onclick="switchSection('notifications'); closeModal('quickActionsModal');">
+            <span>🔔</span> Send Notification
+          </button>
+          <button class="btn btn-warning" onclick="switchSection('events'); closeModal('quickActionsModal');">
+            <span>📅</span> Create Event
+          </button>
+          <button class="btn btn-info" onclick="switchSection('welfare'); closeModal('quickActionsModal');">
+            <span>💰</span> Manage Welfare
+          </button>
+          <button class="btn btn-secondary" onclick="exportData(); closeModal('quickActionsModal');">
+            <span>📥</span> Export Data
+          </button>
+          <button class="btn" onclick="switchSection('change-password'); closeModal('quickActionsModal');">
+            <span>🔒</span> Change Password
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- JavaScript -->
   <script>
     // ========== Configuration ==========
-    const API_BASE_URL = 'http://localhost:5000/api';
-
-    // ========== Global Variables ==========
+    const API_BASE_URL = '/api';
+    
+    // ========== State Management ==========
     let currentAdmin = null;
-    let authToken = null;
+    let currentSection = 'overview';
     let allMembers = [];
-    let filteredMembers = [];
-    let allCelebrations = [];
     let currentPage = 1;
-    let totalPages = 1;
+    const membersPerPage = 10;
+    let memberToDelete = null;
 
-    // ========== Get Elements ==========
+    // ========== DOM Elements ==========
     const loadingOverlay = document.getElementById('loadingOverlay');
     const loadingText = document.getElementById('loadingText');
     const alertSuccess = document.getElementById('alertSuccess');
     const alertError = document.getElementById('alertError');
+    const alertWarning = document.getElementById('alertWarning');
     const alertInfo = document.getElementById('alertInfo');
     const successMessage = document.getElementById('successMessage');
     const errorMessage = document.getElementById('errorMessage');
+    const warningMessage = document.getElementById('warningMessage');
     const infoMessage = document.getElementById('infoMessage');
+    
+    // Sidebar elements
+    const sidebar = document.getElementById('sidebar');
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const adminAvatar = document.getElementById('adminAvatar');
+    const adminName = document.getElementById('adminName');
+    const adminRole = document.getElementById('adminRole');
+    const membersCount = document.getElementById('membersCount');
+    const pendingCount = document.getElementById('pendingCount');
+    
+    // Section elements
+    const dashboardSections = {
+      overview: document.getElementById('overviewSection'),
+      members: document.getElementById('membersSection'),
+      pending: document.getElementById('pendingSection'),
+      'add-member': document.getElementById('addMemberSection'),
+      'change-password': document.getElementById('changePasswordSection')
+      // Add other sections as needed
+    };
+    
+    // Overview stats
+    const totalMembersEl = document.getElementById('totalMembers');
+    const verifiedMembersEl = document.getElementById('verifiedMembers');
+    const pendingMembersEl = document.getElementById('pendingMembers');
+    const activeMembersEl = document.getElementById('activeMembers');
+    
+    // Page elements
+    const pageTitle = document.getElementById('pageTitle');
+    const pageSubtitle = document.getElementById('pageSubtitle');
+    
+    // Tables
+    const recentMembersTable = document.getElementById('recentMembersTable');
+    const membersTable = document.getElementById('membersTable');
+    const pendingTable = document.getElementById('pendingTable');
+    
+    // Forms
+    const addMemberForm = document.getElementById('addMemberForm');
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    
+    // Search
+    const globalSearch = document.getElementById('globalSearch');
+    
+    // Buttons
     const logoutBtn = document.getElementById('logoutBtn');
-    const refreshMembersBtn = document.getElementById('refreshMembersBtn');
-    const refreshCelebrationsBtn = document.getElementById('refreshCelebrationsBtn');
-    const searchInput = document.getElementById('searchInput');
-    const filterLG = document.getElementById('filterLG');
-    const filterStatus = document.getElementById('filterStatus');
-    const exportDataBtn = document.getElementById('exportDataBtn');
-    const viewCelebrationsBtn = document.getElementById('viewCelebrationsBtn');
-    const sendBulkReminderBtn = document.getElementById('sendBulkReminderBtn');
-    const systemSettingsBtn = document.getElementById('systemSettingsBtn');
-    const memberModal = document.getElementById('memberModal');
-    const closeMemberModal = document.getElementById('closeMemberModal');
-    const celebrationsModal = document.getElementById('celebrationsModal');
-    const closeCelebrationsModal = document.getElementById('closeCelebrationsModal');
+    const quickActionBtn = document.getElementById('quickActionBtn');
 
-    // ========== Local Storage Functions ==========
-    function getFromLocalStorage(key) {
-      try {
-        const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : null;
-      } catch (error) {
-        console.error('Error reading from localStorage:', error);
-        return null;
-      }
-    }
-
-    function removeFromLocalStorage(key) {
-      try {
-        localStorage.removeItem(key);
-      } catch (error) {
-        console.error('Error removing from localStorage:', error);
-      }
-    }
-
-    // ========== Alert Functions ==========
-    function showAlert(type, message) {
+    // ========== Utility Functions ==========
+    function showAlert(message, type = 'success', duration = 5000) {
+      // Hide all alerts first
       alertSuccess.classList.remove('show');
       alertError.classList.remove('show');
+      alertWarning.classList.remove('show');
       alertInfo.classList.remove('show');
+
+      // Show selected alert
+      const alertMap = {
+        success: alertSuccess,
+        error: alertError,
+        warning: alertWarning,
+        info: alertInfo
+      };
       
-      if (type === 'success') {
-        successMessage.textContent = message;
-        alertSuccess.classList.add('show');
-      } else if (type === 'error') {
-        errorMessage.textContent = message;
-        alertError.classList.add('show');
-      } else if (type === 'info') {
-        infoMessage.textContent = message;
-        alertInfo.classList.add('show');
+      const messageMap = {
+        success: successMessage,
+        error: errorMessage,
+        warning: warningMessage,
+        info: infoMessage
+      };
+      
+      if (alertMap[type] && messageMap[type]) {
+        messageMap[type].textContent = message;
+        alertMap[type].classList.add('show');
       }
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      setTimeout(() => {
-        alertSuccess.classList.remove('show');
-        alertError.classList.remove('show');
-        alertInfo.classList.remove('show');
-      }, 5000);
+      // Auto-hide
+      if (duration > 0) {
+        setTimeout(() => {
+          if (alertMap[type]) {
+            alertMap[type].classList.remove('show');
+          }
+        }, duration);
+      }
     }
 
-    // ========== Loading Functions ==========
-    function showLoading(text = 'Loading...') {
-      loadingText.textContent = text;
+    function showLoading(message) {
+      loadingText.textContent = message;
       loadingOverlay.classList.add('show');
     }
 
@@ -1010,581 +1891,1463 @@
       loadingOverlay.classList.remove('show');
     }
 
-    // ========== Authentication Check ==========
-    function checkAuthentication() {
-      authToken = getFromLocalStorage('psnToken');
-      currentAdmin = getFromLocalStorage('psnUser');
-      const userRole = getFromLocalStorage('psnUserRole');
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
 
-      if (!authToken || !currentAdmin || userRole !== 'admin') {
-        console.log('Not authenticated as admin, redirecting to login...');
-        window.location.href = '/admin-login.html';
+    function formatDateTime(dateString) {
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function getInitials(name) {
+      if (!name) return 'U';
+      return name
+        .split(' ')
+        .map(word => word[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
+    }
+
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('show');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    // ========== Navigation ==========
+    function switchSection(section) {
+      // Update active menu link
+      document.querySelectorAll('.menu-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.dataset.section === section) {
+          link.classList.add('active');
+        }
+      });
+
+      // Update active section
+      Object.keys(dashboardSections).forEach(key => {
+        if (dashboardSections[key]) {
+          dashboardSections[key].classList.remove('active');
+        }
+      });
+      
+      if (dashboardSections[section]) {
+        dashboardSections[section].classList.add('active');
+      }
+
+      // Update current section
+      currentSection = section;
+
+      // Update page title based on section
+      const titles = {
+        overview: 'Dashboard Overview',
+        members: 'Members Management',
+        pending: 'Pending Verification',
+        'add-member': 'Add New Member',
+        'change-password': 'Change Password',
+        welfare: 'Welfare Management',
+        events: 'Events Calendar',
+        notifications: 'Send Notifications',
+        settings: 'System Settings'
+      };
+
+      const subtitles = {
+        overview: 'PSN Taraba Welfare Registry Management System',
+        members: 'Manage all registered members',
+        pending: 'Review and verify new registrations',
+        'add-member': 'Manually add new member to the system',
+        'change-password': 'Update your admin password',
+        welfare: 'Manage welfare packages and benefits',
+        events: 'Schedule and manage events',
+        notifications: 'Send notifications to members',
+        settings: 'Configure system settings'
+      };
+
+      pageTitle.textContent = titles[section] || 'Admin Dashboard';
+      pageSubtitle.textContent = subtitles[section] || 'PSN Taraba Welfare Registry Management System';
+
+      // Load section-specific data
+      if (section === 'overview') {
+        loadOverviewData();
+      } else if (section === 'members') {
+        loadMembersData();
+      } else if (section === 'pending') {
+        loadPendingData();
+      }
+
+      // Close mobile menu on section change
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('show');
+      }
+    }
+
+    // ========== Authentication & Initialization ==========
+    function checkAdminAuth() {
+      const adminToken = localStorage.getItem('psnAdminToken');
+      const adminData = localStorage.getItem('psnAdmin');
+      const userRole = localStorage.getItem('psnUserRole');
+
+      if (!adminToken || !adminData || userRole !== 'admin') {
+        showAlert('Please login as admin first', 'error');
+        setTimeout(() => {
+          window.location.href = '/admin-login';
+        }, 1500);
         return false;
       }
 
-      return true;
+      try {
+        currentAdmin = JSON.parse(adminData);
+        updateAdminInfo();
+        return true;
+      } catch (error) {
+        console.error('Error parsing admin data:', error);
+        localStorage.clear();
+        window.location.href = '/admin-login';
+        return false;
+      }
     }
 
-    // ========== API Request Helper ==========
-    async function apiRequest(endpoint, options = {}) {
+    function updateAdminInfo() {
+      if (currentAdmin) {
+        adminName.textContent = currentAdmin.fullName || 'Admin User';
+        adminRole.textContent = currentAdmin.role || 'Administrator';
+        adminAvatar.textContent = getInitials(currentAdmin.fullName || 'Admin');
+      }
+    }
+
+    // ========== Data Loading ==========
+    async function loadOverviewData() {
       try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-          ...options,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`,
-            ...options.headers
+        showLoading('Loading dashboard data...');
+        
+        // Load statistics
+        const statsResponse = await fetch(`${API_BASE_URL}/admin/stats`);
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+          if (statsData.success) {
+            updateStats(statsData.stats);
           }
+        }
+
+        // Load recent members
+        const membersResponse = await fetch(`${API_BASE_URL}/admin/members`);
+        if (membersResponse.ok) {
+          const membersData = await membersResponse.json();
+          if (membersData.success) {
+            updateRecentMembers(membersData.members.slice(0, 5));
+            updateMembersCount(membersData.members.length);
+            updatePendingCount(membersData.members.filter(m => !m.isVerified).length);
+          }
+        }
+
+        // Load system info
+        const healthResponse = await fetch(`${API_BASE_URL}/health`);
+        if (healthResponse.ok) {
+          const healthData = await healthResponse.json();
+          if (healthData.uptime) {
+            updateSystemInfo(healthData.uptime);
+          }
+        }
+
+      } catch (error) {
+        console.error('Error loading overview data:', error);
+        showAlert('Failed to load dashboard data', 'error');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function updateStats(stats) {
+      totalMembersEl.textContent = stats.totalMembers || 0;
+      verifiedMembersEl.textContent = stats.verifiedMembers || 0;
+      pendingMembersEl.textContent = stats.totalMembers - stats.verifiedMembers || 0;
+      activeMembersEl.textContent = stats.activeMembers || 0;
+      
+      // Update badge counts
+      membersCount.textContent = stats.totalMembers || 0;
+      pendingCount.textContent = stats.totalMembers - stats.verifiedMembers || 0;
+    }
+
+    function updateRecentMembers(members) {
+      const tbody = recentMembersTable.querySelector('tbody');
+      tbody.innerHTML = '';
+
+      if (members.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" class="text-center">No recent members</td>
+          </tr>
+        `;
+        return;
+      }
+
+      members.forEach(member => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${member.fullName || 'Unknown'}</td>
+          <td>${member.email || 'N/A'}</td>
+          <td>${formatDate(member.registrationDate)}</td>
+          <td>
+            <span class="status ${member.isVerified ? 'active' : 'pending'}">
+              ${member.isVerified ? 'Verified' : 'Pending'}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function updateMembersCount(count) {
+      membersCount.textContent = count;
+    }
+
+    function updatePendingCount(count) {
+      pendingCount.textContent = count;
+    }
+
+    function updateSystemInfo(uptime) {
+      const days = Math.floor(uptime / (24 * 60 * 60));
+      const hours = Math.floor((uptime % (24 * 60 * 60)) / (60 * 60));
+      const minutes = Math.floor((uptime % (60 * 60)) / 60);
+      
+      document.getElementById('serverUptime').textContent = 
+        `${days}d ${hours}h ${minutes}m`;
+    }
+
+    // ========== Members Management ==========
+    async function loadMembersData(page = 1) {
+      try {
+        showLoading('Loading members...');
+        
+        const response = await fetch(`${API_BASE_URL}/admin/members`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            allMembers = data.members;
+            displayMembersPage(page);
+            updateMembersCount(allMembers.length);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading members:', error);
+        showAlert('Failed to load members', 'error');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function displayMembersPage(page) {
+      const tbody = membersTable.querySelector('tbody');
+      tbody.innerHTML = '';
+
+      if (allMembers.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center">No members found</td>
+          </tr>
+        `;
+        return;
+      }
+
+      const startIndex = (page - 1) * membersPerPage;
+      const endIndex = startIndex + membersPerPage;
+      const pageMembers = allMembers.slice(startIndex, endIndex);
+
+      pageMembers.forEach(member => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${member.id.substring(0, 8)}...</td>
+          <td>${member.fullName || 'Unknown'}</td>
+          <td>${member.email || 'N/A'}</td>
+          <td>${member.phoneNumber || 'N/A'}</td>
+          <td>${member.localGovernment || 'N/A'}</td>
+          <td>
+            <span class="status ${member.isVerified ? 'active' : 'pending'}">
+              ${member.isVerified ? 'Verified' : 'Pending'}
+            </span>
+          </td>
+          <td>
+            <div class="table-actions">
+              <button class="btn btn-sm btn-primary" onclick="editMember('${member.id}')">
+                Edit
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteMember('${member.id}', '${member.fullName}')">
+                Delete
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      updatePagination(page, Math.ceil(allMembers.length / membersPerPage));
+    }
+
+    function updatePagination(currentPage, totalPages) {
+      const pagination = document.getElementById('membersPagination');
+      pagination.innerHTML = '';
+
+      if (totalPages <= 1) return;
+
+      // Previous button
+      const prevLi = document.createElement('li');
+      prevLi.className = 'page-item';
+      prevLi.innerHTML = `
+        <a class="page-link ${currentPage === 1 ? 'disabled' : ''}" 
+           onclick="${currentPage > 1 ? `displayMembersPage(${currentPage - 1})` : ''}">
+          &laquo;
+        </a>
+      `;
+      pagination.appendChild(prevLi);
+
+      // Page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement('li');
+        li.className = 'page-item';
+        li.innerHTML = `
+          <a class="page-link ${i === currentPage ? 'active' : ''}" 
+             onclick="displayMembersPage(${i})">
+            ${i}
+          </a>
+        `;
+        pagination.appendChild(li);
+      }
+
+      // Next button
+      const nextLi = document.createElement('li');
+      nextLi.className = 'page-item';
+      nextLi.innerHTML = `
+        <a class="page-link ${currentPage === totalPages ? 'disabled' : ''}" 
+           onclick="${currentPage < totalPages ? `displayMembersPage(${currentPage + 1})` : ''}">
+          &raquo;
+        </a>
+      `;
+      pagination.appendChild(nextLi);
+    }
+
+    async function editMember(memberId) {
+      try {
+        showLoading('Loading member details...');
+        
+        const response = await fetch(`${API_BASE_URL}/admin/members/${memberId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            showEditMemberModal(data.member);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading member:', error);
+        showAlert('Failed to load member details', 'error');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function showEditMemberModal(member) {
+      const formContent = document.getElementById('editMemberFormContent');
+      formContent.innerHTML = `
+        <input type="hidden" id="editMemberId" value="${member.id}">
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="fullName" value="${member.fullName || ''}" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-control" name="email" value="${member.email || ''}" required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" class="form-control" name="phoneNumber" value="${member.phoneNumber || ''}" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Local Government</label>
+            <select class="form-control" name="localGovernment" required>
+              <option value="">Select LGA</option>
+              <option value="Ardo Kola" ${member.localGovernment === 'Ardo Kola' ? 'selected' : ''}>Ardo Kola</option>
+              <option value="Bali" ${member.localGovernment === 'Bali' ? 'selected' : ''}>Bali</option>
+              <option value="Donga" ${member.localGovernment === 'Donga' ? 'selected' : ''}>Donga</option>
+              <option value="Gashaka" ${member.localGovernment === 'Gashaka' ? 'selected' : ''}>Gashaka</option>
+              <option value="Gassol" ${member.localGovernment === 'Gassol' ? 'selected' : ''}>Gassol</option>
+              <option value="Ibi" ${member.localGovernment === 'Ibi' ? 'selected' : ''}>Ibi</option>
+              <option value="Jalingo" ${member.localGovernment === 'Jalingo' ? 'selected' : ''}>Jalingo</option>
+              <option value="Karim Lamido" ${member.localGovernment === 'Karim Lamido' ? 'selected' : ''}>Karim Lamido</option>
+              <option value="Kurmi" ${member.localGovernment === 'Kurmi' ? 'selected' : ''}>Kurmi</option>
+              <option value="Lau" ${member.localGovernment === 'Lau' ? 'selected' : ''}>Lau</option>
+              <option value="Sardauna" ${member.localGovernment === 'Sardauna' ? 'selected' : ''}>Sardauna</option>
+              <option value="Takum" ${member.localGovernment === 'Takum' ? 'selected' : ''}>Takum</option>
+              <option value="Ussa" ${member.localGovernment === 'Ussa' ? 'selected' : ''}>Ussa</option>
+              <option value="Wukari" ${member.localGovernment === 'Wukari' ? 'selected' : ''}>Wukari</option>
+              <option value="Yorro" ${member.localGovernment === 'Yorro' ? 'selected' : ''}>Yorro</option>
+              <option value="Zing" ${member.localGovernment === 'Zing' ? 'selected' : ''}>Zing</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Verification Status</label>
+          <div>
+            <label style="display: inline-flex; align-items: center; gap: var(--spacing-sm);">
+              <input type="checkbox" name="isVerified" ${member.isVerified ? 'checked' : ''}>
+              <span>Member is verified</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Account Status</label>
+          <select class="form-control" name="status">
+            <option value="active" ${member.status === 'active' ? 'selected' : ''}>Active</option>
+            <option value="inactive" ${member.status === 'inactive' ? 'selected' : ''}>Inactive</option>
+            <option value="suspended" ${member.status === 'suspended' ? 'selected' : ''}>Suspended</option>
+          </select>
+        </div>
+      `;
+      
+      openModal('editMemberModal');
+    }
+
+    async function saveMemberChanges() {
+      try {
+        const form = document.getElementById('editMemberForm');
+        const formData = new FormData(form);
+        const memberId = document.getElementById('editMemberId').value;
+        
+        const updates = {
+          fullName: formData.get('fullName'),
+          email: formData.get('email'),
+          phoneNumber: formData.get('phoneNumber'),
+          localGovernment: formData.get('localGovernment'),
+          isVerified: formData.get('isVerified') === 'on',
+          status: formData.get('status')
+        };
+
+        showLoading('Saving changes...');
+
+        const response = await fetch(`${API_BASE_URL}/admin/members/${memberId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updates)
         });
 
         const data = await response.json();
 
-        if (response.status === 401) {
-          showAlert('error', 'Session expired. Please login again.');
+        if (response.ok && data.success) {
+          showAlert('Member updated successfully', 'success');
+          closeModal('editMemberModal');
+          loadMembersData(currentPage);
+          loadOverviewData();
+        } else {
+          throw new Error(data.message || 'Failed to update member');
+        }
+      } catch (error) {
+        console.error('Error updating member:', error);
+        showAlert(error.message, 'error');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function deleteMember(memberId, memberName) {
+      memberToDelete = { id: memberId, name: memberName };
+      document.getElementById('deleteMemberName').textContent = memberName;
+      openModal('deleteConfirmModal');
+    }
+
+    async function confirmDeleteMember() {
+      if (!memberToDelete) return;
+
+      try {
+        showLoading('Deleting member...');
+
+        const response = await fetch(`${API_BASE_URL}/admin/members/${memberToDelete.id}`, {
+          method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          showAlert('Member deleted successfully', 'success');
+          closeModal('deleteConfirmModal');
+          loadMembersData(currentPage);
+          loadOverviewData();
+        } else {
+          throw new Error(data.message || 'Failed to delete member');
+        }
+      } catch (error) {
+        console.error('Error deleting member:', error);
+        showAlert(error.message, 'error');
+      } finally {
+        hideLoading();
+        memberToDelete = null;
+      }
+    }
+
+    // ========== Pending Verification ==========
+    async function loadPendingData() {
+      try {
+        showLoading('Loading pending members...');
+        
+        const response = await fetch(`${API_BASE_URL}/admin/members`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            const pendingMembers = data.members.filter(m => !m.isVerified);
+            updatePendingTable(pendingMembers);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading pending members:', error);
+        showAlert('Failed to load pending members', 'error');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function updatePendingTable(members) {
+      const tbody = pendingTable.querySelector('tbody');
+      tbody.innerHTML = '';
+
+      if (members.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center">No pending members</td>
+          </tr>
+        `;
+        return;
+      }
+
+      members.forEach(member => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${member.fullName || 'Unknown'}</td>
+          <td>${member.email || 'N/A'}</td>
+          <td>${member.psnMembershipNumber || 'N/A'}</td>
+          <td>${formatDate(member.registrationDate)}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn btn-sm btn-success" onclick="verifyMember('${member.id}')">
+                Verify
+              </button>
+              <button class="btn btn-sm btn-primary" onclick="editMember('${member.id}')">
+                Edit
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function verifyMember(memberId) {
+      try {
+        showLoading('Verifying member...');
+
+        const response = await fetch(`${API_BASE_URL}/admin/members/${memberId}/verify`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            verifiedBy: currentAdmin.username
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          showAlert('Member verified successfully', 'success');
+          loadPendingData();
+          loadOverviewData();
+        } else {
+          throw new Error(data.message || 'Failed to verify member');
+        }
+      } catch (error) {
+        console.error('Error verifying member:', error);
+        showAlert(error.message, 'error');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    async function verifyAllPending() {
+      if (!confirm('Are you sure you want to verify all pending members?')) {
+        return;
+      }
+
+      try {
+        showLoading('Verifying all pending members...');
+        
+        const response = await fetch(`${API_BASE_URL}/admin/members`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            const pendingMembers = data.members.filter(m => !m.isVerified);
+            
+            // Verify each pending member
+            for (const member of pendingMembers) {
+              await fetch(`${API_BASE_URL}/admin/members/${member.id}/verify`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  verifiedBy: currentAdmin.username + ' (batch)'
+                })
+              });
+            }
+            
+            showAlert(`Verified ${pendingMembers.length} members successfully`, 'success');
+            loadPendingData();
+            loadOverviewData();
+          }
+        }
+      } catch (error) {
+        console.error('Error verifying all members:', error);
+        showAlert('Failed to verify all members', 'error');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // ========== Add Member ==========
+    addMemberForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(addMemberForm);
+      const data = {
+        fullName: formData.get('fullName'),
+        email: formData.get('email'),
+        phoneNumber: formData.get('phoneNumber'),
+        password: formData.get('password'),
+        psnMembershipNumber: formData.get('psnMembershipNumber'),
+        localGovernment: formData.get('localGovernment'),
+        psnYearOfInduction: parseInt(formData.get('psnYearOfInduction')),
+        isVerified: formData.get('autoVerify') === 'on'
+      };
+
+      try {
+        showLoading('Creating member account...');
+
+        // First, check if email or PSN number already exists
+        const checkResponse = await fetch(`${API_BASE_URL}/admin/members`);
+        if (checkResponse.ok) {
+          const checkData = await checkResponse.json();
+          if (checkData.success) {
+            const existingMember = checkData.members.find(m => 
+              m.email === data.email || m.psnMembershipNumber === data.psnMembershipNumber
+            );
+            
+            if (existingMember) {
+              throw new Error('A member with this email or PSN number already exists');
+            }
+          }
+        }
+
+        // Create the member (using regular registration endpoint with admin privileges)
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            ...data,
+            confirmPassword: data.password,
+            dateOfBirth: '1990-01-01', // Default DOB
+            placeOfWork: '',
+            residentialAddress: '',
+            nextOfKin: { name: '', relationship: '', phoneNumber: '' },
+            dataConsent: true
+          })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          showAlert('Member created successfully', 'success');
+          addMemberForm.reset();
+          
+          // If auto-verify was checked, update the member
+          if (data.isVerified) {
+            await fetch(`${API_BASE_URL}/admin/members/${result.user.id}/verify`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                verifiedBy: currentAdmin.username
+              })
+            });
+          }
+          
+          // Reload data
+          loadOverviewData();
+          switchSection('members');
+        } else {
+          throw new Error(result.message || 'Failed to create member');
+        }
+      } catch (error) {
+        console.error('Error creating member:', error);
+        showAlert(error.message, 'error');
+      } finally {
+        hideLoading();
+      }
+    });
+
+    // ========== Change Password ==========
+    changePasswordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(changePasswordForm);
+      const currentPassword = formData.get('currentPassword');
+      const newPassword = formData.get('newPassword');
+      const confirmPassword = formData.get('confirmPassword');
+
+      if (newPassword !== confirmPassword) {
+        showAlert('New passwords do not match', 'error');
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        showAlert('Password must be at least 8 characters', 'error');
+        return;
+      }
+
+      try {
+        showLoading('Changing password...');
+
+        const response = await fetch(`${API_BASE_URL}/admin/change-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: currentAdmin.username,
+            currentPassword,
+            newPassword
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          showAlert('Password changed successfully! Please login again.', 'success');
+          
+          // Logout and redirect to login
           setTimeout(() => {
             logout();
           }, 2000);
-          return null;
-        }
-
-        return { response, data };
-      } catch (error) {
-        console.error('API request error:', error);
-        showAlert('error', 'Network error. Please check your connection.');
-        return null;
-      }
-    }
-
-    // ========== Format Date Functions ==========
-    function formatDate(dateString) {
-      const date = new Date(dateString);
-      const options = { year: 'numeric', month: 'short', day: 'numeric' };
-      return date.toLocaleDateString('en-US', options);
-    }
-
-    function formatDateShort(dateString) {
-      const date = new Date(dateString);
-      const options = { month: 'short', day: 'numeric' };
-      return date.toLocaleDateString('en-US', options);
-    }
-
-    // ========== Load Admin Data ==========
-    async function loadAdminData() {
-      try {
-        const result = await apiRequest('/auth/me');
-        
-        if (result && result.data.success) {
-          currentAdmin = result.data.data.user;
-          
-          document.getElementById('adminName').textContent = currentAdmin.fullName;
-          document.getElementById('adminRole').textContent = currentAdmin.role || 'Administrator';
-          
-          return true;
         } else {
-          showAlert('error', 'Failed to load admin data');
-          return false;
+          throw new Error(data.message || 'Failed to change password');
         }
       } catch (error) {
-        console.error('Error loading admin data:', error);
-        showAlert('error', 'Failed to load admin data');
-        return false;
-      }
-    }
-
-    // ========== Load Dashboard Statistics ==========
-    async function loadDashboardStats() {
-      try {
-        const result = await apiRequest('/admin/stats');
-        
-        if (result && result.data.success) {
-          const stats = result.data.data;
-          
-          document.getElementById('totalMembers').textContent = stats.totalMembers;
-          document.getElementById('activeMembers').textContent = stats.activeMembers;
-          document.getElementById('upcomingEvents').textContent = stats.upcomingEvents;
-          document.getElementById('todayEvents').textContent = stats.todayEvents;
-          document.getElementById('memberChange').innerHTML = 
-            `<span>+${stats.newMembersThisMonth} this month</span>`;
-          
-          return true;
-        } else {
-          // Set to 0 if failed
-          document.getElementById('totalMembers').textContent = '0';
-          document.getElementById('activeMembers').textContent = '0';
-          document.getElementById('upcomingEvents').textContent = '0';
-          document.getElementById('todayEvents').textContent = '0';
-          return false;
-        }
-      } catch (error) {
-        console.error('Error loading stats:', error);
-        return false;
-      }
-    }
-
-    // ========== Load Members from API ==========
-    async function loadMembers() {
-      try {
-        const searchTerm = searchInput.value.trim();
-        const lg = filterLG.value;
-        const status = filterStatus.value;
-
-        const queryParams = new URLSearchParams({
-          page: currentPage,
-          limit: 10,
-          ...(searchTerm && { search: searchTerm }),
-          ...(lg && { localGovernment: lg }),
-          ...(status && { status })
-        });
-
-        const result = await apiRequest(`/admin/members?${queryParams}`);
-        
-        if (result && result.data.success) {
-          allMembers = result.data.data.members;
-          totalPages = result.data.pages || 1;
-          displayMembers();
-          updatePagination();
-          return true;
-        } else {
-          allMembers = [];
-          displayMembers();
-          return false;
-        }
-      } catch (error) {
-        console.error('Error loading members:', error);
-        allMembers = [];
-        displayMembers();
-        return false;
-      }
-    }
-
-    // ========== Display Members ==========
-    function displayMembers() {
-      const tableBody = document.getElementById('membersTableBody');
-      
-      if (allMembers.length === 0) {
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="8" class="table-empty">
-              <p>No members found</p>
-              <p class="text-muted" style="font-size: 0.875rem; margin-top: 0.5rem;">
-                Try adjusting your search or filters
-              </p>
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      tableBody.innerHTML = allMembers.map(member => `
-        <tr>
-          <td><strong>${member.fullName}</strong></td>
-          <td>${member.email}</td>
-          <td>${member.phoneNumber}</td>
-          <td><span class="badge badge-info">${member.psnMembershipNumber}</span></td>
-          <td>${member.localGovernment}</td>
-          <td>${formatDate(member.registrationDate)}</td>
-          <td>
-            <span class="badge ${member.isActive ? 'badge-success' : 'badge-danger'}">
-              ${member.isActive ? 'Active' : 'Inactive'}
-            </span>
-          </td>
-          <td>
-            <button class="btn btn-sm btn-primary" onclick="viewMemberDetails('${member._id}')">
-              View
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    // ========== Update Pagination ==========
-    function updatePagination() {
-      const pageInfo = document.getElementById('pageInfo');
-      const prevBtn = document.getElementById('prevPageBtn');
-      const nextBtn = document.getElementById('nextPageBtn');
-
-      pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-      prevBtn.disabled = currentPage === 1;
-      nextBtn.disabled = currentPage === totalPages || totalPages === 0;
-    }
-
-    // ========== Load Upcoming Celebrations ==========
-    async function loadCelebrations() {
-      try {
-        const result = await apiRequest('/admin/celebrations?days=30');
-        
-        if (result && result.data.success) {
-          allCelebrations = result.data.data.celebrations;
-          displayCelebrations();
-          return true;
-        } else {
-          allCelebrations = [];
-          displayCelebrations();
-          return false;
-        }
-      } catch (error) {
-        console.error('Error loading celebrations:', error);
-        allCelebrations = [];
-        displayCelebrations();
-        return false;
-      }
-    }
-
-    // ========== Display Celebrations ==========
-    function displayCelebrations() {
-      const tableBody = document.getElementById('celebrationsTableBody');
-      
-      if (allCelebrations.length === 0) {
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="5" class="table-empty">
-              <p>No upcoming celebrations in the next 30 days</p>
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      // Show only first 5 in dashboard
-      const displayCelebrations = allCelebrations.slice(0, 5);
-
-      tableBody.innerHTML = displayCelebrations.map(celebration => {
-        const displayLabel = celebration.eventLabel === 'Other Celebration' && celebration.customLabel 
-          ? celebration.customLabel 
-          : celebration.eventLabel;
-
-        let daysText = '';
-        let badgeClass = '';
-        
-        if (celebration.daysUntil === 0) {
-          daysText = 'Today!';
-          badgeClass = 'badge-danger';
-        } else if (celebration.daysUntil === 1) {
-          daysText = 'Tomorrow';
-          badgeClass = 'badge-warning';
-        } else if (celebration.daysUntil <= 7) {
-          daysText = `${celebration.daysUntil} days`;
-          badgeClass = 'badge-warning';
-        } else {
-          daysText = `${celebration.daysUntil} days`;
-          badgeClass = 'badge-info';
-        }
-
-        return `
-          <tr>
-            <td><strong>${celebration.member?.fullName || 'N/A'}</strong></td>
-            <td>${displayLabel}</td>
-            <td>${formatDateShort(celebration.eventDate)}</td>
-            <td><span class="badge ${badgeClass}">${daysText}</span></td>
-            <td>
-              <a href="tel:${celebration.member?.phoneNumber}" style="color: var(--primary-color);">
-                ${celebration.member?.phoneNumber || 'N/A'}
-              </a>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    // ========== View Member Details ==========
-    window.viewMemberDetails = async function(memberId) {
-      showLoading('Loading member details...');
-
-      try {
-        const result = await apiRequest(`/admin/members/${memberId}`);
-        
-        if (result && result.data.success) {
-          const member = result.data.data.member;
-          
-          const modalContent = document.getElementById('memberModalContent');
-          modalContent.innerHTML = `
-            <div style="display: grid; gap: 1rem;">
-              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Full Name</div>
-                <div style="font-weight: 600;">${member.fullName}</div>
-              </div>
-              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Email</div>
-                <div style="font-weight: 600;">${member.email}</div>
-              </div>
-              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Phone Number</div>
-                <div style="font-weight: 600;">${member.phoneNumber}</div>
-              </div>
-              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Date of Birth</div>
-                <div style="font-weight: 600;">${member.dateOfBirth ? formatDate(member.dateOfBirth) : 'N/A'}</div>
-              </div>
-              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">PSN Membership Number</div>
-                <div style="font-weight: 600;">${member.psnMembershipNumber}</div>
-              </div>
-              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Year of Induction</div>
-                <div style="font-weight: 600;">${member.psnYearOfInduction}</div>
-              </div>
-              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Local Government</div>
-                <div style="font-weight: 600;">${member.localGovernment}</div>
-              </div>
-              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Place of Work</div>
-                <div style="font-weight: 600;">${member.placeOfWork || 'Not specified'}</div>
-              </div>
-              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Next of Kin</div>
-                <div style="font-weight: 600;">${member.nextOfKin?.name || 'N/A'}</div>
-                <div style="font-size: 0.875rem; color: var(--gray); margin-top: 0.5rem;">
-                  ${member.nextOfKin?.relationship || ''} - ${member.nextOfKin?.phoneNumber || ''}
-                </div>
-              </div>
-              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Registration Date</div>
-                <div style="font-weight: 600;">${formatDate(member.registrationDate)}</div>
-              </div>
-              <div style="padding: 1rem; background: var(--gray-lighter); border-radius: 0.5rem;">
-                <div style="font-size: 0.875rem; color: var(--gray); margin-bottom: 0.25rem;">Status</div>
-                <div>
-                  <span class="badge ${member.isActive ? 'badge-success' : 'badge-danger'}">
-                    ${member.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          `;
-
-          memberModal.style.display = 'flex';
-        } else {
-          showAlert('error', 'Failed to load member details');
-        }
-      } catch (error) {
-        console.error('View member error:', error);
-        showAlert('error', 'Failed to load member details');
+        console.error('Error changing password:', error);
+        showAlert(error.message, 'error');
       } finally {
         hideLoading();
       }
-    };
+    });
 
-    // ========== View All Celebrations ==========
-    viewCelebrationsBtn.addEventListener('click', () => {
-      const modalContent = document.getElementById('celebrationsModalContent');
+    function generatePassword() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+      let password = '';
       
-      if (allCelebrations.length === 0) {
-        modalContent.innerHTML = '<p class="text-center text-muted">No upcoming celebrations</p>';
-      } else {
-        modalContent.innerHTML = `
-          <div class="table-container">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Member Name</th>
-                  <th>Event</th>
-                  <th>Date</th>
-                  <th>Days Until</th>
-                  <th>Contact</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${allCelebrations.map(celebration => {
-                  const displayLabel = celebration.eventLabel === 'Other Celebration' && celebration.customLabel 
-                    ? celebration.customLabel 
-                    : celebration.eventLabel;
-
-                  let badgeClass = celebration.daysUntil === 0 ? 'badge-danger' :
-                                   celebration.daysUntil <= 7 ? 'badge-warning' : 'badge-info';
-
-                  return `
-                    <tr>
-                      <td><strong>${celebration.member?.fullName || 'N/A'}</strong></td>
-                      <td>${displayLabel}</td>
-                      <td>${formatDateShort(celebration.eventDate)}</td>
-                      <td><span class="badge ${badgeClass}">${celebration.daysUntil} days</span></td>
-                      <td>${celebration.member?.phoneNumber || 'N/A'}</td>
-                    </tr>
-                  `;
-                }).join('')}
-              </tbody>
-            </table>
-          </div>
-        `;
+      // Ensure at least one uppercase, one lowercase, one number, one special char
+      password += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random() * 26)];
+      password += 'abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random() * 26)];
+      password += '0123456789'[Math.floor(Math.random() * 10)];
+      password += '!@#$%^&*'[Math.floor(Math.random() * 8)];
+      
+      // Add remaining characters
+      for (let i = 4; i < 12; i++) {
+        password += chars[Math.floor(Math.random() * chars.length)];
       }
       
-      celebrationsModal.style.display = 'flex';
-    });
+      // Shuffle the password
+      password = password.split('').sort(() => 0.5 - Math.random()).join('');
+      
+      // Set the generated password in the form
+      document.querySelector('input[name="newPassword"]').value = password;
+      document.querySelector('input[name="confirmPassword"]').value = password;
+      
+      showAlert('Strong password generated!', 'info', 3000);
+    }
 
-    // ========== Close Modals ==========
-    closeMemberModal.addEventListener('click', () => {
-      memberModal.style.display = 'none';
-    });
+    // ========== Export Functions ==========
+    function exportData() {
+      // This would export all data as CSV/Excel
+      showAlert('Export feature coming soon!', 'info');
+    }
 
-    closeCelebrationsModal.addEventListener('click', () => {
-      celebrationsModal.style.display = 'none';
-    });
-
-    memberModal.addEventListener('click', (e) => {
-      if (e.target === memberModal) {
-        memberModal.style.display = 'none';
-      }
-    });
-
-    celebrationsModal.addEventListener('click', (e) => {
-      if (e.target === celebrationsModal) {
-        celebrationsModal.style.display = 'none';
-      }
-    });
-
-    // ========== Export Data ==========
-    exportDataBtn.addEventListener('click', () => {
+    function exportMembers() {
       if (allMembers.length === 0) {
-        showAlert('info', 'No data to export');
+        showAlert('No members to export', 'warning');
         return;
       }
 
-      const headers = ['Name', 'Email', 'Phone', 'PSN Number', 'Local Government', 'Registration Date', 'Status'];
+      // Create CSV content
+      const headers = ['ID', 'Name', 'Email', 'Phone', 'LGA', 'Status', 'Registration Date'];
+      const rows = allMembers.map(member => [
+        member.id,
+        member.fullName || '',
+        member.email || '',
+        member.phoneNumber || '',
+        member.localGovernment || '',
+        member.isVerified ? 'Verified' : 'Pending',
+        formatDate(member.registrationDate)
+      ]);
+
       const csvContent = [
         headers.join(','),
-        ...allMembers.map(m => [
-          m.fullName,
-          m.email,
-          m.phoneNumber,
-          m.psnMembershipNumber,
-          m.localGovernment,
-          formatDate(m.registrationDate),
-          m.isActive ? 'Active' : 'Inactive'
-        ].join(','))
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
       ].join('\n');
 
+      // Create download link
       const blob = new Blob([csvContent], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `psn-members-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
 
-      showAlert('success', 'Member data exported successfully');
-    });
-
-    // ========== Quick Action Placeholders ==========
-    sendBulkReminderBtn.addEventListener('click', () => {
-      showAlert('info', 'Bulk reminder feature coming soon!');
-    });
-
-    systemSettingsBtn.addEventListener('click', () => {
-      showAlert('info', 'System settings feature coming soon!');
-    });
-
-    // ========== Pagination Handlers ==========
-    document.getElementById('prevPageBtn').addEventListener('click', () => {
-      if (currentPage > 1) {
-        currentPage--;
-        loadMembers();
-      }
-    });
-
-    document.getElementById('nextPageBtn').addEventListener('click', () => {
-      if (currentPage < totalPages) {
-        currentPage++;
-        loadMembers();
-      }
-    });
-
-    // ========== Search and Filter Event Listeners ==========
-    let searchTimeout;
-    searchInput.addEventListener('input', () => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        currentPage = 1;
-        loadMembers();
-      }, 500);
-    });
-
-    filterLG.addEventListener('change', () => {
-      currentPage = 1;
-      loadMembers();
-    });
-
-    filterStatus.addEventListener('change', () => {
-      currentPage = 1;
-      loadMembers();
-    });
-
-    // ========== Refresh Handlers ==========
-    refreshMembersBtn.addEventListener('click', async () => {
-      showLoading('Refreshing members...');
-      await loadMembers();
-      hideLoading();
-      showAlert('success', 'Members list refreshed');
-    });
-
-    refreshCelebrationsBtn.addEventListener('click', async () => {
-      showLoading('Refreshing celebrations...');
-      await loadCelebrations();
-      hideLoading();
-      showAlert('success', 'Celebrations refreshed');
-    });
-
-    // ========== Logout Function ==========
-    function logout() {
-      removeFromLocalStorage('psnToken');
-      removeFromLocalStorage('psnUser');
-      removeFromLocalStorage('psnUserRole');
-      window.location.href = '/admin-login.html';
+      showAlert(`Exported ${allMembers.length} members`, 'success');
     }
 
-    logoutBtn.addEventListener('click', () => {
-      if (confirm('Are you sure you want to logout?')) {
-        logout();
+    // ========== Logout Function ==========
+    async function logout() {
+      try {
+        showLoading('Logging out...');
+        
+        // Clear admin data from localStorage
+        localStorage.removeItem('psnAdminToken');
+        localStorage.removeItem('psnAdmin');
+        localStorage.removeItem('psnUserRole');
+        
+        // Optional: Notify server
+        try {
+          await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
+        } catch (error) {
+          // Ignore if server is unreachable
+        }
+        
+        // Redirect to admin login
+        setTimeout(() => {
+          window.location.href = '/admin-login';
+        }, 500);
+        
+      } catch (error) {
+        console.error('Logout error:', error);
+        showAlert('Logout error', 'error');
       }
+    }
+
+    // ========== Search Functionality ==========
+    globalSearch.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      
+      if (searchTerm.length < 2) {
+        // If search term is too short, show all members
+        displayMembersPage(1);
+        return;
+      }
+      
+      const filteredMembers = allMembers.filter(member => 
+        member.fullName?.toLowerCase().includes(searchTerm) ||
+        member.email?.toLowerCase().includes(searchTerm) ||
+        member.phoneNumber?.includes(searchTerm) ||
+        member.localGovernment?.toLowerCase().includes(searchTerm)
+      );
+      
+      // Temporarily replace allMembers with filtered results
+      const originalMembers = [...allMembers];
+      allMembers = filteredMembers;
+      displayMembersPage(1);
+      allMembers = originalMembers;
+    });
+
+    // ========== Event Listeners ==========
+    // Menu navigation
+    document.querySelectorAll('.menu-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        if (link.dataset.section) {
+          e.preventDefault();
+          switchSection(link.dataset.section);
+        }
+      });
+    });
+
+    // Mobile menu toggle
+    mobileMenuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('show');
+    });
+
+    // Quick actions button
+    quickActionBtn.addEventListener('click', () => {
+      openModal('quickActionsModal');
+    });
+
+    // Logout button
+    logoutBtn.addEventListener('click', logout);
+
+    // Close modal when clicking outside
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('show');
+        }
+      });
     });
 
     // ========== Initialize Dashboard ==========
-    async function initializeDashboard() {
-      if (!checkAuthentication()) {
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('👑 Admin dashboard initializing...');
+      
+      // Check authentication
+      if (!checkAdminAuth()) {
         return;
       }
-
-      console.log('✅ Admin authenticated, loading dashboard...');
-
-      showLoading('Loading admin dashboard...');
-
-      try {
-        const adminLoaded = await loadAdminData();
-        
-        if (!adminLoaded) {
-          hideLoading();
-          return;
+      
+      // Load initial data
+      switchSection('overview');
+      
+      // Auto-refresh every 5 minutes
+      setInterval(() => {
+        if (currentSection === 'overview') {
+          loadOverviewData();
         }
+      }, 5 * 60 * 1000);
+      
+      console.log('✅ Admin dashboard initialized successfully');
+    });
 
-        await Promise.all([
-          loadDashboardStats(),
-          loadMembers(),
-          loadCelebrations()
-        ]);
-
-        showAlert('success', `Welcome back, ${currentAdmin.fullName}!`);
-
-      } catch (error) {
-        console.error('Dashboard initialization error:', error);
-        showAlert('error', 'Failed to load dashboard. Please try refreshing the page.');
-      } finally {
-        hideLoading();
+    // ========== Welfare Management Functions ==========
+async function loadWelfareData() {
+  try {
+    showLoading('Loading welfare packages...');
+    
+    const response = await fetch(`${API_BASE_URL}/admin/welfare`);
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success) {
+        updateWelfareTables(data.packages);
       }
     }
+  } catch (error) {
+    console.error('Error loading welfare data:', error);
+    showAlert('Failed to load welfare packages', 'error');
+  } finally {
+    hideLoading();
+  }
+}
 
-    // ========== Page Load ==========
-    window.addEventListener('DOMContentLoaded', () => {
-      console.log('Admin dashboard page loaded');
-      initializeDashboard();
+function updateWelfareTables(packages) {
+  const now = new Date();
+  
+  // Active packages (distribution date within next 30 days)
+  const activePackages = packages.filter(p => {
+    if (!p.distributionDate) return false;
+    const distDate = new Date(p.distributionDate);
+    const daysUntil = (distDate - now) / (1000 * 60 * 60 * 24);
+    return daysUntil >= 0 && daysUntil <= 30 && p.status !== 'completed';
+  });
+  
+  // Upcoming packages (distribution date more than 30 days away)
+  const upcomingPackages = packages.filter(p => {
+    if (!p.distributionDate) return false;
+    const distDate = new Date(p.distributionDate);
+    const daysUntil = (distDate - now) / (1000 * 60 * 60 * 24);
+    return daysUntil > 30 && p.status !== 'completed';
+  });
+  
+  // Past packages (completed or past distribution date)
+  const pastPackages = packages.filter(p => {
+    if (!p.distributionDate) return p.status === 'completed';
+    const distDate = new Date(p.distributionDate);
+    return distDate < now || p.status === 'completed';
+  });
+  
+  updateWelfareTable('activeWelfareTable', activePackages);
+  updateWelfareTable('upcomingWelfareTable', upcomingPackages);
+  updateWelfareTable('pastWelfareTable', pastPackages);
+  updateWelfareTable('allWelfareTable', packages);
+}
+
+function updateWelfareTable(tableId, packages) {
+  const tbody = document.getElementById(tableId).querySelector('tbody');
+  tbody.innerHTML = '';
+
+  if (packages.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="text-center">No packages found</td>
+      </tr>
+    `;
+    return;
+  }
+
+  packages.forEach(pkg => {
+    const row = document.createElement('tr');
+    
+    let statusBadge = '';
+    switch(pkg.status) {
+      case 'planned': statusBadge = '<span class="badge badge-info">Planned</span>'; break;
+      case 'active': statusBadge = '<span class="badge badge-success">Active</span>'; break;
+      case 'completed': statusBadge = '<span class="badge badge-secondary">Completed</span>'; break;
+      case 'cancelled': statusBadge = '<span class="badge badge-danger">Cancelled</span>'; break;
+      default: statusBadge = `<span class="badge">${pkg.status}</span>`;
+    }
+    
+    row.innerHTML = `
+      <td><strong>${pkg.name}</strong><br><small>${pkg.description.substring(0, 50)}...</small></td>
+      <td>${pkg.type.replace('_', ' ').toUpperCase()}</td>
+      <td>₦${pkg.value ? pkg.value.toLocaleString() : '0'}</td>
+      <td>${tableId === 'pastWelfareTable' ? pkg.beneficiaries.length : pkg.eligibility}</td>
+      <td>${pkg.distributionDate ? formatDate(pkg.distributionDate) : 'Not set'}</td>
+      <td>${statusBadge}</td>
+      <td>
+        <div class="table-actions">
+          <button class="btn btn-sm btn-primary" onclick="editWelfarePackage('${pkg.id}')">
+            Edit
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="deleteWelfarePackage('${pkg.id}', '${pkg.name}')">
+            Delete
+          </button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// ========== Events Management Functions ==========
+async function loadEventsData() {
+  try {
+    showLoading('Loading events data...');
+    
+    // Load member celebrations
+    const membersResponse = await fetch(`${API_BASE_URL}/admin/members`);
+    if (membersResponse.ok) {
+      const membersData = await membersResponse.json();
+      if (membersData.success) {
+        updateMemberCelebrations(membersData.members);
+      }
+    }
+    
+    // TODO: Load PSN events from database
+    // For now, use sample data
+    const sampleEvents = [
+      {
+        id: 'event-001',
+        name: 'Annual General Meeting 2025',
+        type: 'meeting',
+        date: '2025-03-15',
+        venue: 'PSN Secretariat, Jalingo',
+        description: 'Annual general meeting for all PSN Taraba members',
+        status: 'confirmed'
+      },
+      {
+        id: 'event-002',
+        name: 'Continuing Professional Development',
+        type: 'workshop',
+        date: '2025-04-20',
+        venue: 'Jalingo Medical Center',
+        description: 'CPD workshop on modern pharmacy practice',
+        status: 'planned'
+      }
+    ];
+    
+    updateEventsTables(sampleEvents);
+    
+  } catch (error) {
+    console.error('Error loading events:', error);
+    showAlert('Failed to load events data', 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+function updateMemberCelebrations(members) {
+  const now = new Date();
+  const next30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  
+  const celebrations = [];
+  
+  members.forEach(member => {
+    if (member.dateOfBirth) {
+      const birthDate = new Date(member.dateOfBirth);
+      const thisYearBirthday = new Date(now.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+      
+      if (thisYearBirthday >= now && thisYearBirthday <= next30Days) {
+        const daysUntil = Math.ceil((thisYearBirthday - now) / (1000 * 60 * 60 * 24));
+        celebrations.push({
+          type: 'birthday',
+          member: member.fullName,
+          date: thisYearBirthday,
+          daysUntil: daysUntil,
+          contact: member.phoneNumber
+        });
+      }
+    }
+    
+    // You can add anniversary logic here if you have that data
+  });
+  
+  // Sort by date
+  celebrations.sort((a, b) => a.date - b.date);
+  
+  updateCelebrationsTable(celebrations);
+}
+
+function updateCelebrationsTable(celebrations) {
+  const tbody = document.getElementById('memberCelebrationsTable').querySelector('tbody');
+  tbody.innerHTML = '';
+
+  if (celebrations.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center">No celebrations in the next 30 days</td>
+      </tr>
+    `;
+    return;
+  }
+
+  celebrations.forEach(event => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${event.member}</td>
+      <td>${event.type === 'birthday' ? '🎂 Birthday' : '💍 Anniversary'}</td>
+      <td>${formatDate(event.date)}</td>
+      <td>${event.daysUntil === 0 ? '<span class="badge badge-warning">Today!</span>' : 
+            event.daysUntil === 1 ? '<span class="badge badge-info">Tomorrow</span>' : 
+            `${event.daysUntil} days`}</td>
+      <td>${event.contact || 'N/A'}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function updateEventsTables(events) {
+  const now = new Date();
+  
+  const upcomingEvents = events.filter(event => {
+    const eventDate = new Date(event.date);
+    return eventDate >= now;
+  });
+  
+  const pastEvents = events.filter(event => {
+    const eventDate = new Date(event.date);
+    return eventDate < now;
+  });
+  
+  updateEventTable('upcomingEventsTable', upcomingEvents);
+  updateEventTable('psnEventsTable', events); // For PSN events tab
+}
+
+function updateEventTable(tableId, events) {
+  const tbody = document.getElementById(tableId).querySelector('tbody');
+  tbody.innerHTML = '';
+
+  if (events.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="text-center">No events found</td>
+      </tr>
+    `;
+    return;
+  }
+
+  events.forEach(event => {
+    const row = document.createElement('tr');
+    
+    let statusBadge = '';
+    switch(event.status) {
+      case 'planned': statusBadge = '<span class="badge badge-info">Planned</span>'; break;
+      case 'confirmed': statusBadge = '<span class="badge badge-success">Confirmed</span>'; break;
+      case 'cancelled': statusBadge = '<span class="badge badge-danger">Cancelled</span>'; break;
+      default: statusBadge = `<span class="badge">${event.status}</span>`;
+    }
+    
+    row.innerHTML = `
+      <td><strong>${event.name}</strong><br><small>${event.description?.substring(0, 60) || ''}...</small></td>
+      <td>${event.type}</td>
+      <td>${formatDate(event.date)}</td>
+      <td>${event.venue || 'TBD'}</td>
+      <td>${tableId === 'upcomingEventsTable' ? (event.expectedAttendance || 'N/A') : statusBadge}</td>
+      <td>
+        <div class="table-actions">
+          <button class="btn btn-sm btn-primary" onclick="editEvent('${event.id}')">
+            Edit
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="deleteEvent('${event.id}', '${event.name}')">
+            Delete
+          </button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// ========== Notifications Functions ==========
+function setupNotificationForm() {
+  const notificationForm = document.getElementById('notificationForm');
+  const audienceRadios = document.querySelectorAll('input[name="audience"]');
+  const lgaSelect = document.getElementById('lgaSelect');
+  const scheduleRadios = document.querySelectorAll('input[name="schedule"]');
+  const scheduledTime = document.querySelector('input[name="scheduledTime"]');
+  
+  // Show/hide LGA select based on audience selection
+  audienceRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      lgaSelect.style.display = radio.value === 'lga' ? 'block' : 'none';
+      if (radio.value !== 'lga') lgaSelect.value = '';
     });
-
-    window.addEventListener('pageshow', (event) => {
-      if (event.persisted) {
-        checkAuthentication();
+  });
+  
+  // Show/hide datetime picker based on schedule selection
+  scheduleRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      scheduledTime.style.display = radio.value === 'later' ? 'block' : 'none';
+      if (radio.value === 'later') {
+        // Set default to tomorrow same time
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        scheduledTime.value = tomorrow.toISOString().slice(0, 16);
       }
     });
+  });
+  
+  // Form submission
+  notificationForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await sendNotification();
+  });
+}
 
-    console.log('✅ Admin dashboard script loaded successfully');
+async function sendNotification() {
+  try {
+    const form = document.getElementById('notificationForm');
+    const formData = new FormData(form);
+    
+    const notificationData = {
+      type: formData.get('type'),
+      title: formData.get('title'),
+      message: formData.get('message'),
+      audience: formData.get('audience'),
+      specificLGA: formData.get('specificLGA'),
+      methods: Array.from(formData.getAll('methods')),
+      schedule: formData.get('schedule'),
+      scheduledTime: formData.get('scheduledTime')
+    };
+
+    if (notificationData.message.length > 500) {
+      showAlert('Message must be 500 characters or less', 'error');
+      return;
+    }
+
+    showLoading('Sending notification...');
+
+    // For now, just simulate sending
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Log the notification
+    const notifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
+    notifications.unshift({
+      ...notificationData,
+      id: `notif-${Date.now()}`,
+      sentAt: new Date().toISOString(),
+      status: 'sent'
+    });
+    localStorage.setItem('adminNotifications', JSON.stringify(notifications));
+    
+    showAlert('Notification sent successfully!', 'success');
+    form.reset();
+    updateRecentNotifications();
+    
+  } catch (error) {
+    console.error('Error sending notification:', error);
+    showAlert('Failed to send notification', 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+function updateRecentNotifications() {
+  const notifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
+  const tbody = document.getElementById('recentNotificationsTable').querySelector('tbody');
+  tbody.innerHTML = '';
+
+  if (notifications.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="text-center">No notifications sent yet</td>
+      </tr>
+    `;
+    return;
+  }
+
+  // Show only the 10 most recent notifications
+  const recentNotifications = notifications.slice(0, 10);
+
+  recentNotifications.forEach(notification => {
+    const row = document.createElement('tr');
+    
+    // Format audience display
+    let audienceDisplay = notification.audience;
+    if (notification.audience === 'lga' && notification.specificLGA) {
+      audienceDisplay = `${notification.audience.toUpperCase()} (${notification.specificLGA})`;
+    } else {
+      audienceDisplay = notification.audience.toUpperCase();
+    }
+    
+    // Format methods display
+    const methodsDisplay = notification.methods
+      .map(method => {
+        switch(method) {
+          case 'sms': return '📱 SMS';
+          case 'email': return '📧 Email';
+          case 'push': return '🔔 Push';
+          case 'in_app': return '📲 In-App';
+          default: return method;
+        }
+      })
+      .join(', ');
+    
+    // Format schedule status
+    let scheduleBadge = '';
+    if (notification.schedule === 'later' && notification.scheduledTime) {
+      const scheduledDate = new Date(notification.scheduledTime);
+      const now = new Date();
+      if (scheduledDate > now) {
+        scheduleBadge = '<span class="badge badge-info">Scheduled</span>';
+      } else {
+        scheduleBadge = '<span class="badge badge-success">Sent</span>';
+      }
+    } else {
+      scheduleBadge = '<span class="badge badge-success">Sent</span>';
+    }
+    
+    // Format type badge
+    let typeBadge = '';
+    switch(notification.type) {
+      case 'general': typeBadge = '<span class="badge badge-secondary">General</span>'; break;
+      case 'welfare': typeBadge = '<span class="badge badge-info">Welfare</span>'; break;
+      case 'event': typeBadge = '<span class="badge badge-success">Event</span>'; break;
+      case 'urgent': typeBadge = '<span class="badge badge-danger">Urgent</span>'; break;
+      default: typeBadge = `<span class="badge">${notification.type}</span>`;
+    }
+    
+    row.innerHTML = `
+      <td><strong>${notification.title}</strong><br><small>${notification.message.substring(0, 50)}...</small></td>
+      <td>${typeBadge}</td>
+      <td>${audienceDisplay}</td>
+      <td>${methodsDisplay}</td>
+      <td>${formatDateTime(notification.sentAt)}</td>
+      <td>${scheduleBadge}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-info" onclick="viewNotificationDetails('${notification.id}')">
+          View
+        </button>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteNotification('${notification.id}')">
+          Delete
+        </button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// Helper functions for Notifications
+function viewNotificationDetails(notificationId) {
+  const notifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
+  const notification = notifications.find(n => n.id === notificationId);
+  
+  if (!notification) {
+    showAlert('Notification not found', 'error');
+    return;
+  }
+  
+  const detailsHtml = `
+    <div class="notification-details">
+      <h4>${notification.title}</h4>
+      <p><strong>Type:</strong> ${notification.type.toUpperCase()}</p>
+      <p><strong>Audience:</strong> ${notification.audience.toUpperCase()} ${notification.specificLGA ? `(${notification.specificLGA})` : ''}</p>
+      <p><strong>Message:</strong><br>${notification.message}</p>
+      <p><strong>Delivery Methods:</strong> ${notification.methods.join(', ')}</p>
+      <p><strong>Scheduled:</strong> ${notification.schedule === 'later' ? 'Yes' : 'Immediate'}</p>
+      ${notification.scheduledTime ? `<p><strong>Scheduled Time:</strong> ${formatDateTime(notification.scheduledTime)}</p>` : ''}
+      <p><strong>Sent At:</strong> ${formatDateTime(notification.sentAt)}</p>
+      <p><strong>Status:</strong> ${notification.status}</p>
+    </div>
+  `;
+  
+  showModal('Notification Details', detailsHtml, 'info');
+}
+
+function deleteNotification(notificationId) {
+  showConfirmation(
+    'Delete Notification',
+    'Are you sure you want to delete this notification? This action cannot be undone.',
+    'warning',
+    async () => {
+      try {
+        const notifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
+        const filteredNotifications = notifications.filter(n => n.id !== notificationId);
+        localStorage.setItem('adminNotifications', JSON.stringify(filteredNotifications));
+        
+        updateRecentNotifications();
+        showAlert('Notification deleted successfully', 'success');
+      } catch (error) {
+        console.error('Error deleting notification:', error);
+        showAlert('Failed to delete notification', 'error');
+      }
+    }
+  );
+}
+
+// Helper function for date-time formatting
+function formatDateTime(dateTimeString) {
+  if (!dateTimeString) return 'N/A';
+  
+  const date = new Date(dateTimeString);
+  return date.toLocaleDateString('en-NG', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+    
   </script>
 </body>
 </html>

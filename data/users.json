@@ -1,0 +1,32 @@
+{
+  "users": [
+    {
+      "id": "1767202341252",
+      "fullName": "mafindi mustapha Hussain",
+      "email": "mafindi001@gmail.com",
+      "password": "$2b$10$yZsQ.KfywXN5UW..IsRa.uG1CJQzpX6J9A06O1f/6INsKk5BLsASm",
+      "phoneNumber": "08032790176",
+      "dateOfBirth": "1998-12-28",
+      "psnMembershipNumber": "PSN12345",
+      "psnYearOfInduction": 2020,
+      "placeOfWork": "Hospital",
+      "residentialAddress": "Sarkin Dawakai ward",
+      "localGovernment": "Lau",
+      "nextOfKin": {
+        "name": "hanifa mafindi",
+        "relationship": "sister",
+        "phoneNumber": "08134745057"
+      },
+      "dataConsent": true,
+      "registrationDate": "2025-12-31T17:32:21.252Z",
+      "isVerified": false,
+      "userType": "member",
+      "lastLogin": "2025-12-31T19:15:10.714Z",
+      "status": "active"
+    }
+  ],
+  "metadata": {
+    "lastUpdated": "2025-12-31T19:15:10.714Z",
+    "userCount": 1
+  }
+}

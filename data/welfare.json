@@ -1,0 +1,34 @@
+{
+  "packages": [
+    {
+      "id": "welfare-001",
+      "name": "2024 End of Year Package",
+      "type": "food_items",
+      "description": "Rice, oil, and other food items for members",
+      "value": 25000,
+      "eligibility": "All verified members",
+      "distributionDate": "2024-12-20",
+      "status": "completed",
+      "createdAt": "2024-11-15T00:00:00.000Z",
+      "beneficiaries": [],
+      "distributionLog": []
+    },
+    {
+      "id": "welfare-002",
+      "name": "2025 Q1 Medical Support",
+      "type": "healthcare",
+      "description": "Health insurance premium support",
+      "value": 15000,
+      "eligibility": "Active members with 2+ years membership",
+      "distributionDate": "2025-03-15",
+      "status": "planned",
+      "createdAt": "2025-12-31T20:18:03.193Z",
+      "beneficiaries": [],
+      "distributionLog": []
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-12-31T20:18:03.193Z",
+    "lastUpdated": "2025-12-31T20:18:03.193Z"
+  }
+}

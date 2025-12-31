@@ -246,3 +246,36 @@ module.exports = {
   updateSpecialDate,
   deleteSpecialDate
 };
+// Send test email reminder
+exports.sendTestReminder = async (req, res) => {
+  try {
+    const member = await Member.findById(req.userId);
+    
+    const htmlContent = `
+      <h1>🎉 Test Email Reminder</h1>
+      <p>Hello ${member.firstName},</p>
+      <p>This is a test email to confirm your PSN Welfare reminder system is working correctly.</p>
+      <p>You will receive similar emails 24 hours before any special dates you've added.</p>
+      <br>
+      <p>Best regards,<br>PSN Taraba State Welfare System</p>
+    `;
+    
+    const result = await require('../config/email').sendEmail(
+      member.email,
+      'Test: PSN Welfare Reminder System',
+      htmlContent
+    );
+    
+    res.json({
+      success: true,
+      message: 'Test email sent successfully',
+      data: result
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error sending test email',
+      error: error.message
+    });
+  }
+};
