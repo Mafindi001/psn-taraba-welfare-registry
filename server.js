@@ -1,4 +1,4 @@
-// server.js - COMPLETE VERSION WITH ADMIN ENDPOINTS
+// server.js - FIXED FOR VERCEL DEPLOYMENT
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -11,13 +11,47 @@ const PORT = process.env.PORT || 5000;
 
 console.log('🚀 Starting PSN Taraba Welfare System...');
 console.log('📅', new Date().toISOString());
+console.log('🌐 Environment:', process.env.NODE_ENV || 'development');
+console.log('🔧 Vercel:', process.env.VERCEL ? 'Yes' : 'No');
+
+// ========== VERCEL-SPECIFIC CONFIGURATION ==========
+const isVercel = process.env.VERCEL === '1';
+const isProduction = process.env.NODE_ENV === 'production';
 
 // ========== MIDDLEWARE ==========
-app.use(cors());
+// Configure CORS for production
+if (isProduction) {
+  const allowedOrigins = [
+    'https://mafindi001-psn-taraba-welfare.vercel.app',
+    'https://mafindi001.github.io',
+    'http://localhost:3000',
+    'http://localhost:5000'
+  ];
+  
+  app.use(cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      } else {
+        console.log('🔒 CORS blocked origin:', origin);
+        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+    },
+    credentials: true
+  }));
+} else {
+  // Local development - allow all
+  app.use(cors());
+}
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Serve static files
+// Serve static files from views directory
 app.use(express.static(path.join(__dirname, 'views')));
 
 // ========== JSON DATABASE SETUP ==========
@@ -274,7 +308,22 @@ app.get('/api/health', (req, res) => {
     service: 'PSN Taraba Welfare Registry',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    port: PORT
+    environment: process.env.NODE_ENV || 'development',
+    isVercel: !!process.env.VERCEL,
+    origin: req.headers.origin,
+    host: req.headers.host
+  });
+});
+
+// Test connection endpoint
+app.get('/api/test-connection', (req, res) => {
+  res.json({
+    success: true,
+    message: '✅ API connection successful!',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    apiBase: 'Working correctly',
+    cors: 'Enabled'
   });
 });
 
@@ -1088,89 +1137,87 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ========== START SERVER ==========
-async function startServer() {
-  try {
-    // Initialize all databases
-    await initializeDatabase();
-    await initializeAdmins();
-    await initializeWelfare();
-    
-    // Get initial counts
-    const users = await getUsers();
-    const admins = await getAdmins();
-    const welfarePackages = await getWelfarePackages();
-    
-    const server = app.listen(PORT, () => {
-      console.log('\n' + '='.repeat(60));
-      console.log('✅ SERVER STARTED SUCCESSFULLY');
-      console.log('='.repeat(60));
-      console.log(`📡 Server: http://localhost:${PORT}`);
-      console.log(`📁 Database: ${USERS_FILE}`);
-      console.log(`📁 Admins: ${ADMINS_FILE}`);
-      console.log(`💰 Welfare: ${WELFARE_FILE}`);
-      console.log(`👥 Registered users: ${users.length}`);
-      console.log(`👑 Admin accounts: ${admins.length}`);
-      console.log(`📦 Welfare packages: ${welfarePackages.length}`);
-      console.log(`🔐 Default admin: psnadmin / PSN@Taraba2025!`);
-      console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log('='.repeat(60));
-      console.log('\n🌐 Available Pages:');
-      console.log(`   Home: http://localhost:${PORT}/`);
-      console.log(`   Register: http://localhost:${PORT}/register`);
-      console.log(`   Login: http://localhost:${PORT}/login`);
-      console.log(`   Admin Login: http://localhost:${PORT}/admin-login`);
-      console.log(`   Dashboard: http://localhost:${PORT}/dashboard`);
-      console.log(`   Admin Dashboard: http://localhost:${PORT}/admin-dashboard`);
-      console.log('='.repeat(60));
-      console.log('\n🔗 API Endpoints:');
-      console.log(`   Health: GET http://localhost:${PORT}/api/health`);
-      console.log(`   Test: GET http://localhost:${PORT}/api/test`);
-      console.log(`   Register: POST http://localhost:${PORT}/api/auth/register`);
-      console.log(`   Login: POST http://localhost:${PORT}/api/auth/login`);
-      console.log(`   Admin Login: POST http://localhost:${PORT}/api/admin/login`);
-      console.log(`   Admin Stats: GET http://localhost:${PORT}/api/admin/stats`);
-      console.log(`   Admin Members: GET http://localhost:${PORT}/api/admin/members`);
-      console.log(`   Welfare Packages: GET http://localhost:${PORT}/api/welfare`);
-      console.log('='.repeat(60) + '\n');
-    });
-
-    // Graceful shutdown
-    process.on('SIGTERM', () => {
-      console.log('\n👋 SIGTERM received. Shutting down gracefully...');
-      server.close(() => {
-        console.log('✅ Server closed');
-        process.exit(0);
-      });
-    });
-
-    process.on('SIGINT', () => {
-      console.log('\n🛑 SIGINT received. Shutting down...');
-      server.close(() => {
-        console.log('✅ Server closed');
-        process.exit(0);
-      });
-    });
-
-  } catch (error) {
-    console.error('❌ Failed to start server:', error);
-    process.exit(1);
-  }
-}
-
-// Start the server
-startServer();
-
-module.exports = app;
-
-// For Vercel deployment
+// ========== VERCEL DEPLOYMENT CONFIGURATION ==========
+// This is CRITICAL for Vercel deployment
 if (process.env.VERCEL) {
-  // Export for Vercel Serverless Functions
+  // Export the app for Vercel serverless functions
+  console.log('🚀 Configuring for Vercel serverless deployment...');
   module.exports = app;
 } else {
   // Local development
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+  console.log('💻 Running in local development mode...');
+  
+  // Initialize and start server
+  async function startServer() {
+    try {
+      // Initialize all databases
+      await initializeDatabase();
+      await initializeAdmins();
+      await initializeWelfare();
+      
+      // Get initial counts
+      const users = await getUsers();
+      const admins = await getAdmins();
+      const welfarePackages = await getWelfarePackages();
+      
+      app.listen(PORT, () => {
+        console.log('\n' + '='.repeat(60));
+        console.log('✅ SERVER STARTED SUCCESSFULLY');
+        console.log('='.repeat(60));
+        console.log(`📡 Server: http://localhost:${PORT}`);
+        console.log(`📁 Database: ${USERS_FILE}`);
+        console.log(`📁 Admins: ${ADMINS_FILE}`);
+        console.log(`💰 Welfare: ${WELFARE_FILE}`);
+        console.log(`👥 Registered users: ${users.length}`);
+        console.log(`👑 Admin accounts: ${admins.length}`);
+        console.log(`📦 Welfare packages: ${welfarePackages.length}`);
+        console.log(`🔐 Default admin: psnadmin / PSN@Taraba2025!`);
+        console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log('='.repeat(60));
+        console.log('\n🌐 Available Pages:');
+        console.log(`   Home: http://localhost:${PORT}/`);
+        console.log(`   Register: http://localhost:${PORT}/register`);
+        console.log(`   Login: http://localhost:${PORT}/login`);
+        console.log(`   Admin Login: http://localhost:${PORT}/admin-login`);
+        console.log(`   Dashboard: http://localhost:${PORT}/dashboard`);
+        console.log(`   Admin Dashboard: http://localhost:${PORT}/admin-dashboard`);
+        console.log('='.repeat(60));
+        console.log('\n🔗 API Endpoints:');
+        console.log(`   Health: GET http://localhost:${PORT}/api/health`);
+        console.log(`   Test: GET http://localhost:${PORT}/api/test`);
+        console.log(`   Test Connection: GET http://localhost:${PORT}/api/test-connection`);
+        console.log(`   Register: POST http://localhost:${PORT}/api/auth/register`);
+        console.log(`   Login: POST http://localhost:${PORT}/api/auth/login`);
+        console.log(`   Admin Login: POST http://localhost:${PORT}/api/admin/login`);
+        console.log(`   Admin Stats: GET http://localhost:${PORT}/api/admin/stats`);
+        console.log(`   Admin Members: GET http://localhost:${PORT}/api/admin/members`);
+        console.log(`   Welfare Packages: GET http://localhost:${PORT}/api/welfare`);
+        console.log('='.repeat(60) + '\n');
+      });
+
+      // Graceful shutdown
+      process.on('SIGTERM', () => {
+        console.log('\n👋 SIGTERM received. Shutting down gracefully...');
+        server.close(() => {
+          console.log('✅ Server closed');
+          process.exit(0);
+        });
+      });
+
+      process.on('SIGINT', () => {
+        console.log('\n🛑 SIGINT received. Shutting down...');
+        server.close(() => {
+          console.log('✅ Server closed');
+          process.exit(0);
+        });
+      });
+
+    } catch (error) {
+      console.error('❌ Failed to start server:', error);
+      process.exit(1);
+    }
+  }
+
+  // Start the server for local development
+  startServer();
 }
