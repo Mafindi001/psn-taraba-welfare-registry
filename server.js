@@ -7,7 +7,7 @@ const fs = require('fs').promises;
 const bcrypt = require('bcrypt');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000; // Changed from 5000 to 3000 for Vercel compatibility
 
 console.log('🚀 Starting PSN Taraba Welfare System...');
 console.log('📅', new Date().toISOString());
@@ -15,53 +15,17 @@ console.log('🌐 Environment:', process.env.NODE_ENV || 'development');
 console.log('🔧 Vercel:', process.env.VERCEL ? 'Yes' : 'No');
 
 // ========== VERCEL-SPECIFIC CONFIGURATION ==========
-const isVercel = process.env.VERCEL === '1';
+const isVercel = process.env.VERCEL === '1' || process.env.VERCEL_URL;
 const isProduction = process.env.NODE_ENV === 'production';
 
 // ========== MIDDLEWARE ==========
-// Configure CORS for production
-if (isProduction) {
-  const allowedOrigins = [
-    'https://psn-taraba-welfare-registry-git-main-mafindi001s-projects.vercel.app',
-    'https://psn-taraba-welfare-registry.vercel.app',
-    'https://*.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:5000',
-    'http://localhost:5500'
-  ];
-  
+// Configure CORS for production - SIMPLIFIED for Vercel
+if (isProduction || isVercel) {
   app.use(cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      
-      // Check if origin is in allowed list
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      
-      // Check if origin matches wildcard pattern
-      const originMatches = allowedOrigins.some(allowedOrigin => {
-        if (allowedOrigin.includes('*')) {
-          const pattern = allowedOrigin.replace('*', '.*');
-          return new RegExp(pattern).test(origin);
-        }
-        return false;
-      });
-      
-      if (originMatches) {
-        return callback(null, true);
-      }
-      
-      console.log('🔒 CORS blocked origin:', origin);
-      console.log('📋 Allowed origins:', allowedOrigins);
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    },
+    origin: true, // Allow all origins in production (Vercel handles this)
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
-    exposedHeaders: ['Content-Range', 'X-Content-Range']
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
   }));
 } else {
   // Local development - allow all
@@ -77,8 +41,13 @@ app.options('*', cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Serve static files from views directory
-app.use(express.static(path.join(__dirname, 'views')));
+// Serve static files from views directory - FIXED PATH FOR VERCEL
+const viewsPath = path.join(__dirname, 'views');
+console.log('📁 Views path:', viewsPath);
+app.use(express.static(viewsPath));
+
+// Also serve from root for Vercel compatibility
+app.use(express.static(__dirname));
 
 // ========== JSON DATABASE SETUP ==========
 const DATA_DIR = path.join(__dirname, 'data');
@@ -93,8 +62,10 @@ async function ensureDirectories() {
     await fs.mkdir(DATA_DIR, { recursive: true });
     await fs.mkdir(LOGS_DIR, { recursive: true });
     console.log('✅ Directories verified');
+    return true;
   } catch (error) {
     console.error('❌ Directory creation error:', error);
+    return false;
   }
 }
 
@@ -118,8 +89,10 @@ async function initializeDatabase() {
       await fs.writeFile(USERS_FILE, JSON.stringify(initialData, null, 2));
       console.log('📝 Created new users database file');
     }
+    return true;
   } catch (error) {
     console.error('❌ Database initialization error:', error);
+    return false;
   }
 }
 
@@ -157,8 +130,10 @@ async function initializeAdmins() {
       await fs.writeFile(ADMINS_FILE, JSON.stringify(initialAdmins, null, 2));
       console.log('🔐 Created default admin: psnadmin / PSN@Taraba2025!');
     }
+    return true;
   } catch (error) {
     console.error('❌ Admin initialization error:', error);
+    return false;
   }
 }
 
@@ -208,8 +183,10 @@ async function initializeWelfare() {
       await fs.writeFile(WELFARE_FILE, JSON.stringify(initialWelfare, null, 2));
       console.log('💰 Created welfare database with sample packages');
     }
+    return true;
   } catch (error) {
     console.error('❌ Welfare initialization error:', error);
+    return false;
   }
 }
 
@@ -329,82 +306,18 @@ app.get('/admin-dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
 });
 
-// ========== PUBLIC API ROUTES ==========
-console.log('📂 Setting up API routes...');
-
-// Health check
+// Health check endpoint
 app.get('/api/health', (req, res) => {
-  console.log('🏥 Health check requested');
   res.json({
     success: true,
     status: 'healthy',
     service: 'PSN Taraba Welfare Registry',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
-    isVercel: !!process.env.VERCEL,
-    origin: req.headers.origin,
-    host: req.headers.host,
-    cors: 'enabled',
-    url: process.env.VERCEL_URL || 'local'
+    isVercel: isVercel,
+    vercelUrl: process.env.VERCEL_URL || 'Not on Vercel',
+    nodeVersion: process.version
   });
-});
-
-// Test connection endpoint
-app.get('/api/test-connection', (req, res) => {
-  console.log(`🔗 Test connection from: ${req.headers.origin || 'Unknown origin'}`);
-  res.json({
-    success: true,
-    message: '✅ API connection successful!',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    apiBase: 'Working correctly',
-    cors: 'Enabled',
-    origin: req.headers.origin,
-    serverTime: new Date().toISOString()
-  });
-});
-
-// Test endpoint
-app.get('/api/test', (req, res) => {
-  console.log(`🧪 Test endpoint from: ${req.headers.origin || 'Unknown origin'}`);
-  res.json({
-    success: true,
-    message: 'API is working!',
-    timestamp: new Date().toISOString(),
-    corsStatus: 'enabled',
-    origin: req.headers.origin
-  });
-});
-
-// Get user by ID (public)
-app.get('/api/users/:id', async (req, res) => {
-  try {
-    console.log(`👤 User data request for ID: ${req.params.id}`);
-    const users = await getUsers();
-    const user = users.find(u => u.id === req.params.id);
-    
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    // Remove password
-    const { password, ...userWithoutPassword } = user;
-    
-    res.json({
-      success: true,
-      user: userWithoutPassword
-    });
-  } catch (error) {
-    console.error('❌ Error fetching user:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
 });
 
 // ========== AUTH API ROUTES ==========
@@ -667,648 +580,74 @@ app.post('/api/admin/login', async (req, res) => {
   }
 });
 
-// Admin change password
-app.post('/api/admin/change-password', async (req, res) => {
+// ========== INITIALIZE AND START SERVER ==========
+
+// Initialize function
+async function initializeServer() {
   try {
-    const { username, currentPassword, newPassword } = req.body;
-    
-    if (!username || !currentPassword || !newPassword) {
-      return res.status(400).json({
-        success: false,
-        message: 'All fields are required'
-      });
-    }
-    
-    if (newPassword.length < 8) {
-      return res.status(400).json({
-        success: false,
-        message: 'New password must be at least 8 characters'
-      });
-    }
-    
-    const admins = await getAdmins();
-    const adminIndex = admins.findIndex(a => a.username === username);
-    
-    if (adminIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Admin not found'
-      });
-    }
-    
-    // Verify current password
-    const isCurrentValid = await bcrypt.compare(currentPassword, admins[adminIndex].password);
-    
-    if (!isCurrentValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Current password is incorrect'
-      });
-    }
-    
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
-    admins[adminIndex].password = hashedPassword;
-    admins[adminIndex].passwordChangedAt = new Date().toISOString();
-    
-    await saveAdmins(admins);
-    
-    console.log('✅ Admin password changed:', username);
-    
-    res.json({
-      success: true,
-      message: 'Password changed successfully'
-    });
-    
+    console.log('🔄 Initializing server...');
+    await initializeDatabase();
+    await initializeAdmins();
+    await initializeWelfare();
+    console.log('✅ Server initialization complete');
+    return true;
   } catch (error) {
-    console.error('❌ Password change error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during password change'
-    });
+    console.error('❌ Server initialization failed:', error);
+    return false;
   }
-});
+}
 
-// Get all members (admin only)
-app.get('/api/admin/members', async (req, res) => {
-  try {
-    console.log('👥 Admin requested members list from:', req.headers.origin);
-    const users = await getUsers();
-    const usersWithoutPasswords = users.map(({ password, ...user }) => user);
-    
-    res.json({
-      success: true,
-      members: usersWithoutPasswords,
-      count: usersWithoutPasswords.length,
-      stats: {
-        active: users.filter(u => u.status === 'active').length,
-        verified: users.filter(u => u.isVerified).length,
-        newThisMonth: users.filter(u => {
-          const regDate = new Date(u.registrationDate);
-          const now = new Date();
-          return regDate.getMonth() === now.getMonth() && regDate.getFullYear() === now.getFullYear();
-        }).length
-      }
-    });
-  } catch (error) {
-    console.error('❌ Error fetching members:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// Get member by ID (admin only)
-app.get('/api/admin/members/:id', async (req, res) => {
-  try {
-    console.log(`👤 Admin requested member: ${req.params.id}`);
-    const users = await getUsers();
-    const user = users.find(u => u.id === req.params.id);
-    
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'Member not found'
-      });
-    }
-    
-    // Remove password
-    const { password, ...userWithoutPassword } = user;
-    
-    res.json({
-      success: true,
-      member: userWithoutPassword
-    });
-  } catch (error) {
-    console.error('❌ Error fetching member:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// Update member (admin only)
-app.put('/api/admin/members/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updates = req.body;
-    
-    console.log(`✏️ Admin updating member: ${id}`);
-    
-    const users = await getUsers();
-    const userIndex = users.findIndex(u => u.id === id);
-    
-    if (userIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Member not found'
-      });
-    }
-    
-    // Update user
-    users[userIndex] = { ...users[userIndex], ...updates };
-    await saveUsers(users);
-    
-    const { password, ...userWithoutPassword } = users[userIndex];
-    
-    res.json({
-      success: true,
-      message: 'Member updated successfully',
-      member: userWithoutPassword
-    });
-  } catch (error) {
-    console.error('❌ Error updating member:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// Delete member (admin only)
-app.delete('/api/admin/members/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    console.log(`🗑️ Admin deleting member: ${id}`);
-    
-    const users = await getUsers();
-    const userIndex = users.findIndex(u => u.id === id);
-    
-    if (userIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Member not found'
-      });
-    }
-    
-    // Remove user (or mark as deleted)
-    const deletedUser = users.splice(userIndex, 1)[0];
-    await saveUsers(users);
-    
-    console.log('✅ Admin deleted member:', deletedUser.email);
-    
-    res.json({
-      success: true,
-      message: 'Member deleted successfully',
-      deletedMember: {
-        id: deletedUser.id,
-        email: deletedUser.email,
-        fullName: deletedUser.fullName
-      }
-    });
-  } catch (error) {
-    console.error('❌ Error deleting member:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// Verify member (admin only)
-app.post('/api/admin/members/:id/verify', async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    console.log(`✅ Admin verifying member: ${id}`);
-    
-    const users = await getUsers();
-    const userIndex = users.findIndex(u => u.id === id);
-    
-    if (userIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Member not found'
-      });
-    }
-    
-    users[userIndex].isVerified = true;
-    users[userIndex].verifiedAt = new Date().toISOString();
-    users[userIndex].verifiedBy = req.body.verifiedBy || 'admin';
-    
-    await saveUsers(users);
-    
-    res.json({
-      success: true,
-      message: 'Member verified successfully',
-      member: {
-        id: users[userIndex].id,
-        email: users[userIndex].email,
-        fullName: users[userIndex].fullName,
-        isVerified: users[userIndex].isVerified
-      }
-    });
-  } catch (error) {
-    console.error('❌ Error verifying member:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// Get system statistics
-app.get('/api/admin/stats', async (req, res) => {
-  try {
-    console.log('📊 Admin requested system stats');
-    const users = await getUsers();
-    const admins = await getAdmins();
-    const welfarePackages = await getWelfarePackages();
-    
-    // Calculate various stats
-    const now = new Date();
-    const thisMonth = now.getMonth();
-    const thisYear = now.getFullYear();
-    
-    const stats = {
-      totalMembers: users.length,
-      verifiedMembers: users.filter(u => u.isVerified).length,
-      activeMembers: users.filter(u => u.status === 'active').length,
-      newMembersThisMonth: users.filter(u => {
-        const regDate = new Date(u.registrationDate);
-        return regDate.getMonth() === thisMonth && regDate.getFullYear() === thisYear;
-      }).length,
-      totalAdmins: admins.length,
-      welfarePackages: welfarePackages.length,
-      activeWelfarePackages: welfarePackages.filter(p => p.status === 'active').length,
-      membersByLGA: {},
-      membersByYear: {}
-    };
-    
-    // Count by Local Government
-    users.forEach(user => {
-      if (user.localGovernment) {
-        stats.membersByLGA[user.localGovernment] = (stats.membersByLGA[user.localGovernment] || 0) + 1;
-      }
-      
-      // Count by induction year
-      if (user.psnYearOfInduction) {
-        stats.membersByYear[user.psnYearOfInduction] = (stats.membersByYear[user.psnYearOfInduction] || 0) + 1;
-      }
-    });
-    
-    res.json({
-      success: true,
-      stats,
-      updatedAt: new Date().toISOString()
-    });
-  } catch (error) {
-    console.error('❌ Error fetching stats:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// Admin logout
-app.post('/api/admin/logout', (req, res) => {
-  console.log('👋 Admin logout request');
-  res.json({
-    success: true,
-    message: 'Admin logged out successfully'
-  });
-});
-
-// General logout (for both members and admins)
-app.post('/api/auth/logout', (req, res) => {
-  console.log('👋 Logout request');
-  res.json({
-    success: true,
-    message: 'Logged out successfully'
-  });
-});
-
-// ========== WELFARE API ENDPOINTS ==========
-
-// Get all welfare packages (admin only)
-app.get('/api/admin/welfare', async (req, res) => {
-  try {
-    console.log('📦 Admin requested welfare packages');
-    const packages = await getWelfarePackages();
-    res.json({
-      success: true,
-      packages,
-      count: packages.length
-    });
-  } catch (error) {
-    console.error('❌ Error fetching welfare packages:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// Get welfare package by ID (admin only)
-app.get('/api/admin/welfare/:id', async (req, res) => {
-  try {
-    console.log(`📦 Admin requested welfare package: ${req.params.id}`);
-    const packages = await getWelfarePackages();
-    const packageItem = packages.find(p => p.id === req.params.id);
-    
-    if (!packageItem) {
-      return res.status(404).json({
-        success: false,
-        message: 'Welfare package not found'
-      });
-    }
-    
-    res.json({
-      success: true,
-      package: packageItem
-    });
-  } catch (error) {
-    console.error('❌ Error fetching welfare package:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// Create new welfare package (admin only)
-app.post('/api/admin/welfare', async (req, res) => {
-  try {
-    const { name, type, description, value, eligibility, distributionDate, status } = req.body;
-    
-    console.log(`📦 Admin creating welfare package: ${name}`);
-    
-    if (!name || !type || !description) {
-      return res.status(400).json({
-        success: false,
-        message: 'Name, type, and description are required'
-      });
-    }
-    
-    const packages = await getWelfarePackages();
-    
-    const newPackage = {
-      id: `welfare-${Date.now()}`,
-      name,
-      type,
-      description,
-      value: value || 0,
-      eligibility: eligibility || 'All verified members',
-      distributionDate: distributionDate || null,
-      status: status || 'planned',
-      createdAt: new Date().toISOString(),
-      beneficiaries: [],
-      distributionLog: []
-    };
-    
-    packages.push(newPackage);
-    await saveWelfarePackages(packages);
-    
-    res.status(201).json({
-      success: true,
-      message: 'Welfare package created successfully',
-      package: newPackage
-    });
-  } catch (error) {
-    console.error('❌ Error creating welfare package:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// Update welfare package (admin only)
-app.put('/api/admin/welfare/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updates = req.body;
-    
-    console.log(`✏️ Admin updating welfare package: ${id}`);
-    
-    const packages = await getWelfarePackages();
-    const packageIndex = packages.findIndex(p => p.id === id);
-    
-    if (packageIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Welfare package not found'
-      });
-    }
-    
-    packages[packageIndex] = { ...packages[packageIndex], ...updates };
-    await saveWelfarePackages(packages);
-    
-    res.json({
-      success: true,
-      message: 'Welfare package updated successfully',
-      package: packages[packageIndex]
-    });
-  } catch (error) {
-    console.error('❌ Error updating welfare package:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// Delete welfare package (admin only)
-app.delete('/api/admin/welfare/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    console.log(`🗑️ Admin deleting welfare package: ${id}`);
-    
-    const packages = await getWelfarePackages();
-    const packageIndex = packages.findIndex(p => p.id === id);
-    
-    if (packageIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Welfare package not found'
-      });
-    }
-    
-    const deletedPackage = packages.splice(packageIndex, 1)[0];
-    await saveWelfarePackages(packages);
-    
-    res.json({
-      success: true,
-      message: 'Welfare package deleted successfully',
-      deletedPackage: {
-        id: deletedPackage.id,
-        name: deletedPackage.name
-      }
-    });
-  } catch (error) {
-    console.error('❌ Error deleting welfare package:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// Get welfare packages for members (public endpoint)
-app.get('/api/welfare', async (req, res) => {
-  try {
-    console.log('📦 Public welfare packages request');
-    const packages = await getWelfarePackages();
-    
-    // Filter out sensitive info for public view
-    const publicPackages = packages.map(p => ({
-      id: p.id,
-      name: p.name,
-      type: p.type,
-      description: p.description,
-      distributionDate: p.distributionDate,
-      status: p.status
-    }));
-    
-    res.json({
-      success: true,
-      packages: publicPackages
-    });
-  } catch (error) {
-    console.error('❌ Error fetching public welfare packages:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// ========== ERROR HANDLERS ==========
-// API 404 handler
-app.use('/api/*', (req, res) => {
-  console.log(`❌ API endpoint not found: ${req.method} ${req.originalUrl} from ${req.headers.origin}`);
-  res.status(404).json({ 
-    success: false, 
-    message: 'API endpoint not found',
-    path: req.originalUrl,
-    method: req.method,
-    origin: req.headers.origin
-  });
-});
-
-// Global 404 handler
+// Global error handlers
 app.use((req, res) => {
-  console.log(`❌ Page not found: ${req.originalUrl} from ${req.headers.origin}`);
-  if (req.accepts('html')) {
-    res.status(404).send(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-          <title>404 Not Found</title>
-          <style>
-              body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-              h1 { color: #dc2626; }
-              a { color: #1e40af; text-decoration: none; }
-          </style>
-      </head>
-      <body>
-          <h1>404 - Page Not Found</h1>
-          <p>The page you're looking for doesn't exist.</p>
-          <p><a href="/">Go back home</a></p>
-      </body>
-      </html>
-    `);
-  } else {
-    res.status(404).json({ 
-      success: false, 
-      error: 'Not found',
-      path: req.originalUrl
-    });
-  }
+  res.status(404).json({
+    success: false,
+    message: 'Endpoint not found'
+  });
 });
 
-// Global error handler
 app.use((err, req, res, next) => {
-  console.error('❌ Server error:', err.message);
-  console.error('Stack:', err.stack);
+  console.error('❌ Server error:', err);
   res.status(500).json({
     success: false,
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    message: 'Internal server error'
   });
 });
 
-// ========== VERCEL DEPLOYMENT CONFIGURATION ==========
-// This is CRITICAL for Vercel deployment
-if (process.env.VERCEL) {
-  // Export the app for Vercel serverless functions
+// ========== VERCEL COMPATIBILITY ==========
+// This is CRITICAL for Vercel - export the app as a serverless function
+if (isVercel) {
   console.log('🚀 Configuring for Vercel serverless deployment...');
+  // Initialize on cold start
+  initializeServer().then(() => {
+    console.log('✅ Vercel serverless function ready');
+  });
   
-  // Initialize databases on cold start
-  (async () => {
-    try {
-      await initializeDatabase();
-      await initializeAdmins();
-      await initializeWelfare();
-      console.log('✅ Vercel serverless initialization complete');
-    } catch (error) {
-      console.error('❌ Vercel initialization error:', error);
-    }
-  })();
-  
+  // Export for Vercel
   module.exports = app;
 } else {
   // Local development
   console.log('💻 Running in local development mode...');
   
-  // Initialize and start server
-  async function startServer() {
-    try {
-      // Initialize all databases
-      await initializeDatabase();
-      await initializeAdmins();
-      await initializeWelfare();
-      
-      // Get initial counts
-      const users = await getUsers();
-      const admins = await getAdmins();
-      const welfarePackages = await getWelfarePackages();
-      
-      const server = app.listen(PORT, () => {
-        console.log('\n' + '='.repeat(60));
-        console.log('✅ SERVER STARTED SUCCESSFULLY');
-        console.log('='.repeat(60));
-        console.log(`📡 Server: http://localhost:${PORT}`);
-        console.log(`📁 Database: ${USERS_FILE}`);
-        console.log(`📁 Admins: ${ADMINS_FILE}`);
-        console.log(`💰 Welfare: ${WELFARE_FILE}`);
-        console.log(`👥 Registered users: ${users.length}`);
-        console.log(`👑 Admin accounts: ${admins.length}`);
-        console.log(`📦 Welfare packages: ${welfarePackages.length}`);
-        console.log(`🔐 Default admin: psnadmin / PSN@Taraba2025!`);
-        console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
-        console.log('='.repeat(60));
-        console.log('\n🌐 Available Pages:');
-        console.log(`   Home: http://localhost:${PORT}/`);
-        console.log(`   Register: http://localhost:${PORT}/register`);
-        console.log(`   Login: http://localhost:${PORT}/login`);
-        console.log(`   Admin Login: http://localhost:${PORT}/admin-login`);
-        console.log(`   Dashboard: http://localhost:${PORT}/dashboard`);
-        console.log(`   Admin Dashboard: http://localhost:${PORT}/admin-dashboard`);
-        console.log('='.repeat(60));
-        console.log('\n🔗 API Endpoints:');
-        console.log(`   Health: GET http://localhost:${PORT}/api/health`);
-        console.log(`   Test: GET http://localhost:${PORT}/api/test`);
-        console.log(`   Test Connection: GET http://localhost:${PORT}/api/test-connection`);
-        console.log(`   Register: POST http://localhost:${PORT}/api/auth/register`);
-        console.log(`   Login: POST http://localhost:${PORT}/api/auth/login`);
-        console.log(`   Admin Login: POST http://localhost:${PORT}/api/admin/login`);
-        console.log(`   Admin Stats: GET http://localhost:${PORT}/api/admin/stats`);
-        console.log(`   Admin Members: GET http://localhost:${PORT}/api/admin/members`);
-        console.log(`   Welfare Packages: GET http://localhost:${PORT}/api/welfare`);
-        console.log('='.repeat(60) + '\n');
-      });
-
-      // Graceful shutdown
-      process.on('SIGTERM', () => {
-        console.log('\n👋 SIGTERM received. Shutting down gracefully...');
-        server.close(() => {
-          console.log('✅ Server closed');
-          process.exit(0);
-        });
-      });
-
-      process.on('SIGINT', () => {
-        console.log('\n🛑 SIGINT received. Shutting down...');
-        server.close(() => {
-          console.log('✅ Server closed');
-          process.exit(0);
-        });
-      });
-
-    } catch (error) {
-      console.error('❌ Failed to start server:', error);
-      process.exit(1);
-    }
+  // Start server locally
+  async function startLocalServer() {
+    await initializeServer();
+    
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log('\n' + '='.repeat(60));
+      console.log('✅ SERVER STARTED SUCCESSFULLY');
+      console.log('='.repeat(60));
+      console.log(`📡 Server: http://localhost:${PORT}`);
+      console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🔐 Default admin: psnadmin / PSN@Taraba2025!`);
+      console.log('='.repeat(60));
+      console.log('\n🌐 Available Pages:');
+      console.log(`   Home: http://localhost:${PORT}/`);
+      console.log(`   Register: http://localhost:${PORT}/register`);
+      console.log(`   Login: http://localhost:${PORT}/login`);
+      console.log(`   Admin Login: http://localhost:${PORT}/admin-login`);
+      console.log('='.repeat(60) + '\n');
+    });
   }
-
-  // Start the server for local development
-  startServer();
+  
+  startLocalServer();
 }

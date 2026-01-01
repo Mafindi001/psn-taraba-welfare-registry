@@ -4,44 +4,12 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "views/**/*",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/views/index.html"
-    },
-    {
-      "src": "/register",
-      "dest": "/views/register.html"
-    },
-    {
-      "src": "/login",
-      "dest": "/views/login.html"
-    },
-    {
-      "src": "/admin-login",
-      "dest": "/views/admin-login.html"
-    },
-    {
-      "src": "/dashboard",
-      "dest": "/views/dashboard.html"
-    },
-    {
-      "src": "/admin-dashboard",
-      "dest": "/views/admin-dashboard.html"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/views/$1"
+      "dest": "server.js"
     }
   ]
 }
