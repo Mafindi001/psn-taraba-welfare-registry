@@ -1163,3 +1163,14 @@ startServer();
 
 module.exports = app;
 
+// For Vercel deployment
+if (process.env.VERCEL) {
+  // Export for Vercel Serverless Functions
+  module.exports = app;
+} else {
+  // Local development
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}

@@ -1,0 +1,78 @@
+name: Vercel Deployment Notification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  notify-vercel:
+    name: Notify Vercel of Deployment
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Notify Vercel of deployment
+        uses: vercel/repository-dispatch/actions/status@v1
+        with:
+          name: Vercel - mafindi001-psn-taraba-welfare: Password view feature
+          state: ${{ job.status }}
+          description: |
+            Deploying password view feature to production
+            - Added show/hide password toggle
+            - Enhanced user experience
+            - Updated registration and login forms
+          payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+        env:
+          REPOSITORY_DISPATCH_TOKEN: ${{ secrets.VERCEL_DISPATCH_TOKEN }}
+
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    needs: notify-vercel
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Check server.js syntax
+        run: node -c server.js
+      
+      - name: Test API endpoints (simulated)
+        run: |
+          echo "✅ Build successful"
+          echo "📦 Node.js version: $(node --version)"
+          echo "📦 NPM version: $(npm --version)"
+
+  deploy-status:
+    name: Update Deployment Status
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: always()
+    
+    steps:
+      - name: Update Vercel deployment status
+        uses: vercel/repository-dispatch/actions/status@v1
+        with:
+          name: Vercel - mafindi001-psn-taraba-welfare: Password view feature
+          state: ${{ needs.build-and-test.result }}
+          description: |
+            Build ${{ needs.build-and-test.result == 'success' && 'succeeded' || 'failed' }}
+            - Node: ${{ steps.setup-node.outputs.node-version }}
+            - Commit: ${{ github.sha }}
+        env:
+          REPOSITORY_DISPATCH_TOKEN: ${{ secrets.VERCEL_DISPATCH_TOKEN }}
+          
