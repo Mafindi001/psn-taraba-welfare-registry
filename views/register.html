@@ -743,8 +743,37 @@
   
   <!-- JavaScript -->
   <script>
-    // ========== Configuration - FIXED ==========
-    const API_BASE_URL = window.location.origin + '/api';
+    // ========== SMART API CONFIGURATION ==========
+    // Dynamically detect API base URL
+    function getApiBaseUrl() {
+      const hostname = window.location.hostname;
+      const origin = window.location.origin;
+      
+      console.log('🌐 Detecting environment for registration...');
+      console.log('Hostname:', hostname);
+      console.log('Origin:', origin);
+      console.log('Full URL:', window.location.href);
+      
+      // Local development
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:5000/api';
+      }
+      // Vercel production - your specific URL
+      else if (hostname.includes('psn-taraba-welfare-registry')) {
+        return 'https://psn-taraba-welfare-registry-git-main-mafindi001s-projects.vercel.app/api';
+      }
+      // Any other Vercel URL
+      else if (hostname.includes('vercel.app')) {
+        return origin + '/api';
+      }
+      // Fallback
+      else {
+        return origin + '/api';
+      }
+    }
+
+    const API_BASE_URL = getApiBaseUrl();
+    console.log('🚀 Registration API Base URL:', API_BASE_URL);
 
     // ========== Get Form Elements ==========
     const form = document.getElementById('registrationForm');
@@ -755,12 +784,43 @@
     const successMessage = document.getElementById('successMessage');
     const errorMessage = document.getElementById('errorMessage');
 
+    // ========== Test Connection Function ==========
+    async function testApiConnection() {
+      try {
+        console.log('🔍 Testing API connection from registration...');
+        const response = await fetch(`${API_BASE_URL}/test-connection`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ Registration API Connection Test Success:', data);
+          return true;
+        } else {
+          console.warn('⚠️ Registration API connection test failed:', response.status);
+          return false;
+        }
+      } catch (error) {
+        console.error('❌ Registration API Connection Test Error:', error);
+        return false;
+      }
+    }
+
     // ========== Password Toggle Functionality ==========
     function setupPasswordToggles() {
       const passwordInput = document.getElementById('password');
       const confirmPasswordInput = document.getElementById('confirmPassword');
       const togglePasswordBtn = document.getElementById('togglePassword');
       const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPassword');
+
+      if (!passwordInput || !togglePasswordBtn) {
+        console.warn('⚠️ Password toggle elements not found');
+        return;
+      }
 
       // Toggle main password visibility
       togglePasswordBtn.addEventListener('click', function() {
@@ -771,21 +831,25 @@
       });
 
       // Toggle confirm password visibility
-      toggleConfirmPasswordBtn.addEventListener('click', function() {
-        const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        confirmPasswordInput.setAttribute('type', type);
-        this.innerHTML = type === 'password' ? '👁️ Show' : '👁️ Hide';
-        this.setAttribute('aria-label', type === 'password' ? 'Show password' : 'Hide password');
-      });
+      if (confirmPasswordInput && toggleConfirmPasswordBtn) {
+        toggleConfirmPasswordBtn.addEventListener('click', function() {
+          const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+          confirmPasswordInput.setAttribute('type', type);
+          this.innerHTML = type === 'password' ? '👁️ Show' : '👁️ Hide';
+          this.setAttribute('aria-label', type === 'password' ? 'Show password' : 'Hide password');
+        });
+      }
 
       // Handle Enter key on password toggle buttons
       [togglePasswordBtn, toggleConfirmPasswordBtn].forEach(button => {
-        button.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            this.click();
-          }
-        });
+        if (button) {
+          button.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              this.click();
+            }
+          });
+        }
       });
       
       console.log('✅ Password toggles initialized');
@@ -798,7 +862,8 @@
     }
 
     function validatePhone(phone) {
-      const re = /^(\+234|0)[789][01]\d{8}$/;
+      // Accept both 080 and 070/081/090 prefixes
+      const re = /^(0|234)[789][01]\d{8}$/;
       return re.test(phone);
     }
 
@@ -856,7 +921,7 @@
       errorFields.forEach(field => clearError(field));
     }
 
-    function showAlert(type, message) {
+    function showAlert(type, message, duration = 5000) {
       alertSuccess.classList.remove('show');
       alertError.classList.remove('show');
       
@@ -868,7 +933,16 @@
         alertError.classList.add('show');
       }
       
+      // Scroll to top to show alert
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Auto-hide alert after duration
+      if (duration > 0) {
+        setTimeout(() => {
+          alertSuccess.classList.remove('show');
+          alertError.classList.remove('show');
+        }, duration);
+      }
     }
 
     // ========== Form Validation ==========
@@ -1031,34 +1105,55 @@
         dataConsent: document.getElementById('dataConsent').checked
       };
 
+      console.log('📝 Submitting registration with data:', { ...formData, password: '***' });
+
       // Show loading state
       submitBtn.disabled = true;
       submitBtn.innerHTML = 'Registering... <span class="spinner"></span>';
       loadingOverlay.classList.add('show');
 
       try {
-        console.log('Submitting registration...');
-        console.log('API URL:', `${API_BASE_URL}/auth/register`);
+        // First test connection
+        const connected = await testApiConnection();
+        if (!connected) {
+          throw new Error('Cannot connect to server. Please check if the backend is running.');
+        }
+
+        console.log('🚀 Sending registration request to:', `${API_BASE_URL}/auth/register`);
 
         const response = await fetch(`${API_BASE_URL}/auth/register`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Origin': window.location.origin
           },
           body: JSON.stringify(formData)
         });
 
-        const data = await response.json();
-        console.log('Response:', data);
+        console.log('📥 Registration response status:', response.status);
+
+        // Get response text first
+        const responseText = await response.text();
+        console.log('📥 Registration response text:', responseText);
+
+        let data;
+        try {
+          data = responseText ? JSON.parse(responseText) : {};
+        } catch (parseError) {
+          console.error('❌ Failed to parse response as JSON:', parseError);
+          throw new Error('Server returned invalid response. Please try again.');
+        }
 
         if (response.ok && data.success) {
-          showAlert('success', 'Registration successful! Redirecting to login page...');
+          showAlert('success', 'Registration successful! Redirecting to login page...', 3000);
           form.reset();
           
           setTimeout(() => {
             window.location.href = '/login?registered=true';
           }, 2000);
         } else {
+          // Handle validation errors from server
           if (data.errors && Array.isArray(data.errors)) {
             data.errors.forEach(error => {
               if (error.field) {
@@ -1070,14 +1165,27 @@
                 showError(fieldId, error.message);
               }
             });
-            showAlert('error', data.message || 'Please fix the errors in the form');
+            showAlert('error', data.message || 'Please fix the errors in the form', 5000);
           } else {
-            showAlert('error', data.message || 'Registration failed. Please try again.');
+            showAlert('error', data.message || 'Registration failed. Please try again.', 5000);
           }
         }
       } catch (error) {
-        console.error('Registration error:', error);
-        showAlert('error', 'Network error. Please check your internet connection and try again.');
+        console.error('❌ Registration error:', error);
+        
+        let userErrorMessage = 'Registration failed. ';
+        
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+          userErrorMessage += 'Network error: Cannot connect to server. Please check your internet connection.';
+        } else if (error.message.includes('backend') || error.message.includes('server')) {
+          userErrorMessage += 'Server is not responding. Please try again later.';
+        } else if (error.message.includes('CORS')) {
+          userErrorMessage += 'Cross-origin error. Please ensure you are accessing the correct URL.';
+        } else {
+          userErrorMessage += error.message || 'Please try again.';
+        }
+        
+        showAlert('error', userErrorMessage, 7000);
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = 'Register Now';
@@ -1149,11 +1257,47 @@
       // Check for registration success message
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('registered') === 'true') {
-        showAlert('success', 'Registration successful! You can now login with your credentials.');
+        showAlert('success', 'Registration successful! You can now login with your credentials.', 5000);
       }
       
+      // Test API connection on load
+      console.log('🔧 Testing API connection for registration...');
+      testApiConnection().then(connected => {
+        if (connected) {
+          console.log('✅ Registration API is ready');
+        } else {
+          console.warn('⚠️ Registration API connection test failed');
+          showAlert('error', 'Warning: Cannot connect to server. Registration may not work.', 7000);
+        }
+      });
+      
       console.log('✅ Registration form initialized successfully');
-      console.log('🔧 Show Password toggle is ready');
+      console.log('🌐 Registration API Base URL:', API_BASE_URL);
+    });
+
+    // ========== Debug Helper ==========
+    window.debugRegistration = function() {
+      console.log('🔧 Registration Debug Information:');
+      console.log('- Current URL:', window.location.href);
+      console.log('- API Base URL:', API_BASE_URL);
+      console.log('- Registration URL:', `${API_BASE_URL}/auth/register`);
+      console.log('- Test Connection URL:', `${API_BASE_URL}/test-connection`);
+      
+      // Test the connection
+      testApiConnection().then(connected => {
+        if (connected) {
+          console.log('✅ Server is reachable for registration');
+        } else {
+          console.log('❌ Server is not reachable for registration');
+        }
+      });
+    };
+
+    // ========== Enter Key Support ==========
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && e.target.type !== 'textarea' && e.target.type !== 'submit') {
+        e.preventDefault();
+      }
     });
   </script>
 </body>
