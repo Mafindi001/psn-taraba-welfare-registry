@@ -1,4 +1,4 @@
-// server.js - FIXED FOR VERCEL DEPLOYMENT WITH CORRECT URL
+// server.js - SIMPLIFIED FOR VERCEL
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -7,60 +7,32 @@ const fs = require('fs').promises;
 const bcrypt = require('bcrypt');
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Changed from 5000 to 3000 for Vercel compatibility
-
-console.log('🚀 Starting PSN Taraba Welfare System...');
-console.log('📅', new Date().toISOString());
-console.log('🌐 Environment:', process.env.NODE_ENV || 'development');
-console.log('🔧 Vercel:', process.env.VERCEL ? 'Yes' : 'No');
-
-// ========== VERCEL-SPECIFIC CONFIGURATION ==========
-const isVercel = process.env.VERCEL === '1' || process.env.VERCEL_URL;
-const isProduction = process.env.NODE_ENV === 'production';
 
 // ========== MIDDLEWARE ==========
-// Configure CORS for production - SIMPLIFIED for Vercel
-if (isProduction || isVercel) {
-  app.use(cors({
-    origin: true, // Allow all origins in production (Vercel handles this)
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
-  }));
-} else {
-  // Local development - allow all
-  app.use(cors({
-    origin: true,
-    credentials: true
-  }));
-}
-
-// Handle preflight requests
-app.options('*', cors());
+// CORS - Allow all origins for Vercel
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
+}));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Serve static files from views directory - FIXED PATH FOR VERCEL
-const viewsPath = path.join(__dirname, 'views');
-console.log('📁 Views path:', viewsPath);
-app.use(express.static(viewsPath));
-
-// Also serve from root for Vercel compatibility
+// Serve static files
+app.use(express.static(path.join(__dirname, 'views')));
 app.use(express.static(__dirname));
 
 // ========== JSON DATABASE SETUP ==========
 const DATA_DIR = path.join(__dirname, 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const ADMINS_FILE = path.join(DATA_DIR, 'admins.json');
-const WELFARE_FILE = path.join(DATA_DIR, 'welfare.json');
-const LOGS_DIR = path.join(__dirname, 'logs');
 
 // Ensure directories exist
 async function ensureDirectories() {
   try {
     await fs.mkdir(DATA_DIR, { recursive: true });
-    await fs.mkdir(LOGS_DIR, { recursive: true });
     console.log('✅ Directories verified');
     return true;
   } catch (error) {
@@ -70,13 +42,13 @@ async function ensureDirectories() {
 }
 
 // Initialize users file
-async function initializeDatabase() {
+async function initializeUsers() {
   try {
     await ensureDirectories();
     
     try {
       await fs.access(USERS_FILE);
-      console.log('📁 Users database file exists');
+      console.log('📁 Users file exists');
     } catch {
       const initialData = {
         users: [],
@@ -87,11 +59,11 @@ async function initializeDatabase() {
         }
       };
       await fs.writeFile(USERS_FILE, JSON.stringify(initialData, null, 2));
-      console.log('📝 Created new users database file');
+      console.log('📝 Created new users file');
     }
     return true;
   } catch (error) {
-    console.error('❌ Database initialization error:', error);
+    console.error('❌ Users initialization error:', error);
     return false;
   }
 }
@@ -105,7 +77,7 @@ async function initializeAdmins() {
       await fs.access(ADMINS_FILE);
       console.log('📁 Admins file exists');
     } catch {
-      // Create default admin: psnadmin with secure password
+      // Create default admin
       const defaultPassword = await bcrypt.hash('PSN@Taraba2025!', 12);
       const initialAdmins = {
         admins: [
@@ -132,60 +104,7 @@ async function initializeAdmins() {
     }
     return true;
   } catch (error) {
-    console.error('❌ Admin initialization error:', error);
-    return false;
-  }
-}
-
-// Initialize welfare file
-async function initializeWelfare() {
-  try {
-    await ensureDirectories();
-    
-    try {
-      await fs.access(WELFARE_FILE);
-      console.log('📁 Welfare file exists');
-    } catch {
-      const initialWelfare = {
-        packages: [
-          {
-            id: 'welfare-001',
-            name: '2024 End of Year Package',
-            type: 'food_items',
-            description: 'Rice, oil, and other food items for members',
-            value: 25000,
-            eligibility: 'All verified members',
-            distributionDate: '2024-12-20',
-            status: 'completed',
-            createdAt: '2024-11-15T00:00:00.000Z',
-            beneficiaries: [],
-            distributionLog: []
-          },
-          {
-            id: 'welfare-002',
-            name: '2025 Q1 Medical Support',
-            type: 'healthcare',
-            description: 'Health insurance premium support',
-            value: 15000,
-            eligibility: 'Active members with 2+ years membership',
-            distributionDate: '2025-03-15',
-            status: 'planned',
-            createdAt: new Date().toISOString(),
-            beneficiaries: [],
-            distributionLog: []
-          }
-        ],
-        metadata: {
-          createdAt: new Date().toISOString(),
-          lastUpdated: new Date().toISOString()
-        }
-      };
-      await fs.writeFile(WELFARE_FILE, JSON.stringify(initialWelfare, null, 2));
-      console.log('💰 Created welfare database with sample packages');
-    }
-    return true;
-  } catch (error) {
-    console.error('❌ Welfare initialization error:', error);
+    console.error('❌ Admins initialization error:', error);
     return false;
   }
 }
@@ -230,80 +149,21 @@ async function getAdmins() {
   }
 }
 
-async function saveAdmins(admins) {
-  try {
-    const adminData = {
-      admins,
-      metadata: {
-        lastUpdated: new Date().toISOString(),
-        adminCount: admins.length
-      }
-    };
-    await fs.writeFile(ADMINS_FILE, JSON.stringify(adminData, null, 2));
-    return true;
-  } catch (error) {
-    console.error('Error saving admins file:', error);
-    return false;
-  }
-}
-
-async function getWelfarePackages() {
-  try {
-    const data = await fs.readFile(WELFARE_FILE, 'utf8');
-    const parsed = JSON.parse(data);
-    return parsed.packages || [];
-  } catch (error) {
-    console.error('Error reading welfare file:', error);
-    return [];
-  }
-}
-
-async function saveWelfarePackages(packages) {
-  try {
-    const welfareData = {
-      packages,
-      metadata: {
-        lastUpdated: new Date().toISOString(),
-        packageCount: packages.length
-      }
-    };
-    await fs.writeFile(WELFARE_FILE, JSON.stringify(welfareData, null, 2));
-    return true;
-  } catch (error) {
-    console.error('Error saving welfare file:', error);
-    return false;
-  }
-}
-
 // ========== PAGE ROUTES ==========
 app.get('/', (req, res) => {
-  console.log(`🌐 Home page requested from: ${req.headers.origin || 'Unknown origin'}`);
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
 app.get('/register', (req, res) => {
-  console.log(`📝 Register page requested from: ${req.headers.origin || 'Unknown origin'}`);
   res.sendFile(path.join(__dirname, 'views', 'register.html'));
 });
 
 app.get('/login', (req, res) => {
-  console.log(`🔑 Login page requested from: ${req.headers.origin || 'Unknown origin'}`);
   res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 
 app.get('/admin-login', (req, res) => {
-  console.log(`👑 Admin login page requested from: ${req.headers.origin || 'Unknown origin'}`);
   res.sendFile(path.join(__dirname, 'views', 'admin-login.html'));
-});
-
-app.get('/dashboard', (req, res) => {
-  console.log(`📊 Dashboard requested from: ${req.headers.origin || 'Unknown origin'}`);
-  res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
-});
-
-app.get('/admin-dashboard', (req, res) => {
-  console.log(`👑 Admin dashboard requested from: ${req.headers.origin || 'Unknown origin'}`);
-  res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
 });
 
 // Health check endpoint
@@ -313,10 +173,7 @@ app.get('/api/health', (req, res) => {
     status: 'healthy',
     service: 'PSN Taraba Welfare Registry',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    isVercel: isVercel,
-    vercelUrl: process.env.VERCEL_URL || 'Not on Vercel',
-    nodeVersion: process.version
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
@@ -341,7 +198,7 @@ app.post('/api/auth/register', async (req, res) => {
       dataConsent
     } = req.body;
 
-    console.log('📝 Registration attempt for:', email, 'from:', req.headers.origin);
+    console.log('📝 Registration attempt for:', email);
 
     // Basic validation
     const errors = [];
@@ -447,7 +304,7 @@ app.post('/api/auth/register', async (req, res) => {
     console.error('❌ Registration error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error during registration: ' + error.message
+      message: 'Server error during registration'
     });
   }
 });
@@ -457,7 +314,7 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log('🔑 Member login attempt:', email, 'from:', req.headers.origin);
+    console.log('🔑 Member login attempt:', email);
 
     // Validation
     if (!email || !password) {
@@ -517,14 +374,12 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// ========== ADMIN API ROUTES ==========
-
 // Admin login
 app.post('/api/admin/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     
-    console.log('🔑 Admin login attempt:', username, 'from:', req.headers.origin);
+    console.log('🔑 Admin login attempt:', username);
     
     if (!username || !password) {
       return res.status(400).json({
@@ -555,10 +410,6 @@ app.post('/api/admin/login', async (req, res) => {
       });
     }
     
-    // Update last login
-    admin.lastLogin = new Date().toISOString();
-    await saveAdmins(admins);
-    
     // Remove password from response
     const { password: _, ...adminWithoutPassword } = admin;
     
@@ -580,31 +431,17 @@ app.post('/api/admin/login', async (req, res) => {
   }
 });
 
-// ========== INITIALIZE AND START SERVER ==========
-
-// Initialize function
-async function initializeServer() {
-  try {
-    console.log('🔄 Initializing server...');
-    await initializeDatabase();
-    await initializeAdmins();
-    await initializeWelfare();
-    console.log('✅ Server initialization complete');
-    return true;
-  } catch (error) {
-    console.error('❌ Server initialization failed:', error);
-    return false;
-  }
-}
-
-// Global error handlers
+// ========== ERROR HANDLERS ==========
+// Global 404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Endpoint not found'
+    message: 'Endpoint not found',
+    path: req.originalUrl
   });
 });
 
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('❌ Server error:', err);
   res.status(500).json({
@@ -614,40 +451,20 @@ app.use((err, req, res, next) => {
 });
 
 // ========== VERCEL COMPATIBILITY ==========
-// This is CRITICAL for Vercel - export the app as a serverless function
-if (isVercel) {
-  console.log('🚀 Configuring for Vercel serverless deployment...');
-  // Initialize on cold start
-  initializeServer().then(() => {
-    console.log('✅ Vercel serverless function ready');
-  });
-  
-  // Export for Vercel
-  module.exports = app;
-} else {
-  // Local development
-  console.log('💻 Running in local development mode...');
-  
-  // Start server locally
-  async function startLocalServer() {
-    await initializeServer();
-    
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log('\n' + '='.repeat(60));
-      console.log('✅ SERVER STARTED SUCCESSFULLY');
-      console.log('='.repeat(60));
-      console.log(`📡 Server: http://localhost:${PORT}`);
-      console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`🔐 Default admin: psnadmin / PSN@Taraba2025!`);
-      console.log('='.repeat(60));
-      console.log('\n🌐 Available Pages:');
-      console.log(`   Home: http://localhost:${PORT}/`);
-      console.log(`   Register: http://localhost:${PORT}/register`);
-      console.log(`   Login: http://localhost:${PORT}/login`);
-      console.log(`   Admin Login: http://localhost:${PORT}/admin-login`);
-      console.log('='.repeat(60) + '\n');
-    });
-  }
-  
-  startLocalServer();
+// Initialize databases when the server starts
+async function initializeServer() {
+  console.log('🔄 Initializing server...');
+  await initializeUsers();
+  await initializeAdmins();
+  console.log('✅ Server initialization complete');
 }
+
+// Initialize and export for Vercel
+initializeServer().then(() => {
+  console.log('🚀 Server is ready for Vercel');
+}).catch(error => {
+  console.error('❌ Server initialization failed:', error);
+});
+
+// Export the app for Vercel
+module.exports = app;
