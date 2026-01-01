@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Member login for PSN Taraba State Welfare Registry">
   <title>Member Login - PSN Taraba Welfare Registry</title>
-  <script src="/js/logout.js"></script>
-
+  
   <style>
     /* ========== CSS Variables ========== */
     :root {
@@ -563,8 +562,32 @@
   
   <!-- JavaScript -->
   <script>
-    // ========== Configuration - FIXED ==========
-  const API_BASE_URL = window.location.origin + '/api';
+    // ========== SMART API CONFIGURATION ==========
+    // This works for both local development and Vercel production
+    function getApiBaseUrl() {
+      const hostname = window.location.hostname;
+      const origin = window.location.origin;
+      
+      console.log('🌐 Detecting environment...');
+      console.log('Hostname:', hostname);
+      console.log('Origin:', origin);
+      
+      // Local development
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:5000/api';
+      }
+      // Vercel production
+      else if (hostname.includes('vercel.app')) {
+        return origin + '/api';
+      }
+      // GitHub Pages or other hosting
+      else {
+        return origin + '/api';
+      }
+    }
+
+    const API_BASE_URL = getApiBaseUrl();
+    console.log('🚀 Using API Base URL:', API_BASE_URL);
 
     // ========== Get Form Elements ==========
     const form = document.getElementById('loginForm');
@@ -663,6 +686,31 @@
       }
     }
 
+    // ========== API Connection Test ==========
+    async function testApiConnection() {
+      try {
+        console.log('🔍 Testing API connection to:', API_BASE_URL);
+        const response = await fetch(`${API_BASE_URL}/test-connection`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ API Connection Test:', data);
+          return true;
+        } else {
+          console.warn('⚠️ API connection test failed with status:', response.status);
+          return false;
+        }
+      } catch (error) {
+        console.error('❌ API Connection Test Error:', error.message);
+        return false;
+      }
+    }
+
     // ========== Form Validation ==========
     function validateForm() {
       clearAllErrors();
@@ -710,8 +758,15 @@
       loadingOverlay.classList.add('show');
 
       try {
-        console.log('Attempting login...');
+        console.log('🔑 Attempting login...');
         console.log('API URL:', `${API_BASE_URL}/auth/login`);
+        console.log('Login data:', { ...loginData, password: '***' }); // Hide password in logs
+
+        // First test API connection
+        const apiConnected = await testApiConnection();
+        if (!apiConnected) {
+          throw new Error('Cannot connect to server. Please check if the backend is running.');
+        }
 
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
           method: 'POST',
@@ -722,7 +777,7 @@
         });
 
         const data = await response.json();
-        console.log('Login response:', data);
+        console.log('📥 Login response:', data);
 
         if (response.ok && data.success) {
           // Login successful
@@ -758,8 +813,16 @@
           }
         }
       } catch (error) {
-        console.error('Login error:', error);
-        showAlert('error', 'Network error. Please check your internet connection and try again.');
+        console.error('❌ Login error:', error);
+        
+        // Better error messages
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+          showAlert('error', 'Network error: Cannot connect to server. Please check your internet connection.');
+        } else if (error.message.includes('backend')) {
+          showAlert('error', 'Server connection failed. The backend server might not be running.');
+        } else {
+          showAlert('error', 'Network error. Please check your connection and try again.');
+        }
       } finally {
         // Reset button state
         loginBtn.disabled = false;
@@ -795,13 +858,13 @@
       }
     });
 
-    // ========== Load Remembered Email ==========
+    // ========== Initialize Page ==========
     window.addEventListener('DOMContentLoaded', () => {
       // Initialize password toggle
       setupPasswordToggle();
       
+      // Load remembered email
       const rememberedEmail = getFromLocalStorage('psnRememberedEmail');
-      
       if (rememberedEmail) {
         document.getElementById('email').value = rememberedEmail;
         document.getElementById('rememberMe').checked = true;
@@ -810,26 +873,33 @@
       // Check if user is already logged in
       const token = getFromLocalStorage('psnToken');
       const userRole = getFromLocalStorage('psnUserRole');
-      
       if (token && userRole === 'member') {
-        console.log('User already logged in, redirecting to dashboard...');
+        console.log('⚠️ User already logged in, redirecting to dashboard...');
         window.location.href = '/dashboard';
       }
+
+      // Check if user just registered
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('registered') === 'true') {
+        showAlert('success', 'Registration successful! Please login with your credentials.');
+      }
+
+      // Test API connection on page load
+      console.log('🔧 Testing API connection on page load...');
+      testApiConnection().then(connected => {
+        if (connected) {
+          console.log('✅ API is ready for login requests');
+        } else {
+          console.warn('⚠️ API connection test failed on page load');
+        }
+      });
 
       console.log('✅ Login form initialized successfully');
     });
 
-    // Check if user just registered
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('registered') === 'true') {
-      showAlert('success', 'Registration successful! Please login with your credentials.');
-    }
-
     // ========== Forgot Password Handler ==========
     document.querySelector('.forgot-password').addEventListener('click', (e) => {
       e.preventDefault();
-      
-      // Show alert for future implementation
       showAlert('error', 'Password reset feature coming soon. Please contact PSN Welfare office for assistance.');
     });
 
@@ -840,7 +910,24 @@
       }
     });
 
-    console.log('✅ Login page loaded successfully');
+    // ========== Debug Helper ==========
+    window.debugLogin = function() {
+      console.log('🔧 Debug Information:');
+      console.log('- API Base URL:', API_BASE_URL);
+      console.log('- Test Connection URL:', `${API_BASE_URL}/test-connection`);
+      console.log('- Login URL:', `${API_BASE_URL}/auth/login`);
+      console.log('- Local Storage:', {
+        token: getFromLocalStorage('psnToken'),
+        user: getFromLocalStorage('psnUser'),
+        rememberedEmail: getFromLocalStorage('psnRememberedEmail')
+      });
+      
+      // Test the connection
+      testApiConnection();
+    };
+
+    console.log('🚀 Login page loaded successfully');
+    console.log('💡 Tip: Run debugLogin() in console for debug info');
   </script>
 </body>
 </html>
