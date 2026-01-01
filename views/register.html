@@ -6,6 +6,7 @@
   <meta name="description" content="Register as a member of PSN Taraba State Welfare Registry">
   <title>Member Registration - PSN Taraba Welfare Registry</title>
   
+  <!-- [ALL YOUR CSS STYLES REMAIN EXACTLY THE SAME - NO CHANGES NEEDED] -->
   <style>
     /* ========== CSS Variables ========== */
     :root {
@@ -741,35 +742,17 @@
     </div>
   </div>
   
-  <!-- JavaScript -->
+  <!-- JavaScript - FIXED API CONFIGURATION FOR VERCEL -->
   <script>
-    // ========== SMART API CONFIGURATION ==========
-    // Dynamically detect API base URL
+    // ========== IMPROVED API CONFIGURATION FOR VERCEL ==========
+    // Dynamically detect API base URL - Simplified for Vercel
     function getApiBaseUrl() {
-      const hostname = window.location.hostname;
       const origin = window.location.origin;
+      console.log('🌐 Current origin:', origin);
       
-      console.log('🌐 Detecting environment for registration...');
-      console.log('Hostname:', hostname);
-      console.log('Origin:', origin);
-      console.log('Full URL:', window.location.href);
-      
-      // Local development
-      if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        return 'http://localhost:5000/api';
-      }
-      // Vercel production - your specific URL
-      else if (hostname.includes('psn-taraba-welfare-registry')) {
-        return 'https://psn-taraba-welfare-registry-git-main-mafindi001s-projects.vercel.app/api';
-      }
-      // Any other Vercel URL
-      else if (hostname.includes('vercel.app')) {
-        return origin + '/api';
-      }
-      // Fallback
-      else {
-        return origin + '/api';
-      }
+      // For Vercel, we use relative paths since it's the same origin
+      // Vercel serves both frontend and backend from the same domain
+      return origin + '/api';
     }
 
     const API_BASE_URL = getApiBaseUrl();
@@ -784,28 +767,56 @@
     const successMessage = document.getElementById('successMessage');
     const errorMessage = document.getElementById('errorMessage');
 
-    // ========== Test Connection Function ==========
+    // ========== Improved API Connection Test ==========
     async function testApiConnection() {
       try {
-        console.log('🔍 Testing API connection from registration...');
-        const response = await fetch(`${API_BASE_URL}/test-connection`, {
+        console.log('🔍 Testing API connection for registration page...');
+        
+        // First try health endpoint
+        const response = await fetch(`${API_BASE_URL}/health`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
-          }
+          },
+          mode: 'cors',
+          credentials: 'same-origin'
         });
         
         if (response.ok) {
           const data = await response.json();
-          console.log('✅ Registration API Connection Test Success:', data);
+          console.log('✅ Registration API Connection Success:', {
+            status: data.status,
+            service: data.service,
+            isVercel: data.isVercel
+          });
           return true;
         } else {
-          console.warn('⚠️ Registration API connection test failed:', response.status);
+          console.warn('⚠️ Registration API connection failed with status:', response.status);
           return false;
         }
       } catch (error) {
-        console.error('❌ Registration API Connection Test Error:', error);
+        console.error('❌ Registration API Connection Error:', error);
+        console.log('Trying fallback test endpoint...');
+        
+        // Try test endpoint as fallback
+        try {
+          const testResponse = await fetch(`${API_BASE_URL}/test`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (testResponse.ok) {
+            console.log('✅ Fallback test endpoint works');
+            return true;
+          }
+        } catch (fallbackError) {
+          console.error('❌ Fallback test also failed:', fallbackError);
+        }
+        
         return false;
       }
     }
@@ -1113,10 +1124,10 @@
       loadingOverlay.classList.add('show');
 
       try {
-        // First test connection
+        // Test connection first
         const connected = await testApiConnection();
         if (!connected) {
-          throw new Error('Cannot connect to server. Please check if the backend is running.');
+          throw new Error('Cannot connect to server. Please check if the backend is running and refresh the page.');
         }
 
         console.log('🚀 Sending registration request to:', `${API_BASE_URL}/auth/register`);
@@ -1128,18 +1139,16 @@
             'Content-Type': 'application/json',
             'Origin': window.location.origin
           },
+          credentials: 'same-origin', // Important for cookies/sessions
           body: JSON.stringify(formData)
         });
 
         console.log('📥 Registration response status:', response.status);
 
-        // Get response text first
-        const responseText = await response.text();
-        console.log('📥 Registration response text:', responseText);
-
+        // Try to parse JSON response
         let data;
         try {
-          data = responseText ? JSON.parse(responseText) : {};
+          data = await response.json();
         } catch (parseError) {
           console.error('❌ Failed to parse response as JSON:', parseError);
           throw new Error('Server returned invalid response. Please try again.');
@@ -1176,9 +1185,9 @@
         let userErrorMessage = 'Registration failed. ';
         
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
-          userErrorMessage += 'Network error: Cannot connect to server. Please check your internet connection.';
+          userErrorMessage += 'Network error: Cannot connect to server. Please check your internet connection and try again.';
         } else if (error.message.includes('backend') || error.message.includes('server')) {
-          userErrorMessage += 'Server is not responding. Please try again later.';
+          userErrorMessage += 'Server is not responding. Please try again later or contact support.';
         } else if (error.message.includes('CORS')) {
           userErrorMessage += 'Cross-origin error. Please ensure you are accessing the correct URL.';
         } else {
@@ -1261,13 +1270,14 @@
       }
       
       // Test API connection on load
-      console.log('🔧 Testing API connection for registration...');
+      console.log('🔧 Testing API connection for registration page...');
       testApiConnection().then(connected => {
         if (connected) {
           console.log('✅ Registration API is ready');
+          showAlert('success', 'Connected to server. You can proceed with registration.', 3000);
         } else {
           console.warn('⚠️ Registration API connection test failed');
-          showAlert('error', 'Warning: Cannot connect to server. Registration may not work.', 7000);
+          showAlert('error', 'Warning: Cannot connect to server. Registration may not work. Please refresh the page or try again later.', 7000);
         }
       });
       
@@ -1279,9 +1289,10 @@
     window.debugRegistration = function() {
       console.log('🔧 Registration Debug Information:');
       console.log('- Current URL:', window.location.href);
+      console.log('- Origin:', window.location.origin);
       console.log('- API Base URL:', API_BASE_URL);
       console.log('- Registration URL:', `${API_BASE_URL}/auth/register`);
-      console.log('- Test Connection URL:', `${API_BASE_URL}/test-connection`);
+      console.log('- Health Check URL:', `${API_BASE_URL}/health`);
       
       // Test the connection
       testApiConnection().then(connected => {
