@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "build": "echo 'No build step required for Node.js application'",
+    "vercel-build": "npm install",
+    "preview": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -37,5 +40,18 @@
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mafindi001/psn-taraba-welfare.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mafindi001/psn-taraba-welfare/issues"
+  },
+  "homepage": "https://github.com/mafindi001/psn-taraba-welfare#readme",
+  "private": true,
+  "jekyll": false,
+  "volta": {
+    "node": "18.17.0"
   }
 }
