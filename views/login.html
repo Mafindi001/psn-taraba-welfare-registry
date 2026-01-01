@@ -6,6 +6,7 @@
   <meta name="description" content="Member login for PSN Taraba State Welfare Registry">
   <title>Member Login - PSN Taraba Welfare Registry</title>
   
+  <!-- [ALL YOUR CSS STYLES REMAIN EXACTLY THE SAME - NO CHANGES NEEDED] -->
   <style>
     /* ========== CSS Variables ========== */
     :root {
@@ -579,41 +580,20 @@
     </div>
   </div>
   
-  <!-- JavaScript -->
+  <!-- JavaScript - FIXED API CONFIGURATION FOR VERCEL -->
   <script>
-    // ========== SMART API CONFIGURATION ==========
-    // Dynamically detect API base URL
+    // ========== IMPROVED API CONFIGURATION FOR VERCEL ==========
+    // Simplified URL detection for Vercel
     function getApiBaseUrl() {
-      const hostname = window.location.hostname;
       const origin = window.location.origin;
-      const protocol = window.location.protocol;
+      console.log('🌐 Current origin:', origin);
       
-      console.log('🌐 Detecting environment...');
-      console.log('Hostname:', hostname);
-      console.log('Origin:', origin);
-      console.log('Protocol:', protocol);
-      console.log('Full URL:', window.location.href);
-      
-      // Local development
-      if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        return 'http://localhost:5000/api';
-      }
-      // Vercel production - your specific URL
-      else if (origin.includes('psn-taraba-welfare-registry')) {
-        return 'https://psn-taraba-welfare-registry-git-main-mafindi001s-projects.vercel.app/api';
-      }
-      // Any other Vercel URL
-      else if (hostname.includes('vercel.app')) {
-        return origin + '/api';
-      }
-      // Fallback
-      else {
-        return origin + '/api';
-      }
+      // For Vercel, use relative paths - both frontend and backend are on same domain
+      return origin + '/api';
     }
 
     const API_BASE_URL = getApiBaseUrl();
-    console.log('🚀 Using API Base URL:', API_BASE_URL);
+    console.log('🚀 Login API Base URL:', API_BASE_URL);
 
     // ========== Get Form Elements ==========
     const form = document.getElementById('loginForm');
@@ -744,10 +724,10 @@
     // ========== API Connection Test ==========
     async function testApiConnection() {
       try {
-        console.log('🔍 Testing API connection to:', `${API_BASE_URL}/test-connection`);
+        console.log('🔍 Testing API connection to:', `${API_BASE_URL}/health`);
         showAlert('info', 'Testing connection to server...', 3000);
         
-        const response = await fetch(`${API_BASE_URL}/test-connection`, {
+        const response = await fetch(`${API_BASE_URL}/health`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -841,17 +821,13 @@
             'Origin': window.location.origin
           },
           mode: 'cors',
-          credentials: 'include',
+          credentials: 'same-origin',
           body: JSON.stringify(loginData)
         });
 
         console.log('📥 Login response status:', response.status);
 
-        // First check if we got any response at all
-        if (!response) {
-          throw new Error('No response from server. Please check your internet connection.');
-        }
-
+        // Get response text first
         const responseText = await response.text();
         console.log('📥 Login response text:', responseText);
 
@@ -957,7 +933,7 @@
     }
 
     // ========== Initialize Page ==========
-    window.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
       // Initialize password toggle
       setupPasswordToggle();
       
@@ -1028,7 +1004,7 @@
       console.log('🔧 Debug Information:');
       console.log('- Current URL:', window.location.href);
       console.log('- API Base URL:', API_BASE_URL);
-      console.log('- Test Connection URL:', `${API_BASE_URL}/test-connection`);
+      console.log('- Health Check URL:', `${API_BASE_URL}/health`);
       console.log('- Login URL:', `${API_BASE_URL}/auth/login`);
       console.log('- Local Storage:', {
         token: getFromLocalStorage('psnToken'),
