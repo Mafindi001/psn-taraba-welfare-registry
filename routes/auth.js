@@ -1,31 +1,22 @@
 // routes/auth.js
-// Authentication routes
-
 const express = require('express');
 const router = express.Router();
-const {
-  registerMember,
-  loginMember,
-  loginAdmin,
-  getCurrentUser,
-  logout,
-  changePassword
-} = require('../controllers/authController');
-const {
-  validateMemberRegistration,
-  validateMemberLogin,
-  validateAdminLogin
-} = require('../middleware/validation');
-const { authenticate } = require('../middleware/auth');
 
-// Public routes
-router.post('/register', validateMemberRegistration, registerMember);
-router.post('/login', validateMemberLogin, loginMember);
-router.post('/admin/login', validateAdminLogin, loginAdmin);
+// Test route
+router.get('/test', (req, res) => {
+  res.json({ message: 'Auth route working' });
+});
 
-// Protected routes (require authentication)
-router.get('/me', authenticate, getCurrentUser);
-router.post('/logout', authenticate, logout);
-router.post('/change-password', authenticate, changePassword);
+// Login route
+router.post('/login', (req, res) => {
+  // Your login logic here
+  res.json({ message: 'Login endpoint', success: true });
+});
+
+// Register route
+router.post('/register', (req, res) => {
+  // Your registration logic here
+  res.json({ message: 'Register endpoint', success: true });
+});
 
 module.exports = router;

@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Member login for PSN Taraba State Welfare Registry">
   <title>Member Login - PSN Taraba Welfare Registry</title>
-  
+  <script src="/js/logout.js"></script>
+
   <style>
     /* ========== CSS Variables ========== */
     :root {
@@ -230,6 +231,35 @@
       text-decoration: underline;
     }
 
+    /* ========== Password Input Wrapper ========== */
+    .password-input-wrapper {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--gray);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 5px;
+      transition: color 0.3s ease;
+      z-index: 2;
+    }
+
+    .password-toggle:hover {
+      color: var(--primary-color);
+    }
+
+    .password-toggle:focus {
+      outline: none;
+      color: var(--primary-color);
+    }
+
     /* ========== Buttons ========== */
     .btn {
       display: inline-block;
@@ -426,15 +456,15 @@
   </style>
 </head>
 <body>
-  <!-- Navigation -->
+  <!-- Navigation - FIXED -->
   <nav class="navbar">
     <div class="container navbar-content">
       <a href="/" class="navbar-brand">PSN Taraba Welfare</a>
       <ul class="navbar-menu">
         <li><a href="/" class="navbar-link">Home</a></li>
-        <li><a href="/register.html" class="navbar-link">Register</a></li>
-        <li><a href="/login.html" class="navbar-link">Member Login</a></li>
-        <li><a href="/admin-login.html" class="navbar-link">Admin Login</a></li>
+        <li><a href="/register" class="navbar-link">Register</a></li>
+        <li><a href="/login" class="navbar-link">Member Login</a></li>
+        <li><a href="/admin-login" class="navbar-link">Admin Login</a></li>
       </ul>
     </div>
   </nav>
@@ -476,15 +506,20 @@
 
           <div class="form-group">
             <label for="password" class="form-label">Password</label>
-            <input 
-              type="password" 
-              id="password" 
-              name="password" 
-              class="form-input" 
-              placeholder="Enter your password"
-              required
-              autocomplete="current-password"
-            >
+            <div class="password-input-wrapper">
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                class="form-input" 
+                placeholder="Enter your password"
+                required
+                autocomplete="current-password"
+              >
+              <button type="button" class="password-toggle" id="togglePassword" aria-label="Show password">
+                👁️ Show
+              </button>
+            </div>
             <span class="form-error" id="passwordError"></span>
           </div>
 
@@ -510,9 +545,9 @@
           <span>or</span>
         </div>
 
-        <!-- Register Link -->
+        <!-- Register Link - FIXED -->
         <div class="register-link">
-          Don't have an account? <a href="/register.html">Register here</a>
+          Don't have an account? <a href="/register">Register here</a>
         </div>
       </div>
     </div>
@@ -525,10 +560,11 @@
       <p>Logging in...</p>
     </div>
   </div>
+  
   <!-- JavaScript -->
   <script>
-    // ========== Configuration ==========
-    const API_BASE_URL = 'http://localhost:5000/api';
+    // ========== Configuration - FIXED ==========
+  const API_BASE_URL = window.location.origin + '/api';
 
     // ========== Get Form Elements ==========
     const form = document.getElementById('loginForm');
@@ -538,6 +574,28 @@
     const alertError = document.getElementById('alertError');
     const successMessage = document.getElementById('successMessage');
     const errorMessage = document.getElementById('errorMessage');
+
+    // ========== Password Toggle Functionality ==========
+    function setupPasswordToggle() {
+      const passwordInput = document.getElementById('password');
+      const togglePasswordBtn = document.getElementById('togglePassword');
+
+      // Toggle password visibility
+      togglePasswordBtn.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.innerHTML = type === 'password' ? '👁️ Show' : '👁️ Hide';
+        this.setAttribute('aria-label', type === 'password' ? 'Show password' : 'Hide password');
+      });
+
+      // Handle Enter key on password toggle button
+      togglePasswordBtn.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.click();
+        }
+      });
+    }
 
     // ========== Validation Functions ==========
     function validateEmail(email) {
@@ -653,6 +711,7 @@
 
       try {
         console.log('Attempting login...');
+        console.log('API URL:', `${API_BASE_URL}/auth/login`);
 
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
           method: 'POST',
@@ -670,9 +729,9 @@
           showAlert('success', 'Login successful! Redirecting to dashboard...');
           
           // Save user data and token to localStorage
-          saveToLocalStorage('psnToken', data.data.token);
-          saveToLocalStorage('psnUser', data.data.member);
-          saveToLocalStorage('psnUserRole', 'member');
+          saveToLocalStorage('psnToken', data.token);
+          saveToLocalStorage('psnUser', data.user);
+          saveToLocalStorage('psnUserRole', data.user.userType);
           
           // Save email if remember me is checked
           if (rememberMe) {
@@ -683,7 +742,7 @@
           
           // Redirect to member dashboard after 1 second
           setTimeout(() => {
-            window.location.href = '/dashboard.html';
+            window.location.href = '/dashboard';
           }, 1000);
         } else {
           // Login failed
@@ -738,6 +797,9 @@
 
     // ========== Load Remembered Email ==========
     window.addEventListener('DOMContentLoaded', () => {
+      // Initialize password toggle
+      setupPasswordToggle();
+      
       const rememberedEmail = getFromLocalStorage('psnRememberedEmail');
       
       if (rememberedEmail) {
@@ -751,11 +813,17 @@
       
       if (token && userRole === 'member') {
         console.log('User already logged in, redirecting to dashboard...');
-        window.location.href = '/dashboard.html';
+        window.location.href = '/dashboard';
       }
 
       console.log('✅ Login form initialized successfully');
     });
+
+    // Check if user just registered
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('registered') === 'true') {
+      showAlert('success', 'Registration successful! Please login with your credentials.');
+    }
 
     // ========== Forgot Password Handler ==========
     document.querySelector('.forgot-password').addEventListener('click', (e) => {

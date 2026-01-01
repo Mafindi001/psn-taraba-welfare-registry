@@ -1,0 +1,21 @@
+{
+  "admins": [
+    {
+      "id": "admin-001",
+      "username": "psnadmin",
+      "password": "$2b$12$qswA8yV1ADxgbpHT0GNdJelL8KN0NHjGEmWad6/bVhMh7WoLQYEfG",
+      "fullName": "PSN Taraba Admin",
+      "email": "admin@psntaraba.org",
+      "role": "superadmin",
+      "createdAt": "2025-12-31T19:23:18.413Z",
+      "lastLogin": "2025-12-31T19:25:16.590Z",
+      "permissions": [
+        "all"
+      ]
+    }
+  ],
+  "metadata": {
+    "lastUpdated": "2025-12-31T19:25:16.590Z",
+    "adminCount": 1
+  }
+}

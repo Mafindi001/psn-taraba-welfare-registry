@@ -1,29 +1,15 @@
 // routes/admin.js
-// Admin-specific routes
-
 const express = require('express');
 const router = express.Router();
-const {
-  getAllMembers,
-  getMemberById,
-  getUpcomingCelebrations,
-  getDashboardStats
-} = require('../controllers/adminController');
-const { authenticate } = require('../middleware/auth');
-const { requireRole, requirePermission } = require('../middleware/roleCheck');
 
-// All routes require admin authentication
-router.use(authenticate);
-router.use(requireRole('admin', 'super_admin'));
+// Test route
+router.get('/test', (req, res) => {
+  res.json({ message: 'Admin route working' });
+});
 
-// Dashboard stats
-router.get('/stats', getDashboardStats);
-
-// Members management
-router.get('/members', requirePermission('view_members'), getAllMembers);
-router.get('/members/:memberId', requirePermission('view_members'), getMemberById);
-
-// Celebrations
-router.get('/celebrations', requirePermission('view_members'), getUpcomingCelebrations);
+// Admin dashboard data
+router.get('/dashboard', (req, res) => {
+  res.json({ message: 'Admin dashboard data' });
+});
 
 module.exports = router;

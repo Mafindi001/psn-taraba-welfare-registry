@@ -3,19 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Member dashboard for PSN Taraba State Welfare Registry">
-  <title>Member Dashboard - PSN Taraba Welfare Registry</title>
-  
+  <title>Member Dashboard - PSN Taraba Welfare</title>
   <style>
     /* ========== CSS Variables ========== */
     :root {
       --primary-color: #1e40af;
       --primary-dark: #1e3a8a;
-      --primary-light: #3b82f6;
-      --secondary-color: #059669;
-      --danger-color: #dc2626;
       --success-color: #10b981;
       --warning-color: #f59e0b;
+      --danger-color: #dc2626;
+      --info-color: #3b82f6;
       --dark: #1f2937;
       --gray: #6b7280;
       --gray-light: #d1d5db;
@@ -28,9 +25,9 @@
       --spacing-2xl: 3rem;
       --radius-md: 0.5rem;
       --radius-lg: 0.75rem;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
@@ -78,62 +75,112 @@
       font-weight: 700;
       color: var(--primary-color);
       text-decoration: none;
-    }
-
-    .navbar-user {
       display: flex;
       align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .navbar-menu {
+      display: flex;
+      list-style: none;
       gap: var(--spacing-lg);
+      align-items: center;
+      flex-wrap: wrap;
     }
 
-    .user-info {
-      text-align: right;
-    }
-
-    .user-name {
-      font-weight: 600;
+    .navbar-link {
       color: var(--dark);
-      font-size: 0.875rem;
+      font-weight: 500;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-md);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      cursor: pointer;
     }
 
-    .user-role {
-      font-size: 0.75rem;
-      color: var(--gray);
+    .navbar-link:hover {
+      background-color: var(--gray-lighter);
+    }
+
+    .navbar-link.active {
+      background-color: var(--primary-color);
+      color: var(--white);
     }
 
     .btn-logout {
-      padding: var(--spacing-sm) var(--spacing-md);
       background-color: var(--danger-color);
       color: var(--white);
       border: none;
+      padding: var(--spacing-sm) var(--spacing-lg);
       border-radius: var(--radius-md);
-      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
     }
 
     .btn-logout:hover {
       background-color: #b91c1c;
-      transform: translateY(-1px);
     }
 
-    /* ========== Page Header ========== */
-    .page-header {
+    /* ========== Dashboard Header ========== */
+    .dashboard-header {
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
       color: var(--white);
       padding: var(--spacing-xl) 0;
       margin-bottom: var(--spacing-xl);
     }
 
-    .page-header h1 {
-      margin: 0;
-      font-size: 2rem;
+    .welcome-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-lg);
     }
 
-    .page-header p {
-      margin: var(--spacing-sm) 0 0 0;
+    .welcome-text h1 {
+      font-size: 2rem;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .welcome-text p {
       opacity: 0.9;
+    }
+
+    .user-avatar {
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.05);
+    }
+
+    /* ========== Dashboard Sections ========== */
+    .dashboard-section {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .dashboard-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* ========== Cards ========== */
@@ -155,103 +202,117 @@
     }
 
     .card-title {
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       font-weight: 700;
-      color: var(--dark);
-      margin: 0;
+      color: var(--primary-color);
     }
 
-    .card-body {
-      padding: var(--spacing-md) 0;
-    }
-
-    /* ========== Stats Cards ========== */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: var(--spacing-lg);
-      margin-bottom: var(--spacing-xl);
-    }
-
-    .stat-card {
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-      color: var(--white);
-      padding: var(--spacing-xl);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      transition: transform 0.3s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-4px);
-    }
-
-    .stat-card.secondary {
-      background: linear-gradient(135deg, var(--secondary-color) 0%, #34d399 100%);
-    }
-
-    .stat-card.warning {
-      background: linear-gradient(135deg, var(--warning-color) 0%, #fbbf24 100%);
-    }
-
-    .stat-icon {
-      font-size: 2.5rem;
-      margin-bottom: var(--spacing-sm);
-    }
-
-    .stat-value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: var(--spacing-xs);
-    }
-
-    .stat-label {
-      font-size: 0.875rem;
-      opacity: 0.9;
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      background-color: var(--gray-lighter);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
     }
 
     /* ========== Profile Section ========== */
-    .profile-grid {
+    .info-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: var(--spacing-md);
     }
 
-    .profile-item {
-      padding: var(--spacing-md);
-      background-color: var(--gray-lighter);
-      border-radius: var(--radius-md);
+    .info-item {
+      margin-bottom: var(--spacing-md);
     }
 
-    .profile-label {
+    .info-label {
       font-size: 0.875rem;
       color: var(--gray);
-      margin-bottom: var(--spacing-xs);
+      margin-bottom: var(--spacing-sm);
+      font-weight: 500;
     }
 
-    .profile-value {
-      font-weight: 600;
-      color: var(--dark);
-    }
-
-    /* ========== Buttons ========== */
-    .btn {
-      display: inline-block;
-      padding: var(--spacing-md) var(--spacing-xl);
+    .info-value {
       font-size: 1rem;
+      color: var(--dark);
       font-weight: 600;
-      text-align: center;
-      text-decoration: none;
-      border: none;
+      padding: var(--spacing-sm);
+      background-color: var(--gray-lighter);
       border-radius: var(--radius-md);
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+
+    .info-value.editable {
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .info-value.editable:hover {
+      background-color: var(--gray-light);
+    }
+
+    /* Edit Form */
+    .edit-form {
+      background-color: var(--gray-lighter);
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-lg);
+      margin-top: var(--spacing-lg);
+      display: none;
+    }
+
+    .edit-form.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+      color: var(--dark);
+      font-size: 0.875rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: var(--spacing-md);
+      border: 2px solid var(--gray-light);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-family: var(--font-sans);
+      transition: all 0.3s ease;
+      background-color: var(--white);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-xl);
+    }
+
+    .btn {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-md);
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
+      border: none;
       font-family: var(--font-sans);
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
 
     .btn-primary {
@@ -259,33 +320,230 @@
       color: var(--white);
     }
 
-    .btn-primary:hover:not(:disabled) {
+    .btn-primary:hover {
       background-color: var(--primary-dark);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
     }
 
     .btn-secondary {
-      background-color: var(--secondary-color);
+      background-color: var(--gray);
       color: var(--white);
     }
 
-    .btn-secondary:hover:not(:disabled) {
-      background-color: #047857;
+    .btn-secondary:hover {
+      background-color: var(--dark);
     }
 
-    .btn-danger {
-      background-color: var(--danger-color);
+    /* ========== Welfare Section ========== */
+    .welfare-tabs {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      border-bottom: 2px solid var(--gray-lighter);
+      padding-bottom: var(--spacing-md);
+    }
+
+    .welfare-tab {
+      padding: var(--spacing-sm) var(--spacing-lg);
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-weight: 600;
+      color: var(--gray);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .welfare-tab.active {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+    }
+
+    .welfare-tab:hover {
+      color: var(--primary-dark);
+    }
+
+    .welfare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--spacing-lg);
+    }
+
+    .welfare-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: var(--white);
+      padding: var(--spacing-xl);
+      border-radius: var(--radius-lg);
+      position: relative;
+      overflow: hidden;
     }
 
-    .btn-danger:hover:not(:disabled) {
-      background-color: #b91c1c;
+    .welfare-card.past {
+      opacity: 0.8;
+      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
     }
 
-    .btn-sm {
+    .welfare-card.upcoming {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .welfare-badge {
+      position: absolute;
+      top: var(--spacing-md);
+      right: var(--spacing-md);
+      background: rgba(255, 255, 255, 0.2);
       padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-md);
       font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .welfare-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .welfare-desc {
+      font-size: 0.875rem;
+      opacity: 0.9;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .welfare-details {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+
+    /* ========== Events Section ========== */
+    .events-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-xl);
+    }
+
+    @media (max-width: 768px) {
+      .events-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .psn-event {
+      background: linear-gradient(135deg, var(--danger-color) 0%, #991b1b 100%);
+      color: var(--white);
+      padding: var(--spacing-xl);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--spacing-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .event-countdown {
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: center;
+      margin: var(--spacing-lg) 0;
+      background: rgba(255, 255, 255, 0.2);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-lg);
+    }
+
+    .members-events {
+      background-color: var(--white);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-xl);
+    }
+
+    .event-tabs {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .event-tab {
+      padding: var(--spacing-sm) var(--spacing-lg);
+      background: var(--gray-lighter);
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      color: var(--gray);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .event-tab.active {
+      background-color: var(--primary-color);
+      color: var(--white);
+    }
+
+    .event-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .event-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--gray-lighter);
+      transition: background-color 0.3s ease;
+    }
+
+    .event-item:hover {
+      background-color: var(--gray-lighter);
+    }
+
+    .event-item.today {
+      background-color: #fef3c7;
+      border-left: 4px solid var(--warning-color);
+    }
+
+    .event-item.upcoming {
+      background-color: #d1fae5;
+      border-left: 4px solid var(--success-color);
+    }
+
+    .event-avatar {
+      width: 40px;
+      height: 40px;
+      background-color: var(--primary-color);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .event-details {
+      flex: 1;
+    }
+
+    .event-member {
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .event-type {
+      font-size: 0.875rem;
+      color: var(--gray);
+    }
+
+    .event-date {
+      font-size: 0.875rem;
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .event-days {
+      background-color: var(--warning-color);
+      color: var(--white);
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      font-weight: 600;
     }
 
     /* ========== Alerts ========== */
@@ -313,173 +571,13 @@
       color: #991b1b;
     }
 
-    .alert-info {
-      background-color: #dbeafe;
-      border-left-color: var(--primary-color);
-      color: #1e3a8a;
-    }
-
-    /* ========== Special Dates Table ========== */
-    .table-container {
-      overflow-x: auto;
-    }
-
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .table th,
-    .table td {
-      padding: var(--spacing-md);
-      text-align: left;
-      border-bottom: 1px solid var(--gray-lighter);
-    }
-
-    .table th {
-      background-color: var(--gray-lighter);
-      font-weight: 700;
-      color: var(--dark);
-      font-size: 0.875rem;
-      text-transform: uppercase;
-    }
-
-    .table tr:hover {
-      background-color: var(--gray-lighter);
-    }
-
-    .table-empty {
-      text-align: center;
-      padding: var(--spacing-2xl);
-      color: var(--gray);
-    }
-
-    /* ========== Badge ========== */
-    .badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      border-radius: var(--radius-sm);
-      text-transform: uppercase;
-    }
-
-    .badge-success {
-      background-color: #d1fae5;
-      color: #065f46;
-    }
-
-    .badge-warning {
+    .alert-warning {
       background-color: #fef3c7;
+      border-left-color: var(--warning-color);
       color: #92400e;
     }
 
-    .badge-info {
-      background-color: #dbeafe;
-      color: #1e3a8a;
-    }
-
-    /* ========== Modal Styles ========== */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 10000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-content {
-      background: var(--white);
-      padding: var(--spacing-xl);
-      border-radius: var(--radius-lg);
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--spacing-lg);
-    }
-
-    .modal-title {
-      margin: 0;
-      font-size: 1.5rem;
-      color: var(--dark);
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--gray);
-      line-height: 1;
-    }
-
-    .form-group {
-      margin-bottom: var(--spacing-md);
-    }
-
-    .form-label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: var(--spacing-sm);
-      font-size: 0.875rem;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: var(--spacing-md);
-      border: 2px solid var(--gray-light);
-      border-radius: var(--radius-md);
-      font-size: 1rem;
-      font-family: var(--font-sans);
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--primary-color);
-    }
-
-    .form-check {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      cursor: pointer;
-    }
-
-    .form-check-input {
-      width: 18px;
-      height: 18px;
-    }
-
-    /* ========== Loading States ========== */
-    .skeleton {
-      background: linear-gradient(90deg, var(--gray-lighter) 25%, #e5e7eb 50%, var(--gray-lighter) 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s ease-in-out infinite;
-      border-radius: var(--radius-md);
-      height: 20px;
-    }
-
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
+    /* ========== Loading ========== */
     .loading-overlay {
       position: fixed;
       top: 0;
@@ -519,99 +617,80 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* ========== Utilities ========== */
-    .text-center {
-      text-align: center;
-    }
-
-    .text-muted {
-      color: var(--gray);
-    }
-
-    .mt-2 {
-      margin-top: var(--spacing-md);
-    }
-
-    .mb-3 {
-      margin-bottom: var(--spacing-lg);
-    }
-
-    .d-none {
-      display: none;
-    }
-
-    .d-block {
-      display: block;
-    }
-
     /* ========== Responsive ========== */
     @media (max-width: 768px) {
       .navbar-content {
         flex-direction: column;
       }
 
-      .navbar-user {
+      .navbar-menu {
+        flex-direction: column;
+        gap: var(--spacing-sm);
         width: 100%;
-        justify-content: space-between;
       }
 
-      .profile-grid {
+      .welcome-section {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .info-grid {
         grid-template-columns: 1fr;
       }
 
-      .stats-grid {
+      .welfare-grid {
         grid-template-columns: 1fr;
       }
 
-      .card {
-        padding: var(--spacing-md);
-      }
-
-      .page-header h1 {
-        font-size: 1.5rem;
-      }
-
-      .table {
-        font-size: 0.875rem;
-      }
-
-      .table th,
-      .table td {
-        padding: var(--spacing-sm);
-      }
-
-      .modal-content {
-        padding: var(--spacing-md);
-        width: 95%;
+      .events-container {
+        grid-template-columns: 1fr;
       }
     }
+
+    /* ========== Utilities ========== */
+    .text-center { text-align: center; }
+    .mb-2 { margin-bottom: var(--spacing-md); }
+    .mt-2 { margin-top: var(--spacing-md); }
+    .d-none { display: none; }
+    .d-block { display: block; }
   </style>
 </head>
 <body>
   <!-- Navigation -->
   <nav class="navbar">
     <div class="container navbar-content">
-      <a href="/dashboard.html" class="navbar-brand">PSN Taraba Welfare</a>
-      <div class="navbar-user">
-        <div class="user-info">
-          <div class="user-name" id="userName">Loading...</div>
-          <div class="user-role">Member</div>
-        </div>
-        <button class="btn-logout" id="logoutBtn">Logout</button>
-      </div>
+      <a href="/dashboard" class="navbar-brand">
+        <span>👨‍⚕️</span>
+        <span>PSN Taraba Member Dashboard</span>
+      </a>
+      <ul class="navbar-menu">
+        <li><a class="navbar-link active" data-section="profile">👤 Profile</a></li>
+        <li><a class="navbar-link" data-section="welfare">💰 Welfare</a></li>
+        <li><a class="navbar-link" data-section="events">📅 Events</a></li>
+        <li>
+          <button id="logoutBtn" class="btn-logout">🚪 Logout</button>
+        </li>
+      </ul>
     </div>
   </nav>
 
-  <!-- Page Header -->
-  <div class="page-header">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
     <div class="container">
-      <h1>Welcome to Your Dashboard</h1>
-      <p>Manage your profile and special dates</p>
+      <div class="welcome-section">
+        <div class="welcome-text">
+          <h1>Welcome, <span id="userName">Member</span>!</h1>
+          <p id="dashboardMessage">Manage your profile, welfare benefits, and view upcoming events</p>
+        </div>
+        <div class="user-avatar" id="userAvatar" title="Click to edit profile">
+          <!-- Initials will be set by JavaScript -->
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Main Content -->
-  <div class="container" style="padding-bottom: 3rem;">
+  <!-- Main Content Container -->
+  <div class="container">
     <!-- Alert Messages -->
     <div id="alertSuccess" class="alert alert-success">
       <strong>Success!</strong> <span id="successMessage"></span>
@@ -619,160 +698,219 @@
     <div id="alertError" class="alert alert-error">
       <strong>Error!</strong> <span id="errorMessage"></span>
     </div>
-    <div id="alertInfo" class="alert alert-info">
-      <strong>Info!</strong> <span id="infoMessage"></span>
+    <div id="alertWarning" class="alert alert-warning">
+      <strong>Info!</strong> <span id="warningMessage"></span>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon">📅</div>
-        <div class="stat-value" id="totalDates">0</div>
-        <div class="stat-label">Special Dates</div>
-      </div>
-
-      <div class="stat-card secondary">
-        <div class="stat-icon">🎉</div>
-        <div class="stat-value" id="upcomingDates">0</div>
-        <div class="stat-label">Upcoming This Month</div>
-      </div>
-
-      <div class="stat-card warning">
-        <div class="stat-icon">⏰</div>
-        <div class="stat-value" id="nextEvent">-</div>
-        <div class="stat-label">Days to Next Event</div>
-      </div>
-    </div>
-
-    <!-- Profile Information Card -->
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">Profile Information</h2>
-        <button class="btn btn-secondary btn-sm" id="editProfileBtn">Edit Profile</button>
-      </div>
-      <div class="card-body">
-        <div class="profile-grid" id="profileGrid">
-          <!-- Profile data will be loaded here -->
-          <div class="profile-item">
-            <div class="profile-label">Full Name</div>
-            <div class="skeleton"></div>
+    <!-- ========== PROFILE SECTION ========== -->
+    <div id="profileSection" class="dashboard-section active">
+      <!-- Personal Information Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">👤 Personal Information</h3>
+          <div class="card-icon">ℹ️</div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Full Name</div>
+            <div class="info-value editable" data-field="fullName" id="infoFullName">Loading...</div>
           </div>
-          <div class="profile-item">
-            <div class="profile-label">Email</div>
-            <div class="skeleton"></div>
+          <div class="info-item">
+            <div class="info-label">Email Address</div>
+            <div class="info-value" id="infoEmail">Loading...</div>
           </div>
-          <div class="profile-item">
-            <div class="profile-label">Phone Number</div>
-            <div class="skeleton"></div>
+          <div class="info-item">
+            <div class="info-label">Phone Number</div>
+            <div class="info-value editable" data-field="phoneNumber" id="infoPhone">Loading...</div>
           </div>
-          <div class="profile-item">
-            <div class="profile-label">Date of Birth</div>
-            <div class="skeleton"></div>
+          <div class="info-item">
+            <div class="info-label">Date of Birth</div>
+            <div class="info-value editable" data-field="dateOfBirth" id="infoDOB">Loading...</div>
           </div>
-          <div class="profile-item">
-            <div class="profile-label">PSN Membership Number</div>
-            <div class="skeleton"></div>
+          <div class="info-item">
+            <div class="info-label">PSN Membership Number</div>
+            <div class="info-value" id="infoPSNNumber">Loading...</div>
           </div>
-          <div class="profile-item">
-            <div class="profile-label">Year of Induction</div>
-            <div class="skeleton"></div>
+          <div class="info-item">
+            <div class="info-label">Year of Induction</div>
+            <div class="info-value editable" data-field="psnYearOfInduction" id="infoInductionYear">Loading...</div>
           </div>
-          <div class="profile-item">
-            <div class="profile-label">Local Government</div>
-            <div class="skeleton"></div>
+          <div class="info-item">
+            <div class="info-label">Local Government</div>
+            <div class="info-value editable" data-field="localGovernment" id="infoLGA">Loading...</div>
           </div>
-          <div class="profile-item">
-            <div class="profile-label">Place of Work</div>
-            <div class="skeleton"></div>
+          <div class="info-item">
+            <div class="info-label">Place of Work</div>
+            <div class="info-value editable" data-field="placeOfWork" id="infoWorkplace">Loading...</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Residential Address</div>
+            <div class="info-value editable" data-field="residentialAddress" id="infoAddress">Loading...</div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Special Dates Card -->
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">My Special Dates</h2>
-        <button class="btn btn-primary btn-sm" id="addDateBtn">Add Special Date</button>
+        <!-- Edit Profile Form (Hidden by default) -->
+        <div id="editProfileForm" class="edit-form">
+          <h4>Edit <span id="editFieldName">Field</span></h4>
+          <form id="profileForm">
+            <div class="form-group">
+              <label class="form-label" id="editFieldLabel">Field Value</label>
+              <input type="text" class="form-input" id="editFieldInput" required>
+              <small id="editFieldHelp" style="color: var(--gray); font-size: 0.875rem;"></small>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+              <button type="button" class="btn btn-secondary" id="cancelEdit">Cancel</button>
+            </div>
+          </form>
+        </div>
       </div>
-      <div class="card-body">
-        <div class="table-container">
-          <table class="table" id="datesTable">
-            <thead>
-              <tr>
-                <th>Event</th>
-                <th>Date</th>
-                <th>Recurring</th>
-                <th>Days Until</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="datesTableBody">
-              <!-- Special dates will be loaded here -->
-              <tr>
-                <td colspan="5" class="table-empty">Loading special dates...</td>
-              </tr>
-            </tbody>
-          </table>
+
+      <!-- Next of Kin Information -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">👨‍👩‍👧‍👦 Next of Kin Information</h3>
+          <div class="card-icon">❤️</div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Next of Kin Name</div>
+            <div class="info-value editable" data-field="nextOfKin.name" id="nextOfKinName">Loading...</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Relationship</div>
+            <div class="info-value editable" data-field="nextOfKin.relationship" id="nextOfKinRelationship">Loading...</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Phone Number</div>
+            <div class="info-value editable" data-field="nextOfKin.phoneNumber" id="nextOfKinPhone">Loading...</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Special Date Modal -->
-  <div class="modal" id="specialDateModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">Add Special Date</h2>
-        <button class="modal-close" id="closeModalBtn">×</button>
+    <!-- ========== WELFARE SECTION ========== -->
+    <div id="welfareSection" class="dashboard-section">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">💰 Welfare Packages & Benefits</h3>
+          <div class="card-icon">🎁</div>
+        </div>
+
+        <div class="welfare-tabs">
+          <button class="welfare-tab active" data-tab="previous">Previous Welfare</button>
+          <button class="welfare-tab" data-tab="upcoming">Upcoming Welfare</button>
+          <button class="welfare-tab" data-tab="benefits">Available Benefits</button>
+        </div>
+
+        <!-- Previous Welfare -->
+        <div id="previousWelfare" class="welfare-tab-content active">
+          <div class="welfare-grid">
+            <!-- Previous welfare cards will be inserted here by JavaScript -->
+            <div class="welfare-card past">
+              <div class="welfare-badge">Completed</div>
+              <div class="welfare-title">2024 End of Year Package</div>
+              <div class="welfare-desc">Food items, cash gift, and healthcare support for members</div>
+              <div class="welfare-details">
+                <span>Date: Dec 2024</span>
+                <span>Status: Distributed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Welfare -->
+        <div id="upcomingWelfare" class="welfare-tab-content">
+          <div class="welfare-grid">
+            <!-- Upcoming welfare cards will be inserted here by JavaScript -->
+            <div class="welfare-card upcoming">
+              <div class="welfare-badge">Upcoming</div>
+              <div class="welfare-title">2025 Q1 Welfare Package</div>
+              <div class="welfare-desc">Educational support, healthcare subsidy, and professional development</div>
+              <div class="welfare-details">
+                <span>Expected: Mar 2025</span>
+                <span>Status: Planning</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Available Benefits -->
+        <div id="benefitsTab" class="welfare-tab-content">
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Healthcare Support</div>
+              <div class="info-value">Up to ₦50,000 annual medical allowance</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Educational Support</div>
+              <div class="info-value">Scholarship for members' children</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Emergency Loans</div>
+              <div class="info-value">Interest-free loans up to ₦100,000</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Professional Development</div>
+              <div class="info-value">Sponsored training and workshops</div>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      <form id="addSpecialDateForm">
-        <div class="form-group">
-          <label class="form-label">Event Type <span style="color: red;">*</span></label>
-          <select id="eventLabel" class="form-control" required>
-            <option value="">Select event type</option>
-            <option value="Birthday">Birthday</option>
-            <option value="Wedding Anniversary">Wedding Anniversary</option>
-            <option value="Work Anniversary">Work Anniversary</option>
-            <option value="Induction Anniversary">Induction Anniversary</option>
-            <option value="Other Celebration">Other Celebration</option>
-          </select>
+    </div>
+
+    <!-- ========== EVENTS SECTION ========== -->
+    <div id="eventsSection" class="dashboard-section">
+      <div class="events-container">
+        <!-- PSN Events -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📢 PSN Organized Events</h3>
+            <div class="card-icon">🎯</div>
+          </div>
+          
+          <div class="psn-event">
+            <h4>Annual General Meeting 2025</h4>
+            <p>All PSN Taraba members are invited to the AGM for strategic planning and welfare discussions.</p>
+            <div class="event-countdown" id="psnEventCountdown">00 days 00:00:00</div>
+            <div class="welfare-details">
+              <span>📅 Date: March 15, 2025</span>
+              <span>📍 Venue: PSN Secretariat</span>
+            </div>
+          </div>
+
+          <!-- More PSN events will be inserted here -->
+          <div id="psnEventsList">
+            <!-- PSN events will be loaded here -->
+          </div>
         </div>
 
-        <div class="form-group" id="customLabelDiv" style="display: none;">
-          <label class="form-label">Custom Event Name</label>
-          <input type="text" id="customLabel" class="form-control" placeholder="e.g., Graduation Day">
-        </div>
+        <!-- Members' Events -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">🎉 Members' Celebrations (Next 7 Days)</h3>
+            <div class="card-icon">🎂</div>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Event Date <span style="color: red;">*</span></label>
-          <input type="date" id="eventDate" class="form-control" required>
-        </div>
+          <div class="event-tabs">
+            <button class="event-tab active" data-event-type="all">All Events</button>
+            <button class="event-tab" data-event-type="birthday">Birthdays</button>
+            <button class="event-tab" data-event-type="anniversary">Anniversaries</button>
+          </div>
 
-        <div class="form-group">
-          <label class="form-check">
-            <input type="checkbox" id="isRecurring" class="form-check-input" checked>
-            <span>Repeat annually</span>
-          </label>
+          <div class="event-list" id="membersEventsList">
+            <!-- Events will be loaded here by JavaScript -->
+            <div class="event-item today">
+              <div class="event-avatar">JD</div>
+              <div class="event-details">
+                <div class="event-member">John Doe</div>
+                <div class="event-type">🎂 Birthday Today!</div>
+              </div>
+              <div class="event-days">Today!</div>
+            </div>
+          </div>
         </div>
-
-        <div class="form-group">
-          <label class="form-check">
-            <input type="checkbox" id="sendReminder" class="form-check-input" checked>
-            <span>Send me reminders</span>
-          </label>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Notes (Optional)</label>
-          <textarea id="notes" rows="3" class="form-control" placeholder="Add any notes about this event..."></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">
-          Add Special Date
-        </button>
-      </form>
+      </div>
     </div>
   </div>
 
@@ -780,328 +918,719 @@
   <div id="loadingOverlay" class="loading-overlay">
     <div class="loading-content">
       <div class="loading-spinner"></div>
-      <p id="loadingText">Loading...</p>
+      <p id="loadingText">Loading your dashboard...</p>
     </div>
   </div>
 
-  <!-- JavaScript Section -->
+  <!-- JavaScript -->
   <script>
-    // ========== Global Variables ==========
-    let specialDates = [];
+    // ========== Configuration ==========
+    const API_BASE_URL = '/api';
+
+    // ========== State Management ==========
+    let currentUser = null;
+    let currentSection = 'profile';
+    let editingField = null;
 
     // ========== DOM Elements ==========
-    const specialDateModal = document.getElementById('specialDateModal');
-    const addDateBtn = document.getElementById('addDateBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const addSpecialDateForm = document.getElementById('addSpecialDateForm');
-    const eventLabelSelect = document.getElementById('eventLabel');
-    const customLabelDiv = document.getElementById('customLabelDiv');
     const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertError = document.getElementById('alertError');
+    const alertWarning = document.getElementById('alertWarning');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    const warningMessage = document.getElementById('warningMessage');
+    const logoutBtn = document.getElementById('logoutBtn');
 
-    // ========== Alert Functions ==========
-    function showAlert(type, message) {
-      const alertElement = document.getElementById(`alert${type.charAt(0).toUpperCase() + type.slice(1)}`);
-      const messageElement = alertElement.querySelector('span');
-      
-      messageElement.textContent = message;
-      alertElement.classList.add('show');
-      
-      setTimeout(() => {
-        alertElement.classList.remove('show');
-      }, 5000);
-    }
+    // Dashboard sections
+    const dashboardSections = {
+      profile: document.getElementById('profileSection'),
+      welfare: document.getElementById('welfareSection'),
+      events: document.getElementById('eventsSection')
+    };
 
-    // ========== Modal Functions ==========
-    function openSpecialDateModal() {
-      specialDateModal.classList.add('show');
-      addSpecialDateForm.reset();
-      customLabelDiv.style.display = 'none';
-    }
+    // Profile elements
+    const userName = document.getElementById('userName');
+    const userAvatar = document.getElementById('userAvatar');
+    const infoFullName = document.getElementById('infoFullName');
+    const infoEmail = document.getElementById('infoEmail');
+    const infoPhone = document.getElementById('infoPhone');
+    const infoDOB = document.getElementById('infoDOB');
+    const infoPSNNumber = document.getElementById('infoPSNNumber');
+    const infoInductionYear = document.getElementById('infoInductionYear');
+    const infoLGA = document.getElementById('infoLGA');
+    const infoWorkplace = document.getElementById('infoWorkplace');
+    const infoAddress = document.getElementById('infoAddress');
+    const nextOfKinName = document.getElementById('nextOfKinName');
+    const nextOfKinRelationship = document.getElementById('nextOfKinRelationship');
+    const nextOfKinPhone = document.getElementById('nextOfKinPhone');
 
-    function closeSpecialDateModal() {
-      specialDateModal.classList.remove('show');
-    }
+    // Edit form elements
+    const editProfileForm = document.getElementById('editProfileForm');
+    const editFieldName = document.getElementById('editFieldName');
+    const editFieldLabel = document.getElementById('editFieldLabel');
+    const editFieldInput = document.getElementById('editFieldInput');
+    const editFieldHelp = document.getElementById('editFieldHelp');
+    const profileForm = document.getElementById('profileForm');
+    const cancelEdit = document.getElementById('cancelEdit');
 
-    // ========== Calculate Days Until Event ==========
-    function calculateDaysUntil(dateString, isRecurring) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      const eventDate = new Date(dateString);
-      eventDate.setHours(0, 0, 0, 0);
-      
-      // For recurring events, adjust to current/next year
-      if (isRecurring) {
-        eventDate.setFullYear(today.getFullYear());
-        
-        if (eventDate < today) {
-          eventDate.setFullYear(today.getFullYear() + 1);
-        }
+    // Welfare elements
+    const welfareTabs = document.querySelectorAll('.welfare-tab');
+    const welfareTabContents = document.querySelectorAll('.welfare-tab-content');
+
+    // Events elements
+    const psnEventCountdown = document.getElementById('psnEventCountdown');
+    const psnEventsList = document.getElementById('psnEventsList');
+    const eventTabs = document.querySelectorAll('.event-tab');
+    const membersEventsList = document.getElementById('membersEventsList');
+
+    // ========== Utility Functions ==========
+    function showAlert(message, type = 'success', duration = 5000) {
+      // Hide all alerts first
+      alertSuccess.classList.remove('show');
+      alertError.classList.remove('show');
+      alertWarning.classList.remove('show');
+
+      // Show selected alert
+      if (type === 'success') {
+        successMessage.textContent = message;
+        alertSuccess.classList.add('show');
+      } else if (type === 'error') {
+        errorMessage.textContent = message;
+        alertError.classList.add('show');
+      } else if (type === 'warning') {
+        warningMessage.textContent = message;
+        alertWarning.classList.add('show');
       }
-      
-      const diffTime = eventDate - today;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
-      return diffDays;
+
+      // Auto-hide
+      if (duration > 0) {
+        setTimeout(() => {
+          if (type === 'success') alertSuccess.classList.remove('show');
+          else if (type === 'error') alertError.classList.remove('show');
+          else if (type === 'warning') alertWarning.classList.remove('show');
+        }, duration);
+      }
     }
 
-    // ========== Format Date for Display ==========
-    function formatDateForDisplay(dateString) {
+    function formatDate(dateString) {
+      if (!dateString) return 'Not set';
       const date = new Date(dateString);
-      const options = { month: 'short', day: 'numeric' };
-      return date.toLocaleDateString('en-US', options);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
     }
 
-    // ========== Update Special Dates Stats ==========
-    function updateSpecialDatesStats() {
+    function formatDateTime(dateString) {
+      if (!dateString) return 'Never';
+      const date = new Date(dateString);
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function getInitials(name) {
+      if (!name) return 'U';
+      return name
+        .split(' ')
+        .map(word => word[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
+    }
+
+    function getDaysBetween(date1, date2) {
+      const diffTime = Math.abs(date2 - date1);
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    function formatCountdown(targetDate) {
       const now = new Date();
-      const currentMonth = now.getMonth();
-      
-      // Calculate total dates
-      document.getElementById('totalDates').textContent = specialDates.length;
-      
-      // Calculate upcoming dates this month
-      const upcomingThisMonth = specialDates.filter(date => {
-        const eventDate = new Date(date.eventDate);
-        return eventDate.getMonth() === currentMonth && 
-               calculateDaysUntil(date.eventDate, date.isRecurring) >= 0;
-      }).length;
-      
-      document.getElementById('upcomingDates').textContent = upcomingThisMonth;
-      
-      // Calculate days to next event
-      if (specialDates.length > 0) {
-        const nextEvent = specialDates.reduce((closest, date) => {
-          const daysUntil = calculateDaysUntil(date.eventDate, date.isRecurring);
-          if (daysUntil >= 0) {
-            return daysUntil < closest ? daysUntil : closest;
-          }
-          return closest;
-        }, Infinity);
-        
-        if (nextEvent !== Infinity) {
-          document.getElementById('nextEvent').textContent = nextEvent;
-        } else {
-          document.getElementById('nextEvent').textContent = '-';
+      const target = new Date(targetDate);
+      const diff = target - now;
+
+      if (diff <= 0) return 'Event in progress';
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      return `${days} days ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // ========== Navigation ==========
+    function switchSection(section) {
+      // Update active nav link
+      document.querySelectorAll('.navbar-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.dataset.section === section) {
+          link.classList.add('active');
         }
-      } else {
-        document.getElementById('nextEvent').textContent = '-';
-      }
-    }
-
-    // ========== Load Special Dates (Placeholder) ==========
-    async function loadSpecialDates() {
-      // This is a placeholder since we haven't created the special dates API yet
-      // For now, we'll show a message
-      
-      const tableBody = document.getElementById('datesTableBody');
-      
-      tableBody.innerHTML = `
-        <tr>
-          <td colspan="5" class="table-empty">
-            <p style="margin-bottom: 1rem;">No special dates added yet.</p>
-            <p class="text-muted" style="font-size: 0.875rem;">
-              Click "Add Special Date" to create your first special date for birthday, anniversary, or other celebrations.
-            </p>
-          </td>
-        </tr>
-      `;
-
-      // Update stats
-      document.getElementById('totalDates').textContent = '0';
-      document.getElementById('upcomingDates').textContent = '0';
-      document.getElementById('nextEvent').textContent = '-';
-    }
-
-    // ========== Display Special Dates in Table ==========
-    function displaySpecialDates() {
-      const tableBody = document.getElementById('datesTableBody');
-      
-      if (specialDates.length === 0) {
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="5" class="table-empty">
-              <p style="margin-bottom: 1rem;">No special dates added yet.</p>
-              <p class="text-muted" style="font-size: 0.875rem;">
-                Click "Add Special Date" to create your first special date for birthday, anniversary, or other celebrations.
-              </p>
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      // Sort by upcoming dates
-      const sortedDates = [...specialDates].sort((a, b) => {
-        const daysA = calculateDaysUntil(a.eventDate, a.isRecurring);
-        const daysB = calculateDaysUntil(b.eventDate, b.isRecurring);
-        return daysA - daysB;
       });
 
-      tableBody.innerHTML = sortedDates.map(date => {
-        const daysUntil = calculateDaysUntil(date.eventDate, date.isRecurring);
-        const displayLabel = date.eventLabel === 'Other Celebration' && date.customLabel 
-          ? date.customLabel 
-          : date.eventLabel;
+      // Update active section
+      Object.keys(dashboardSections).forEach(key => {
+        dashboardSections[key].classList.remove('active');
+      });
+      dashboardSections[section].classList.add('active');
 
-        let daysText = '';
-        let badgeClass = '';
-        
-        if (daysUntil === 0) {
-          daysText = 'Today!';
-          badgeClass = 'badge-danger';
-        } else if (daysUntil === 1) {
-          daysText = 'Tomorrow';
-          badgeClass = 'badge-warning';
-        } else if (daysUntil <= 7) {
-          daysText = `${daysUntil} days`;
-          badgeClass = 'badge-warning';
-        } else if (daysUntil <= 30) {
-          daysText = `${daysUntil} days`;
-          badgeClass = 'badge-info';
-        } else {
-          daysText = `${daysUntil} days`;
-          badgeClass = 'badge-success';
-        }
+      // Update current section
+      currentSection = section;
 
-        return `
-          <tr>
-            <td><strong>${displayLabel}</strong></td>
-            <td>${formatDateForDisplay(date.eventDate)}</td>
-            <td>
-              <span class="badge ${date.isRecurring ? 'badge-success' : 'badge-info'}">
-                ${date.isRecurring ? 'Yes' : 'No'}
-              </span>
-            </td>
-            <td>
-              <span class="badge ${badgeClass}">${daysText}</span>
-            </td>
-            <td>
-              <button class="btn btn-sm" style="background-color: var(--secondary-color); color: white; margin-right: 0.5rem;" onclick="editSpecialDate('${date._id}')">
-                Edit
-              </button>
-              <button class="btn btn-sm btn-danger" onclick="deleteSpecialDate('${date._id}')">
-                Delete
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
+      // Load section-specific data
+      if (section === 'welfare') {
+        loadWelfareData();
+      } else if (section === 'events') {
+        loadEventsData();
+        startCountdownTimer();
+      }
     }
 
-    // ========== Form Submission ==========
-    async function handleAddSpecialDate(event) {
-      event.preventDefault();
-      
-      const formData = {
-        eventLabel: eventLabelSelect.value,
-        eventDate: document.getElementById('eventDate').value,
-        isRecurring: document.getElementById('isRecurring').checked,
-        sendReminder: document.getElementById('sendReminder').checked,
-        notes: document.getElementById('notes').value
-      };
-      
-      if (formData.eventLabel === 'Other Celebration') {
-        formData.customLabel = document.getElementById('customLabel').value;
-      }
-      
-      // Validate form
-      if (!formData.eventLabel || !formData.eventDate) {
-        showAlert('error', 'Please fill in all required fields');
-        return;
-      }
-      
-      // Show loading
-      loadingOverlay.classList.add('show');
-      
+    // ========== Profile Management ==========
+    function loadUserData() {
       try {
-        // Placeholder for API call
-        // const response = await fetch('/api/special-dates', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(formData)
-        // });
+        showLoading('Loading user data...');
         
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        const userData = JSON.parse(localStorage.getItem('psnUser'));
+        const token = localStorage.getItem('psnToken');
         
-        // For now, add to local array
-        const newDate = {
-          _id: Date.now().toString(),
-          ...formData,
-          createdAt: new Date().toISOString()
-        };
+        if (!userData || !token) {
+          throw new Error('User not authenticated');
+        }
+
+        currentUser = userData;
+        updateProfileDisplay(userData);
         
-        specialDates.push(newDate);
-        displaySpecialDates();
-        updateSpecialDatesStats();
-        
-        showAlert('success', 'Special date added successfully!');
-        closeSpecialDateModal();
+        // Try to fetch fresh data from server
+        if (userData.id) {
+          fetchUserFromServer(userData.id);
+        }
+
       } catch (error) {
-        console.error('Error adding special date:', error);
-        showAlert('error', 'Failed to add special date. Please try again.');
+        console.error('Error loading user data:', error);
+        showAlert('Please login again', 'error');
+        setTimeout(() => window.location.href = '/login', 2000);
       } finally {
-        loadingOverlay.classList.remove('show');
+        hideLoading();
+      }
+    }
+
+    async function fetchUserFromServer(userId) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.user) {
+            localStorage.setItem('psnUser', JSON.stringify(data.user));
+            currentUser = data.user;
+            updateProfileDisplay(data.user);
+          }
+        }
+      } catch (error) {
+        console.log('Using cached user data:', error.message);
+      }
+    }
+
+    function updateProfileDisplay(user) {
+      // Update header
+      userName.textContent = user.fullName || 'Member';
+      userAvatar.textContent = getInitials(user.fullName);
+      
+      // Update personal information
+      infoFullName.textContent = user.fullName || 'Not set';
+      infoEmail.textContent = user.email || 'Not set';
+      infoPhone.textContent = user.phoneNumber || 'Not set';
+      infoDOB.textContent = formatDate(user.dateOfBirth);
+      infoPSNNumber.textContent = user.psnMembershipNumber || 'Not set';
+      infoInductionYear.textContent = user.psnYearOfInduction || 'Not set';
+      infoLGA.textContent = user.localGovernment || 'Not set';
+      infoWorkplace.textContent = user.placeOfWork || 'Not set';
+      infoAddress.textContent = user.residentialAddress || 'Not set';
+      
+      // Update next of kin
+      if (user.nextOfKin) {
+        nextOfKinName.textContent = user.nextOfKin.name || 'Not set';
+        nextOfKinRelationship.textContent = user.nextOfKin.relationship || 'Not set';
+        nextOfKinPhone.textContent = user.nextOfKin.phoneNumber || 'Not set';
+      }
+    }
+
+    function startEditing(field) {
+      editingField = field;
+      const fieldConfig = getFieldConfig(field);
+      
+      if (!fieldConfig) return;
+
+      editFieldName.textContent = fieldConfig.label;
+      editFieldLabel.textContent = fieldConfig.label;
+      editFieldInput.type = fieldConfig.type || 'text';
+      editFieldInput.value = getFieldValue(currentUser, field) || '';
+      editFieldHelp.textContent = fieldConfig.help || '';
+
+      // Set input attributes
+      if (fieldConfig.min) editFieldInput.min = fieldConfig.min;
+      if (fieldConfig.max) editFieldInput.max = fieldConfig.max;
+      if (fieldConfig.pattern) editFieldInput.pattern = fieldConfig.pattern;
+      if (fieldConfig.placeholder) editFieldInput.placeholder = fieldConfig.placeholder;
+
+      // Show edit form
+      editProfileForm.classList.add('active');
+      editFieldInput.focus();
+    }
+
+    function getFieldConfig(field) {
+      const configs = {
+        'fullName': {
+          label: 'Full Name',
+          help: 'Enter your full name as registered with PSN'
+        },
+        'phoneNumber': {
+          label: 'Phone Number',
+          help: 'Enter your Nigerian phone number (e.g., 08012345678)',
+          pattern: '^(\+234|0)[789][01]\d{8}$'
+        },
+        'dateOfBirth': {
+          label: 'Date of Birth',
+          type: 'date',
+          help: 'Select your date of birth'
+        },
+        'psnYearOfInduction': {
+          label: 'Year of Induction',
+          type: 'number',
+          min: 1960,
+          max: new Date().getFullYear(),
+          help: 'Enter the year you were inducted into PSN'
+        },
+        'localGovernment': {
+          label: 'Local Government',
+          help: 'Select your local government area'
+        },
+        'placeOfWork': {
+          label: 'Place of Work',
+          help: 'Enter your hospital/pharmacy name'
+        },
+        'residentialAddress': {
+          label: 'Residential Address',
+          help: 'Enter your complete residential address'
+        },
+        'nextOfKin.name': {
+          label: 'Next of Kin Name',
+          help: 'Enter full name of your next of kin'
+        },
+        'nextOfKin.relationship': {
+          label: 'Relationship',
+          help: 'Enter relationship (e.g., Spouse, Sibling, Parent)'
+        },
+        'nextOfKin.phoneNumber': {
+          label: 'Next of Kin Phone',
+          help: 'Enter next of kin phone number',
+          pattern: '^(\+234|0)[789][01]\d{8}$'
+        }
+      };
+
+      return configs[field];
+    }
+
+    function getFieldValue(obj, path) {
+      return path.split('.').reduce((o, p) => o?.[p], obj);
+    }
+
+    function setFieldValue(obj, path, value) {
+      const keys = path.split('.');
+      const lastKey = keys.pop();
+      const target = keys.reduce((o, p) => o[p] = o[p] || {}, obj);
+      target[lastKey] = value;
+    }
+
+    async function saveProfileUpdate() {
+      try {
+        showLoading('Saving changes...');
+        
+        const field = editingField;
+        const value = editFieldInput.value;
+        const fieldConfig = getFieldConfig(field);
+
+        // Validation
+        if (fieldConfig.pattern && !new RegExp(fieldConfig.pattern).test(value)) {
+          throw new Error(`Invalid ${fieldConfig.label.toLowerCase()}`);
+        }
+
+        if (fieldConfig.min && parseInt(value) < fieldConfig.min) {
+          throw new Error(`${fieldConfig.label} must be ${fieldConfig.min} or later`);
+        }
+
+        if (fieldConfig.max && parseInt(value) > fieldConfig.max) {
+          throw new Error(`${fieldConfig.label} cannot be after ${fieldConfig.max}`);
+        }
+
+        // Update local user object
+        setFieldValue(currentUser, field, value);
+        
+        // Update localStorage
+        localStorage.setItem('psnUser', JSON.stringify(currentUser));
+        
+        // Update display
+        updateProfileDisplay(currentUser);
+        
+        // Close edit form
+        editProfileForm.classList.remove('active');
+        editingField = null;
+        
+        showAlert('Profile updated successfully!');
+        
+        // TODO: Send update to server
+        // await updateUserOnServer(currentUser);
+
+      } catch (error) {
+        showAlert(error.message, 'error');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // ========== Welfare Management ==========
+    async function loadWelfareData() {
+      try {
+        showLoading('Loading welfare information...');
+        
+        // TODO: Fetch welfare data from server
+        // For now, use mock data
+        const welfareData = {
+          previous: [
+            {
+              title: '2024 End of Year Package',
+              description: 'Food items, cash gift, and healthcare support for members',
+              date: 'Dec 2024',
+              status: 'Distributed'
+            },
+            {
+              title: 'Q3 2024 Medical Support',
+              description: 'Health insurance premium support for members',
+              date: 'Sep 2024',
+              status: 'Completed'
+            }
+          ],
+          upcoming: [
+            {
+              title: '2025 Q1 Welfare Package',
+              description: 'Educational support, healthcare subsidy, and professional development',
+              date: 'Mar 2025',
+              status: 'Planning'
+            },
+            {
+              title: 'Annual Dues Waiver',
+              description: 'Waiver of annual dues for senior members',
+              date: 'Jun 2025',
+              status: 'Pending Approval'
+            }
+          ]
+        };
+
+        updateWelfareDisplay(welfareData);
+
+      } catch (error) {
+        console.error('Error loading welfare data:', error);
+        showAlert('Failed to load welfare data', 'warning');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function updateWelfareDisplay(data) {
+      // Update previous welfare
+      const previousContainer = document.querySelector('#previousWelfare .welfare-grid');
+      previousContainer.innerHTML = data.previous.map(item => `
+        <div class="welfare-card past">
+          <div class="welfare-badge">${item.status}</div>
+          <div class="welfare-title">${item.title}</div>
+          <div class="welfare-desc">${item.description}</div>
+          <div class="welfare-details">
+            <span>Date: ${item.date}</span>
+            <span>Status: ${item.status}</span>
+          </div>
+        </div>
+      `).join('');
+
+      // Update upcoming welfare
+      const upcomingContainer = document.querySelector('#upcomingWelfare .welfare-grid');
+      upcomingContainer.innerHTML = data.upcoming.map(item => `
+        <div class="welfare-card upcoming">
+          <div class="welfare-badge">${item.status}</div>
+          <div class="welfare-title">${item.title}</div>
+          <div class="welfare-desc">${item.description}</div>
+          <div class="welfare-details">
+            <span>Expected: ${item.date}</span>
+            <span>Status: ${item.status}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ========== Events Management ==========
+    async function loadEventsData() {
+      try {
+        showLoading('Loading events...');
+        
+        // TODO: Fetch events from server
+        // For now, use mock data
+        const eventsData = {
+          psnEvents: [
+            {
+              title: 'Annual General Meeting 2025',
+              description: 'All PSN Taraba members are invited to the AGM',
+              date: '2025-03-15',
+              venue: 'PSN Secretariat',
+              type: 'meeting'
+            },
+            {
+              title: 'Continuing Professional Development',
+              description: 'CPD workshop on modern pharmacy practice',
+              date: '2025-04-20',
+              venue: 'Jalingo Medical Center',
+              type: 'workshop'
+            }
+          ],
+          memberEvents: [
+            {
+              name: 'John Doe',
+              type: 'birthday',
+              date: new Date().toISOString().split('T')[0], // Today
+              avatar: 'JD'
+            },
+            {
+              name: 'Jane Smith',
+              type: 'anniversary',
+              date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 days from now
+              avatar: 'JS'
+            },
+            {
+              name: 'Mike Johnson',
+              type: 'birthday',
+              date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 5 days from now
+              avatar: 'MJ'
+            }
+          ]
+        };
+
+        updateEventsDisplay(eventsData);
+
+      } catch (error) {
+        console.error('Error loading events:', error);
+        showAlert('Failed to load events', 'warning');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function updateEventsDisplay(data) {
+      // Update PSN events
+      psnEventsList.innerHTML = data.psnEvents.slice(1).map(event => `
+        <div class="card mb-2">
+          <h4>${event.title}</h4>
+          <p>${event.description}</p>
+          <div class="welfare-details">
+            <span>📅 ${formatDate(event.date)}</span>
+            <span>📍 ${event.venue}</span>
+          </div>
+        </div>
+      `).join('');
+
+      // Update member events
+      updateMembersEventsList(data.memberEvents);
+    }
+
+    function updateMembersEventsList(events) {
+      const now = new Date();
+      const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+      const filteredEvents = events.filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate >= now && eventDate <= sevenDaysFromNow;
+      });
+
+      membersEventsList.innerHTML = filteredEvents.map(event => {
+        const eventDate = new Date(event.date);
+        const daysUntil = getDaysBetween(now, eventDate);
+        const isToday = daysUntil === 0;
+        
+        return `
+          <div class="event-item ${isToday ? 'today' : 'upcoming'}">
+            <div class="event-avatar">${event.avatar}</div>
+            <div class="event-details">
+              <div class="event-member">${event.name}</div>
+              <div class="event-type">
+                ${event.type === 'birthday' ? '🎂 Birthday' : '💍 Anniversary'}
+              </div>
+            </div>
+            <div class="event-days">${isToday ? 'Today!' : `In ${daysUntil} days`}</div>
+          </div>
+        `;
+      }).join('');
+
+      if (filteredEvents.length === 0) {
+        membersEventsList.innerHTML = `
+          <div class="text-center" style="padding: 2rem; color: var(--gray);">
+            No upcoming celebrations in the next 7 days
+          </div>
+        `;
+      }
+    }
+
+    function startCountdownTimer() {
+      // Set target date for next PSN event (March 15, 2025)
+      const targetDate = new Date('2025-03-15T10:00:00');
+      
+      function updateCountdown() {
+        psnEventCountdown.textContent = formatCountdown(targetDate);
+      }
+      
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    }
+
+    // ========== Loading Functions ==========
+    function showLoading(message = 'Loading...') {
+      loadingText.textContent = message;
+      loadingOverlay.classList.add('show');
+    }
+
+    function hideLoading() {
+      loadingOverlay.classList.remove('show');
+    }
+
+    // ========== Logout Function ==========
+    async function logout() {
+      try {
+        showLoading('Logging out...');
+        
+        // Clear localStorage
+        localStorage.removeItem('psnUser');
+        localStorage.removeItem('psnToken');
+        localStorage.removeItem('psnUserRole');
+        localStorage.removeItem('psnRememberedEmail');
+        
+        // Optional: Notify server
+        try {
+          await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
+        } catch (error) {
+          // Ignore if server is unreachable
+        }
+        
+        // Redirect to login
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 500);
+        
+      } catch (error) {
+        console.error('Logout error:', error);
+        showAlert('Logout error', 'error');
       }
     }
 
     // ========== Event Listeners ==========
-    document.addEventListener('DOMContentLoaded', () => {
-      // Load initial data
-      loadSpecialDates();
+    // Navigation
+    document.querySelectorAll('.navbar-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const section = link.dataset.section;
+        switchSection(section);
+      });
+    });
+
+    // Profile editing
+    document.querySelectorAll('.info-value.editable').forEach(element => {
+      element.addEventListener('click', () => {
+        const field = element.dataset.field;
+        startEditing(field);
+      });
+    });
+
+    userAvatar.addEventListener('click', () => {
+      startEditing('fullName');
+    });
+
+    // Edit form
+    profileForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      saveProfileUpdate();
+    });
+
+    cancelEdit.addEventListener('click', () => {
+      editProfileForm.classList.remove('active');
+      editingField = null;
+    });
+
+    // Welfare tabs
+    welfareTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabId = tab.dataset.tab;
+        
+        // Update active tab
+        welfareTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Show corresponding content
+        welfareTabContents.forEach(content => {
+          content.classList.remove('active');
+          if (content.id === tabId + 'Welfare' || content.id === tabId + 'Tab') {
+            content.classList.add('active');
+          }
+        });
+      });
+    });
+
+    // Event tabs
+    eventTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const eventType = tab.dataset.eventType;
+        
+        // Update active tab
+        eventTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // TODO: Filter events by type
+        // For now, just update the tab
+      });
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', logout);
+
+    // ========== Initialize Dashboard ==========
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('🚀 Dashboard initializing...');
       
-      // Set current date as default for date picker
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('eventDate').value = today;
-      document.getElementById('eventDate').min = '1900-01-01';
-      document.getElementById('eventDate').max = '2100-12-31';
+      // Check authentication
+      const token = localStorage.getItem('psnToken');
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+      
+      // Load user data
+      loadUserData();
+      
+      // Set up section switching
+      switchSection('profile');
     });
 
-    // Modal event listeners
-    addDateBtn.addEventListener('click', openSpecialDateModal);
-    closeModalBtn.addEventListener('click', closeSpecialDateModal);
-    specialDateModal.addEventListener('click', (e) => {
-      if (e.target === specialDateModal) {
-        closeSpecialDateModal();
+    // Auto-refresh every 10 minutes
+    setInterval(() => {
+      if (currentUser?.id) {
+        fetchUserFromServer(currentUser.id);
       }
-    });
+    }, 10 * 60 * 1000);
 
-    // Event label change listener
-    eventLabelSelect.addEventListener('change', () => {
-      if (eventLabelSelect.value === 'Other Celebration') {
-        customLabelDiv.style.display = 'block';
-      } else {
-        customLabelDiv.style.display = 'none';
-      }
-    });
 
-    // Form submission
-    addSpecialDateForm.addEventListener('submit', handleAddSpecialDate);
-
-    // Logout button
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      if (confirm('Are you sure you want to logout?')) {
-        // Redirect to logout or clear session
-        window.location.href = '/login.html';
-      }
-    });
-
-    // ========== Placeholder Functions ==========
-    function editSpecialDate(id) {
-      showAlert('info', 'Edit functionality coming soon!');
-      console.log('Edit special date:', id);
-    }
-
-    function deleteSpecialDate(id) {
-      if (confirm('Are you sure you want to delete this special date?')) {
-        // Placeholder for delete functionality
-        specialDates = specialDates.filter(date => date._id !== id);
-        displaySpecialDates();
-        updateSpecialDatesStats();
-        showAlert('success', 'Special date deleted successfully!');
-      }
-    }
+    
   </script>
 </body>
 </html>
