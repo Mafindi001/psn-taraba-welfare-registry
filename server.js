@@ -1,17 +1,35 @@
-// server.js - VERCEL COMPATIBLE FULL VERSION
-console.log('🚀 Starting PSN Taraba Welfare System on Vercel...');
+// server.js - FINAL VERCEL-OPTIMIZED VERSION
+console.log('🚀 PSN Taraba Welfare System - Vercel Deployment');
 
-// Import dependencies
-const express = require('express');
-const cors = require('cors');
+// Import core modules
 const path = require('path');
-const fs = require('fs').promises;
-const bcrypt = require('bcrypt');
 
-// Initialize Express app
+// Import dependencies with error handling
+let express, cors, fs, bcrypt;
+try {
+  express = require('express');
+  cors = require('cors');
+  fs = require('fs').promises;
+  bcrypt = require('bcrypt');
+  console.log('✅ Dependencies loaded successfully');
+} catch (error) {
+  console.error('❌ Failed to load dependencies:', error.message);
+  process.exit(1);
+}
+
 const app = express();
 
-// ========== MIDDLEWARE CONFIGURATION ==========
+// ========== CONFIGURATION ==========
+const IS_VERCEL = process.env.VERCEL === '1' || process.env.VERCEL_URL;
+const PORT = process.env.PORT || 3000;
+
+// ========== FILE PATHS ==========
+const DATA_DIR = path.join(__dirname, 'data');
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
+const ADMINS_FILE = path.join(DATA_DIR, 'admins.json');
+const WELFARE_FILE = path.join(DATA_DIR, 'welfare.json');
+
+// ========== MIDDLEWARE ==========
 app.use(cors({
   origin: '*',
   credentials: true,
@@ -26,50 +44,28 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'views')));
 app.use(express.static(__dirname));
 
-// ========== FILE PATHS ==========
-const DATA_DIR = path.join(__dirname, 'data');
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
-const ADMINS_FILE = path.join(DATA_DIR, 'admins.json');
-const WELFARE_FILE = path.join(DATA_DIR, 'welfare.json');
-
-// ========== DATABASE FUNCTIONS ==========
-async function ensureDataDir() {
+// ========== DATABASE INITIALIZATION ==========
+async function initializeDatabase() {
+  console.log('🔄 Initializing database...');
+  
   try {
+    // Create data directory
     await fs.mkdir(DATA_DIR, { recursive: true });
-    console.log('✅ Data directory ready');
-    return true;
-  } catch (error) {
-    console.error('❌ Failed to create data directory:', error.message);
-    return false;
-  }
-}
-
-async function initializeFiles() {
-  try {
+    
     // Initialize users file
     try {
       await fs.access(USERS_FILE);
-      console.log('📁 Users file exists');
     } catch {
-      const initialUsers = {
-        users: [],
-        metadata: {
-          createdAt: new Date().toISOString(),
-          lastUpdated: new Date().toISOString(),
-          version: '1.0.0'
-        }
-      };
-      await fs.writeFile(USERS_FILE, JSON.stringify(initialUsers, null, 2));
-      console.log('📝 Created new users file');
+      await fs.writeFile(USERS_FILE, JSON.stringify({ users: [], metadata: { createdAt: new Date().toISOString() } }, null, 2));
+      console.log('📝 Created users.json');
     }
-
+    
     // Initialize admins file
     try {
       await fs.access(ADMINS_FILE);
-      console.log('📁 Admins file exists');
     } catch {
       const hashedPassword = await bcrypt.hash('PSN@Taraba2025!', 10);
-      const initialAdmins = {
+      const adminsData = {
         admins: [{
           id: 'admin-001',
           username: 'psnadmin',
@@ -77,61 +73,48 @@ async function initializeFiles() {
           fullName: 'PSN Taraba Admin',
           email: 'admin@psntaraba.org',
           role: 'superadmin',
-          createdAt: new Date().toISOString(),
-          lastLogin: null,
-          permissions: ['all']
+          createdAt: new Date().toISOString()
         }],
-        metadata: {
-          createdAt: new Date().toISOString(),
-          lastUpdated: new Date().toISOString()
-        }
+        metadata: { createdAt: new Date().toISOString() }
       };
-      await fs.writeFile(ADMINS_FILE, JSON.stringify(initialAdmins, null, 2));
-      console.log('🔐 Created default admin: psnadmin / PSN@Taraba2025!');
+      await fs.writeFile(ADMINS_FILE, JSON.stringify(adminsData, null, 2));
+      console.log('🔐 Created admins.json with default admin');
     }
-
+    
     // Initialize welfare file
     try {
       await fs.access(WELFARE_FILE);
-      console.log('📁 Welfare file exists');
     } catch {
-      const initialWelfare = {
+      const welfareData = {
         packages: [{
           id: 'welfare-001',
           name: '2024 End of Year Package',
           type: 'food_items',
-          description: 'Rice, oil, and other food items for members',
+          description: 'Rice, oil, and other food items',
           value: 25000,
           eligibility: 'All verified members',
           distributionDate: '2024-12-20',
-          status: 'completed',
-          createdAt: '2024-11-15T00:00:00.000Z',
-          beneficiaries: [],
-          distributionLog: []
+          status: 'completed'
         }],
-        metadata: {
-          createdAt: new Date().toISOString(),
-          lastUpdated: new Date().toISOString()
-        }
+        metadata: { createdAt: new Date().toISOString() }
       };
-      await fs.writeFile(WELFARE_FILE, JSON.stringify(initialWelfare, null, 2));
-      console.log('💰 Created welfare database');
+      await fs.writeFile(WELFARE_FILE, JSON.stringify(welfareData, null, 2));
+      console.log('💰 Created welfare.json');
     }
-
-    console.log('✅ All database files initialized');
+    
+    console.log('✅ Database initialization complete');
     return true;
   } catch (error) {
-    console.error('❌ Error initializing files:', error.message);
+    console.error('❌ Database initialization failed:', error.message);
     return false;
   }
 }
 
-// ========== DATA OPERATIONS ==========
+// ========== DATABASE FUNCTIONS ==========
 async function getUsers() {
   try {
     const data = await fs.readFile(USERS_FILE, 'utf8');
-    const parsed = JSON.parse(data);
-    return parsed.users || [];
+    return JSON.parse(data).users || [];
   } catch (error) {
     console.error('Error reading users:', error.message);
     return [];
@@ -140,13 +123,7 @@ async function getUsers() {
 
 async function saveUsers(users) {
   try {
-    const data = {
-      users,
-      metadata: {
-        lastUpdated: new Date().toISOString(),
-        userCount: users.length
-      }
-    };
+    const data = { users, metadata: { lastUpdated: new Date().toISOString() } };
     await fs.writeFile(USERS_FILE, JSON.stringify(data, null, 2));
     return true;
   } catch (error) {
@@ -158,8 +135,7 @@ async function saveUsers(users) {
 async function getAdmins() {
   try {
     const data = await fs.readFile(ADMINS_FILE, 'utf8');
-    const parsed = JSON.parse(data);
-    return parsed.admins || [];
+    return JSON.parse(data).admins || [];
   } catch (error) {
     console.error('Error reading admins:', error.message);
     return [];
@@ -169,541 +145,248 @@ async function getAdmins() {
 async function getWelfarePackages() {
   try {
     const data = await fs.readFile(WELFARE_FILE, 'utf8');
-    const parsed = JSON.parse(data);
-    return parsed.packages || [];
+    return JSON.parse(data).packages || [];
   } catch (error) {
-    console.error('Error reading welfare packages:', error.message);
+    console.error('Error reading welfare:', error.message);
     return [];
   }
 }
 
 // ========== PAGE ROUTES ==========
 app.get('/', (req, res) => {
-  console.log('🌐 Home page requested');
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
 app.get('/register', (req, res) => {
-  console.log('📝 Register page requested');
   res.sendFile(path.join(__dirname, 'views', 'register.html'));
 });
 
 app.get('/login', (req, res) => {
-  console.log('🔑 Login page requested');
   res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 
 app.get('/admin-login', (req, res) => {
-  console.log('👑 Admin login page requested');
   res.sendFile(path.join(__dirname, 'views', 'admin-login.html'));
 });
 
 app.get('/dashboard', (req, res) => {
-  console.log('📊 Dashboard requested');
   res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
 });
 
 app.get('/admin-dashboard', (req, res) => {
-  console.log('👑 Admin dashboard requested');
   res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
 });
 
 // ========== API ROUTES ==========
-
-// Health check
 app.get('/api/health', (req, res) => {
-  console.log('🏥 Health check requested');
   res.json({
     success: true,
     status: 'healthy',
-    service: 'PSN Taraba Welfare Registry',
+    service: 'PSN Taraba Welfare',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'production'
+    environment: IS_VERCEL ? 'vercel' : 'local'
   });
 });
 
-// Test endpoint
 app.get('/api/test', (req, res) => {
-  console.log('🧪 Test endpoint requested');
-  res.json({
-    success: true,
-    message: 'API is working!',
-    timestamp: new Date().toISOString()
-  });
+  res.json({ success: true, message: 'API is working!' });
 });
-
-// ========== AUTHENTICATION ENDPOINTS ==========
 
 // Member registration
 app.post('/api/auth/register', async (req, res) => {
-  console.log('📝 Registration attempt');
   try {
-    const {
-      fullName,
-      email,
-      password,
-      confirmPassword,
-      phoneNumber,
-      dateOfBirth,
-      psnMembershipNumber,
-      psnYearOfInduction,
-      placeOfWork,
-      residentialAddress,
-      localGovernment,
-      nextOfKin,
-      dataConsent
-    } = req.body;
-
-    // Basic validation
-    const errors = [];
-
-    if (!fullName || fullName.trim().length < 3) {
-      errors.push({ field: 'fullName', message: 'Full name is required' });
+    const { fullName, email, password, confirmPassword, phoneNumber } = req.body;
+    
+    if (!fullName || !email || !password || !confirmPassword || !phoneNumber) {
+      return res.status(400).json({ success: false, message: 'All fields are required' });
     }
-
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.push({ field: 'email', message: 'Valid email is required' });
-    }
-
-    if (!phoneNumber) {
-      errors.push({ field: 'phoneNumber', message: 'Phone number is required' });
-    }
-
-    if (!password || password.length < 8) {
-      errors.push({ field: 'password', message: 'Password must be at least 8 characters' });
-    }
-
+    
     if (password !== confirmPassword) {
-      errors.push({ field: 'confirmPassword', message: 'Passwords do not match' });
+      return res.status(400).json({ success: false, message: 'Passwords do not match' });
     }
-
-    if (!psnMembershipNumber) {
-      errors.push({ field: 'psnMembershipNumber', message: 'PSN membership number is required' });
-    }
-
-    if (!localGovernment) {
-      errors.push({ field: 'localGovernment', message: 'Local government is required' });
-    }
-
-    if (errors.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors
-      });
-    }
-
-    // Check if user exists
+    
     const users = await getUsers();
-    const normalizedEmail = email.toLowerCase().trim();
-    const userExists = users.find(u => u.email === normalizedEmail);
-
+    const userExists = users.find(u => u.email === email.toLowerCase());
+    
     if (userExists) {
-      return res.status(409).json({
-        success: false,
-        message: 'User already exists with this email'
-      });
+      return res.status(409).json({ success: false, message: 'User already exists' });
     }
-
-    // Hash password and create user
+    
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
       id: Date.now().toString(),
-      fullName: fullName.trim(),
-      email: normalizedEmail,
+      fullName,
+      email: email.toLowerCase(),
       password: hashedPassword,
-      phoneNumber: phoneNumber.trim(),
-      dateOfBirth: dateOfBirth || '',
-      psnMembershipNumber: psnMembershipNumber.toUpperCase().trim(),
-      psnYearOfInduction: psnYearOfInduction ? parseInt(psnYearOfInduction) : null,
-      placeOfWork: placeOfWork ? placeOfWork.trim() : '',
-      residentialAddress: residentialAddress ? residentialAddress.trim() : '',
-      localGovernment: localGovernment || '',
-      nextOfKin: nextOfKin || { name: '', relationship: '', phoneNumber: '' },
-      dataConsent: !!dataConsent,
+      phoneNumber,
       registrationDate: new Date().toISOString(),
       isVerified: false,
-      userType: 'member',
-      lastLogin: null,
-      status: 'active'
+      userType: 'member'
     };
-
+    
     users.push(newUser);
     await saveUsers(users);
-
-    // Remove password from response
+    
     const { password: _, ...userWithoutPassword } = newUser;
-
-    console.log('✅ User registered:', newUser.email);
+    
     res.status(201).json({
       success: true,
       message: 'Registration successful!',
       user: userWithoutPassword
     });
-
   } catch (error) {
-    console.error('❌ Registration error:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during registration'
-    });
+    console.error('Registration error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
 // Member login
 app.post('/api/auth/login', async (req, res) => {
-  console.log('🔑 Member login attempt');
   try {
     const { email, password } = req.body;
-
+    
     if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email and password are required'
-      });
+      return res.status(400).json({ success: false, message: 'Email and password required' });
     }
-
+    
     const users = await getUsers();
-    const user = users.find(u => u.email === email.toLowerCase().trim());
-
+    const user = users.find(u => u.email === email.toLowerCase());
+    
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      });
+    
+    const validPassword = await bcrypt.compare(password, user.password);
+    
+    if (!validPassword) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
-
-    // Update last login
-    user.lastLogin = new Date().toISOString();
-    await saveUsers(users);
-
-    // Remove password from response
+    
     const { password: _, ...userWithoutPassword } = user;
-
-    console.log('✅ Login successful:', user.email);
+    
     res.json({
       success: true,
       message: 'Login successful!',
       user: userWithoutPassword,
       token: `user-${user.id}-${Date.now()}`
     });
-
   } catch (error) {
-    console.error('❌ Login error:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during login'
-    });
+    console.error('Login error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
 // Admin login
 app.post('/api/admin/login', async (req, res) => {
-  console.log('👑 Admin login attempt');
   try {
     const { username, password } = req.body;
-
+    
     if (!username || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Username and password are required'
-      });
+      return res.status(400).json({ success: false, message: 'Username and password required' });
     }
-
+    
     const admins = await getAdmins();
     const admin = admins.find(a => a.username === username);
-
+    
     if (!admin) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
-
-    const isPasswordValid = await bcrypt.compare(password, admin.password);
-
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
+    
+    const validPassword = await bcrypt.compare(password, admin.password);
+    
+    if (!validPassword) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
-
-    // Remove password from response
+    
     const { password: _, ...adminWithoutPassword } = admin;
-
-    console.log('✅ Admin login successful:', username);
+    
     res.json({
       success: true,
-      message: 'Admin login successful',
+      message: 'Admin login successful!',
       admin: adminWithoutPassword,
       token: `admin-${admin.id}-${Date.now()}`
     });
-
   } catch (error) {
-    console.error('❌ Admin login error:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during login'
-    });
+    console.error('Admin login error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
 // Get all members (admin)
 app.get('/api/admin/members', async (req, res) => {
-  console.log('👥 Admin requested members list');
   try {
     const users = await getUsers();
     const usersWithoutPasswords = users.map(({ password, ...user }) => user);
-
+    
     res.json({
       success: true,
       members: usersWithoutPasswords,
       count: usersWithoutPasswords.length
     });
   } catch (error) {
-    console.error('❌ Error fetching members:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
+    console.error('Error fetching members:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
 // Get welfare packages
 app.get('/api/welfare', async (req, res) => {
-  console.log('📦 Welfare packages requested');
   try {
     const packages = await getWelfarePackages();
-    const publicPackages = packages.map(p => ({
-      id: p.id,
-      name: p.name,
-      type: p.type,
-      description: p.description,
-      distributionDate: p.distributionDate,
-      status: p.status
-    }));
-
+    
     res.json({
       success: true,
-      packages: publicPackages
+      packages: packages
     });
   } catch (error) {
-    console.error('❌ Error fetching welfare packages:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// Get user by ID
-app.get('/api/users/:id', async (req, res) => {
-  console.log('👤 User data request for:', req.params.id);
-  try {
-    const users = await getUsers();
-    const user = users.find(u => u.id === req.params.id);
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    const { password, ...userWithoutPassword } = user;
-    res.json({
-      success: true,
-      user: userWithoutPassword
-    });
-  } catch (error) {
-    console.error('❌ Error fetching user:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// Admin welfare packages
-app.get('/api/admin/welfare', async (req, res) => {
-  console.log('📦 Admin requested welfare packages');
-  try {
-    const packages = await getWelfarePackages();
-    res.json({
-      success: true,
-      packages,
-      count: packages.length
-    });
-  } catch (error) {
-    console.error('❌ Error fetching welfare packages:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// Admin statistics
-app.get('/api/admin/stats', async (req, res) => {
-  console.log('📊 Admin requested statistics');
-  try {
-    const users = await getUsers();
-    const admins = await getAdmins();
-    const welfarePackages = await getWelfarePackages();
-
-    const stats = {
-      totalMembers: users.length,
-      verifiedMembers: users.filter(u => u.isVerified).length,
-      activeMembers: users.filter(u => u.status === 'active').length,
-      totalAdmins: admins.length,
-      welfarePackages: welfarePackages.length,
-      activeWelfarePackages: welfarePackages.filter(p => p.status === 'active').length
-    };
-
-    res.json({
-      success: true,
-      stats,
-      updatedAt: new Date().toISOString()
-    });
-  } catch (error) {
-    console.error('❌ Error fetching stats:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
+    console.error('Error fetching welfare:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
 // ========== ERROR HANDLERS ==========
-app.use('/api/*', (req, res) => {
-  console.log(`❌ API endpoint not found: ${req.originalUrl}`);
-  res.status(404).json({
-    success: false,
-    message: 'API endpoint not found'
-  });
-});
-
 app.use((req, res) => {
-  console.log(`❌ Page not found: ${req.originalUrl}`);
-  if (req.accepts('html')) {
-    res.status(404).send(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-          <title>404 Not Found</title>
-          <style>
-              body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-              h1 { color: #dc2626; }
-              a { color: #1e40af; text-decoration: none; }
-          </style>
-      </head>
-      <body>
-          <h1>404 - Page Not Found</h1>
-          <p>The page you're looking for doesn't exist.</p>
-          <p><a href="/">Go back home</a></p>
-      </body>
-      </html>
-    `);
-  } else {
-    res.status(404).json({
-      success: false,
-      error: 'Not found'
-    });
-  }
+  res.status(404).json({ success: false, message: 'Not found' });
 });
 
 app.use((err, req, res, next) => {
-  console.error('❌ Server error:', err.message);
-  res.status(500).json({
-    success: false,
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
+  console.error('Server error:', err);
+  res.status(500).json({ success: false, message: 'Internal server error' });
 });
 
 // ========== INITIALIZATION ==========
-async function initializeServer() {
-  console.log('🔄 Initializing server...');
+async function startServer() {
+  console.log('🔄 Starting server initialization...');
   
-  try {
-    // Ensure data directory exists
-    await ensureDataDir();
-    
-    // Initialize database files
-    await initializeFiles();
-    
-    // Get initial counts for logging
-    const users = await getUsers();
-    const admins = await getAdmins();
-    const welfarePackages = await getWelfarePackages();
-    
-    console.log('✅ Server initialization complete');
-    console.log(`👥 Registered users: ${users.length}`);
-    console.log(`👑 Admin accounts: ${admins.length}`);
-    console.log(`📦 Welfare packages: ${welfarePackages.length}`);
-    console.log(`🔐 Default admin: psnadmin / PSN@Taraba2025!`);
-    
-    return true;
-  } catch (error) {
-    console.error('❌ Server initialization failed:', error.message);
-    return false;
+  const dbInitialized = await initializeDatabase();
+  if (!dbInitialized) {
+    console.error('❌ Failed to initialize database');
+    return;
+  }
+  
+  console.log('✅ Server initialization complete');
+  
+  // If not on Vercel, start local server
+  if (!IS_VERCEL) {
+    app.listen(PORT, () => {
+      console.log(`\n✅ Server running on http://localhost:${PORT}`);
+      console.log('📁 Available Pages:');
+      console.log(`   Home: http://localhost:${PORT}/`);
+      console.log(`   Register: http://localhost:${PORT}/register`);
+      console.log(`   Login: http://localhost:${PORT}/login`);
+      console.log(`   Admin Login: http://localhost:${PORT}/admin-login`);
+      console.log('='.repeat(60) + '\n');
+    });
   }
 }
 
-// ========== START SERVER OR EXPORT FOR VERCEL ==========
-const isVercel = process.env.VERCEL || process.env.VERCEL_URL;
+// Start initialization
+startServer().catch(error => {
+  console.error('❌ Failed to start server:', error);
+});
 
-if (isVercel) {
-  console.log('🚀 Running on Vercel - Serverless mode');
-  
-  // Initialize on cold start
-  initializeServer().then(success => {
-    if (success) {
-      console.log('✅ Vercel serverless function ready');
-    } else {
-      console.error('❌ Vercel serverless function initialization failed');
-    }
-  });
-  
-  // Export app for Vercel
+// Export for Vercel
+if (IS_VERCEL) {
+  console.log('🚀 Exporting app for Vercel serverless...');
   module.exports = app;
-} else {
-  console.log('💻 Running in local development mode');
-  
-  // Initialize and start server locally
-  initializeServer().then(success => {
-    if (success) {
-      const PORT = process.env.PORT || 3000;
-      app.listen(PORT, () => {
-        console.log(`\n✅ Server started on http://localhost:${PORT}`);
-        console.log('📁 Available Pages:');
-        console.log(`   Home: http://localhost:${PORT}/`);
-        console.log(`   Register: http://localhost:${PORT}/register`);
-        console.log(`   Login: http://localhost:${PORT}/login`);
-        console.log(`   Admin Login: http://localhost:${PORT}/admin-login`);
-        console.log(`   Dashboard: http://localhost:${PORT}/dashboard`);
-        console.log(`   Admin Dashboard: http://localhost:${PORT}/admin-dashboard`);
-        console.log('\n🔗 API Endpoints:');
-        console.log(`   Health: GET http://localhost:${PORT}/api/health`);
-        console.log(`   Register: POST http://localhost:${PORT}/api/auth/register`);
-        console.log(`   Login: POST http://localhost:${PORT}/api/auth/login`);
-        console.log(`   Admin Login: POST http://localhost:${PORT}/api/admin/login`);
-        console.log(`   Admin Stats: GET http://localhost:${PORT}/api/admin/stats`);
-        console.log('='.repeat(60) + '\n');
-      });
-    } else {
-      console.error('❌ Failed to start server');
-      process.exit(1);
-    }
-  });
 }
