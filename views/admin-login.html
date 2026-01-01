@@ -448,9 +448,8 @@
               required
               autocomplete="username"
               value="psnadmin"
-              readonly
             >
-            <small style="color: var(--gray);">Default username: psnadmin (cannot be changed)</small>
+            <small style="color: var(--gray);">Default username: psnadmin</small>
           </div>
 
           <div class="form-group">
@@ -463,7 +462,9 @@
               placeholder="Enter admin password"
               required
               autocomplete="current-password"
+              value="PSN@Taraba2025!"
             >
+            <small style="color: var(--gray);">Default password: PSN@Taraba2025!</small>
             <span class="form-error" id="passwordError"></span>
           </div>
 
@@ -491,8 +492,37 @@
   
   <!-- JavaScript -->
   <script>
-    // ========== Configuration ==========
-    const API_BASE_URL = '/api';
+    // ========== SMART API CONFIGURATION ==========
+    // Dynamically detect API base URL
+    function getApiBaseUrl() {
+      const hostname = window.location.hostname;
+      const origin = window.location.origin;
+      
+      console.log('🌐 Detecting environment for admin login...');
+      console.log('Hostname:', hostname);
+      console.log('Origin:', origin);
+      console.log('Full URL:', window.location.href);
+      
+      // Local development
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:5000/api';
+      }
+      // Vercel production - your specific URL
+      else if (hostname.includes('psn-taraba-welfare-registry')) {
+        return 'https://psn-taraba-welfare-registry-git-main-mafindi001s-projects.vercel.app/api';
+      }
+      // Any other Vercel URL
+      else if (hostname.includes('vercel.app')) {
+        return origin + '/api';
+      }
+      // Fallback
+      else {
+        return origin + '/api';
+      }
+    }
+
+    const API_BASE_URL = getApiBaseUrl();
+    console.log('🚀 Admin Login API Base URL:', API_BASE_URL);
 
     // ========== DOM Elements ==========
     const adminLoginForm = document.getElementById('adminLoginForm');
@@ -520,6 +550,9 @@
         alertError.classList.add('show');
       }
 
+      // Scroll to alert
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
       // Auto-hide
       if (duration > 0) {
         setTimeout(() => {
@@ -536,6 +569,32 @@
 
     function hideLoading() {
       loadingOverlay.classList.remove('show');
+    }
+
+    // ========== Test API Connection ==========
+    async function testApiConnection() {
+      try {
+        console.log('🔍 Testing API connection for admin...');
+        const response = await fetch(`${API_BASE_URL}/test-connection`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ Admin API Connection Test Success:', data);
+          return true;
+        } else {
+          console.warn('⚠️ Admin API connection test failed:', response.status);
+          return false;
+        }
+      } catch (error) {
+        console.error('❌ Admin API Connection Test Error:', error);
+        return false;
+      }
     }
 
     // ========== Form Submission Handler ==========
@@ -557,21 +616,44 @@
 
       try {
         console.log('🔑 Admin login attempt...');
+        console.log('API URL:', `${API_BASE_URL}/admin/login`);
+        console.log('Credentials:', { username, password: '***' });
+
+        // Test connection first
+        const connected = await testApiConnection();
+        if (!connected) {
+          throw new Error('Cannot connect to server. Please check if the backend is running.');
+        }
 
         const response = await fetch(`${API_BASE_URL}/admin/login`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Origin': window.location.origin
           },
           body: JSON.stringify({ username, password })
         });
 
-        const data = await response.json();
-        console.log('Admin login response:', data);
+        console.log('📥 Admin login response status:', response.status);
+
+        // Get response text first
+        const responseText = await response.text();
+        console.log('📥 Admin login response text:', responseText);
+
+        let data;
+        try {
+          data = responseText ? JSON.parse(responseText) : {};
+        } catch (parseError) {
+          console.error('❌ Failed to parse response as JSON:', parseError);
+          throw new Error('Server returned invalid response. Please try again.');
+        }
+
+        console.log('Admin login response data:', data);
 
         if (response.ok && data.success) {
           // Login successful
-          showAlert('Admin login successful! Redirecting to dashboard...', 'success');
+          showAlert('Admin login successful! Redirecting to dashboard...', 'success', 3000);
           
           // Save admin data to localStorage
           localStorage.setItem('psnAdminToken', data.token);
@@ -584,15 +666,29 @@
           }, 1000);
         } else {
           // Login failed
-          showAlert(data.message || 'Invalid credentials. Please try again.', 'error');
+          const errorMsg = data.message || 'Invalid admin credentials. Please try again.';
+          showAlert(errorMsg, 'error', 5000);
           
           // Clear password field on failed attempt
           document.getElementById('password').value = '';
           document.getElementById('password').focus();
         }
       } catch (error) {
-        console.error('Admin login error:', error);
-        showAlert('Network error. Please check your connection and try again.', 'error');
+        console.error('❌ Admin login error:', error);
+        
+        let userErrorMessage = 'Admin login failed. ';
+        
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+          userErrorMessage += 'Network error: Cannot connect to server. Please check your internet connection.';
+        } else if (error.message.includes('backend') || error.message.includes('server')) {
+          userErrorMessage += 'Server is not responding. Please try again later.';
+        } else if (error.message.includes('CORS')) {
+          userErrorMessage += 'Cross-origin error. Please ensure you are accessing the correct URL.';
+        } else {
+          userErrorMessage += error.message || 'Please try again.';
+        }
+        
+        showAlert(userErrorMessage, 'error', 7000);
       } finally {
         // Reset button state
         loginBtn.disabled = false;
@@ -604,12 +700,12 @@
     // ========== Forgot Password Handler ==========
     forgotPasswordLink.addEventListener('click', (e) => {
       e.preventDefault();
-      showAlert('Please contact the system administrator or super admin to reset your password.', 'error');
+      showAlert('Please contact the system administrator or super admin to reset your password.', 'error', 5000);
     });
 
     // ========== Auto-focus password field ==========
     window.addEventListener('DOMContentLoaded', () => {
-      // Auto-focus password field (username is readonly)
+      // Auto-focus password field
       document.getElementById('password').focus();
       
       // Check if already logged in as admin
@@ -617,11 +713,29 @@
       const userRole = localStorage.getItem('psnUserRole');
       
       if (adminToken && userRole === 'admin') {
-        console.log('Admin already logged in, redirecting to dashboard...');
-        window.location.href = '/admin-dashboard';
+        console.log('⚠️ Admin already logged in, redirecting to dashboard...');
+        showAlert('You are already logged in as admin. Redirecting...', 'info', 2000);
+        setTimeout(() => {
+          window.location.href = '/admin-dashboard';
+        }, 2000);
       }
       
+      // Test API connection on load
+      console.log('🔧 Testing API connection for admin login...');
+      testApiConnection().then(connected => {
+        if (connected) {
+          console.log('✅ Admin API is ready');
+        } else {
+          console.warn('⚠️ Admin API connection test failed');
+          showAlert('Warning: Cannot connect to server. Admin login may not work.', 'error', 7000);
+        }
+      });
+      
       console.log('✅ Admin login page loaded successfully');
+      console.log('🌐 Admin Login API Base URL:', API_BASE_URL);
+      
+      // Show current environment info
+      showAlert(`Connecting to: ${API_BASE_URL.replace('/api', '')}`, 'info', 4000);
     });
 
     // ========== Enter Key Support ==========
@@ -631,28 +745,76 @@
       }
     });
 
-    // ========== Security Features ==========
-    // Disable right-click (optional security measure)
-    document.addEventListener('contextmenu', (e) => {
-      if (e.target.closest('.login-card')) {
-        e.preventDefault();
-        showAlert('Right-click is disabled for security reasons.', 'error', 2000);
-      }
+    // ========== Security Features (Optional) ==========
+    // Disable right-click on form area
+    document.querySelector('.login-card').addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showAlert('Right-click is disabled for security reasons.', 'error', 2000);
     });
 
-    // Disable keyboard shortcuts for developer tools (basic)
-    document.addEventListener('keydown', (e) => {
-      // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-      if (
-        e.keyCode === 123 || // F12
-        (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
-        (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J
-        (e.ctrlKey && e.keyCode === 85) // Ctrl+U
-      ) {
-        e.preventDefault();
-        showAlert('Developer tools are disabled on this page.', 'error', 2000);
-      }
-    });
+    // ========== Debug Helper ==========
+    window.debugAdminLogin = function() {
+      console.log('🔧 Admin Login Debug Information:');
+      console.log('- Current URL:', window.location.href);
+      console.log('- API Base URL:', API_BASE_URL);
+      console.log('- Admin Login URL:', `${API_BASE_URL}/admin/login`);
+      console.log('- Test Connection URL:', `${API_BASE_URL}/test-connection`);
+      console.log('- Form values:', {
+        username: document.getElementById('username').value,
+        password: '***'
+      });
+      console.log('- Local Storage:', {
+        adminToken: localStorage.getItem('psnAdminToken'),
+        admin: localStorage.getItem('psnAdmin'),
+        userRole: localStorage.getItem('psnUserRole')
+      });
+      
+      // Test the connection
+      testApiConnection().then(connected => {
+        if (connected) {
+          console.log('✅ Server is reachable for admin login');
+        } else {
+          console.log('❌ Server is not reachable for admin login');
+        }
+      });
+    };
+
+    // ========== Quick Login for Testing ==========
+    // Uncomment for easier testing
+    /*
+    window.quickLogin = function() {
+      document.getElementById('username').value = 'psnadmin';
+      document.getElementById('password').value = 'PSN@Taraba2025!';
+      console.log('🔑 Quick login credentials filled');
+      showAlert('Default credentials filled. Click Login to test.', 'info', 3000);
+    };
+    */
+
+    // ========== Demo Mode ==========
+    // Add demo mode for testing without backend
+    window.enableDemoMode = function() {
+      console.log('🎭 Enabling demo mode...');
+      localStorage.setItem('psnDemoMode', 'true');
+      localStorage.setItem('psnAdminToken', 'demo-token-12345');
+      localStorage.setItem('psnUserRole', 'admin');
+      localStorage.setItem('psnAdmin', JSON.stringify({
+        username: 'psnadmin',
+        fullName: 'Demo Admin',
+        email: 'demo@psntaraba.org',
+        role: 'admin'
+      }));
+      
+      showAlert('Demo mode enabled! Redirecting to admin dashboard...', 'success', 2000);
+      setTimeout(() => {
+        window.location.href = '/admin-dashboard';
+      }, 2000);
+    };
+
+    // Check if demo mode is requested
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('demo') === 'true') {
+      window.enableDemoMode();
+    }
   </script>
 </body>
 </html>
