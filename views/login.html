@@ -318,6 +318,12 @@
       color: #991b1b;
     }
 
+    .alert-info {
+      background-color: #dbeafe;
+      border-left-color: var(--primary-color);
+      color: #1e40af;
+    }
+
     /* ========== Loading Spinner ========== */
     .spinner {
       border: 3px solid var(--white);
@@ -422,6 +428,10 @@
       margin-top: var(--spacing-md);
     }
 
+    .mb-3 {
+      margin-bottom: var(--spacing-lg);
+    }
+
     /* ========== Responsive ========== */
     @media (max-width: 768px) {
       .navbar-content {
@@ -480,6 +490,9 @@
         </div>
 
         <!-- Alert Messages -->
+        <div id="alertInfo" class="alert alert-info">
+          <strong>Info:</strong> <span id="infoMessage"></span>
+        </div>
         <div id="alertSuccess" class="alert alert-success">
           <strong>Success!</strong> <span id="successMessage"></span>
         </div>
@@ -499,6 +512,7 @@
               placeholder="your.email@example.com"
               required
               autocomplete="email"
+              autocapitalize="none"
             >
             <span class="form-error" id="emailError"></span>
           </div>
@@ -539,6 +553,11 @@
           </button>
         </form>
 
+        <!-- Demo Credentials Info -->
+        <div class="alert alert-info mt-2 mb-3">
+          <strong>Demo Access:</strong> Use email: <code>demo@psntaraba.org</code> with any password to test
+        </div>
+
         <!-- Divider -->
         <div class="divider">
           <span>or</span>
@@ -563,24 +582,31 @@
   <!-- JavaScript -->
   <script>
     // ========== SMART API CONFIGURATION ==========
-    // This works for both local development and Vercel production
+    // Dynamically detect API base URL
     function getApiBaseUrl() {
       const hostname = window.location.hostname;
       const origin = window.location.origin;
+      const protocol = window.location.protocol;
       
       console.log('🌐 Detecting environment...');
       console.log('Hostname:', hostname);
       console.log('Origin:', origin);
+      console.log('Protocol:', protocol);
+      console.log('Full URL:', window.location.href);
       
       // Local development
       if (hostname === 'localhost' || hostname === '127.0.0.1') {
         return 'http://localhost:5000/api';
       }
-      // Vercel production
+      // Vercel production - your specific URL
+      else if (origin.includes('psn-taraba-welfare-registry')) {
+        return 'https://psn-taraba-welfare-registry-git-main-mafindi001s-projects.vercel.app/api';
+      }
+      // Any other Vercel URL
       else if (hostname.includes('vercel.app')) {
         return origin + '/api';
       }
-      // GitHub Pages or other hosting
+      // Fallback
       else {
         return origin + '/api';
       }
@@ -593,8 +619,10 @@
     const form = document.getElementById('loginForm');
     const loginBtn = document.getElementById('loginBtn');
     const loadingOverlay = document.getElementById('loadingOverlay');
+    const alertInfo = document.getElementById('alertInfo');
     const alertSuccess = document.getElementById('alertSuccess');
     const alertError = document.getElementById('alertError');
+    const infoMessage = document.getElementById('infoMessage');
     const successMessage = document.getElementById('successMessage');
     const errorMessage = document.getElementById('errorMessage');
 
@@ -602,6 +630,8 @@
     function setupPasswordToggle() {
       const passwordInput = document.getElementById('password');
       const togglePasswordBtn = document.getElementById('togglePassword');
+
+      if (!passwordInput || !togglePasswordBtn) return;
 
       // Toggle password visibility
       togglePasswordBtn.addEventListener('click', function() {
@@ -624,6 +654,44 @@
     function validateEmail(email) {
       const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return re.test(email.toLowerCase());
+    }
+
+    // ========== Alert Display Functions ==========
+    function showAlert(type, message, duration = 5000) {
+      // Hide all alerts first
+      alertInfo.classList.remove('show');
+      alertSuccess.classList.remove('show');
+      alertError.classList.remove('show');
+      
+      let alertElement, messageElement;
+      
+      switch(type) {
+        case 'info':
+          alertElement = alertInfo;
+          messageElement = infoMessage;
+          break;
+        case 'success':
+          alertElement = alertSuccess;
+          messageElement = successMessage;
+          break;
+        case 'error':
+          alertElement = alertError;
+          messageElement = errorMessage;
+          break;
+        default:
+          alertElement = alertInfo;
+          messageElement = infoMessage;
+      }
+      
+      messageElement.textContent = message;
+      alertElement.classList.add('show');
+      
+      // Auto-hide after duration
+      if (duration > 0) {
+        setTimeout(() => {
+          alertElement.classList.remove('show');
+        }, duration);
+      }
     }
 
     // ========== Error Display Functions ==========
@@ -654,19 +722,6 @@
       clearError('password');
     }
 
-    function showAlert(type, message) {
-      alertSuccess.classList.remove('show');
-      alertError.classList.remove('show');
-      
-      if (type === 'success') {
-        successMessage.textContent = message;
-        alertSuccess.classList.add('show');
-      } else {
-        errorMessage.textContent = message;
-        alertError.classList.add('show');
-      }
-    }
-
     // ========== Local Storage Functions ==========
     function saveToLocalStorage(key, value) {
       try {
@@ -689,24 +744,34 @@
     // ========== API Connection Test ==========
     async function testApiConnection() {
       try {
-        console.log('🔍 Testing API connection to:', API_BASE_URL);
+        console.log('🔍 Testing API connection to:', `${API_BASE_URL}/test-connection`);
+        showAlert('info', 'Testing connection to server...', 3000);
+        
         const response = await fetch(`${API_BASE_URL}/test-connection`, {
           method: 'GET',
           headers: {
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
-          }
+          },
+          mode: 'cors',
+          cache: 'no-cache'
         });
+        
+        console.log('📡 Connection test response status:', response.status);
         
         if (response.ok) {
           const data = await response.json();
-          console.log('✅ API Connection Test:', data);
+          console.log('✅ API Connection Test Success:', data);
+          showAlert('success', 'Connected to server successfully!', 3000);
           return true;
         } else {
           console.warn('⚠️ API connection test failed with status:', response.status);
+          showAlert('error', `Server responded with status: ${response.status}`, 5000);
           return false;
         }
       } catch (error) {
-        console.error('❌ API Connection Test Error:', error.message);
+        console.error('❌ API Connection Test Error:', error);
+        showAlert('error', `Connection failed: ${error.message}`, 5000);
         return false;
       }
     }
@@ -762,7 +827,7 @@
         console.log('API URL:', `${API_BASE_URL}/auth/login`);
         console.log('Login data:', { ...loginData, password: '***' }); // Hide password in logs
 
-        // First test API connection
+        // Test API connection first
         const apiConnected = await testApiConnection();
         if (!apiConnected) {
           throw new Error('Cannot connect to server. Please check if the backend is running.');
@@ -771,17 +836,36 @@
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Origin': window.location.origin
           },
+          mode: 'cors',
+          credentials: 'include',
           body: JSON.stringify(loginData)
         });
 
-        const data = await response.json();
-        console.log('📥 Login response:', data);
+        console.log('📥 Login response status:', response.status);
+
+        // First check if we got any response at all
+        if (!response) {
+          throw new Error('No response from server. Please check your internet connection.');
+        }
+
+        const responseText = await response.text();
+        console.log('📥 Login response text:', responseText);
+
+        let data;
+        try {
+          data = responseText ? JSON.parse(responseText) : {};
+        } catch (parseError) {
+          console.error('❌ Failed to parse response as JSON:', parseError);
+          throw new Error('Server returned invalid response. Please try again.');
+        }
 
         if (response.ok && data.success) {
           // Login successful
-          showAlert('success', 'Login successful! Redirecting to dashboard...');
+          showAlert('success', 'Login successful! Redirecting to dashboard...', 3000);
           
           // Save user data and token to localStorage
           saveToLocalStorage('psnToken', data.token);
@@ -801,7 +885,8 @@
           }, 1000);
         } else {
           // Login failed
-          showAlert('error', data.message || 'Invalid email or password. Please try again.');
+          const errorMsg = data.message || 'Invalid email or password. Please try again.';
+          showAlert('error', errorMsg, 5000);
           
           // Show field-specific errors if available
           if (data.errors && Array.isArray(data.errors)) {
@@ -816,13 +901,19 @@
         console.error('❌ Login error:', error);
         
         // Better error messages
+        let userErrorMessage = 'Login failed. ';
+        
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
-          showAlert('error', 'Network error: Cannot connect to server. Please check your internet connection.');
-        } else if (error.message.includes('backend')) {
-          showAlert('error', 'Server connection failed. The backend server might not be running.');
+          userErrorMessage += 'Network error: Cannot connect to server. Please check your internet connection and try again.';
+        } else if (error.message.includes('backend') || error.message.includes('server')) {
+          userErrorMessage += 'Server is not responding. Please try again later.';
+        } else if (error.message.includes('CORS')) {
+          userErrorMessage += 'CORS error detected. Please ensure you are accessing the correct URL.';
         } else {
-          showAlert('error', 'Network error. Please check your connection and try again.');
+          userErrorMessage += error.message || 'Please check your credentials and try again.';
         }
+        
+        showAlert('error', userErrorMessage, 7000);
       } finally {
         // Reset button state
         loginBtn.disabled = false;
@@ -834,29 +925,36 @@
     // ========== Real-time Field Validation ==========
     
     // Email validation on blur
-    document.getElementById('email').addEventListener('blur', function() {
-      const email = this.value.trim();
-      if (email && !validateEmail(email)) {
-        showError('email', 'Please enter a valid email address');
-      } else if (email) {
-        clearError('email');
-      }
-    });
+    const emailInput = document.getElementById('email');
+    if (emailInput) {
+      emailInput.addEventListener('blur', function() {
+        const email = this.value.trim();
+        if (email && !validateEmail(email)) {
+          showError('email', 'Please enter a valid email address');
+        } else if (email) {
+          clearError('email');
+        }
+      });
 
-    // Clear errors when user starts typing
-    document.getElementById('email').addEventListener('input', function() {
-      if (this.value) {
-        clearError('email');
-        alertError.classList.remove('show');
-      }
-    });
+      // Clear errors when user starts typing
+      emailInput.addEventListener('input', function() {
+        if (this.value) {
+          clearError('email');
+          alertError.classList.remove('show');
+        }
+      });
+    }
 
-    document.getElementById('password').addEventListener('input', function() {
-      if (this.value) {
-        clearError('password');
-        alertError.classList.remove('show');
-      }
-    });
+    // Password field validation
+    const passwordInput = document.getElementById('password');
+    if (passwordInput) {
+      passwordInput.addEventListener('input', function() {
+        if (this.value) {
+          clearError('password');
+          alertError.classList.remove('show');
+        }
+      });
+    }
 
     // ========== Initialize Page ==========
     window.addEventListener('DOMContentLoaded', () => {
@@ -875,44 +973,60 @@
       const userRole = getFromLocalStorage('psnUserRole');
       if (token && userRole === 'member') {
         console.log('⚠️ User already logged in, redirecting to dashboard...');
-        window.location.href = '/dashboard';
+        showAlert('info', 'You are already logged in. Redirecting to dashboard...', 2000);
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 2000);
       }
 
-      // Check if user just registered
+      // Check URL parameters
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('registered') === 'true') {
-        showAlert('success', 'Registration successful! Please login with your credentials.');
+        showAlert('success', 'Registration successful! Please login with your credentials.', 5000);
+      }
+      if (urlParams.get('loggedout') === 'true') {
+        showAlert('info', 'You have been logged out successfully.', 3000);
       }
 
       // Test API connection on page load
       console.log('🔧 Testing API connection on page load...');
-      testApiConnection().then(connected => {
-        if (connected) {
-          console.log('✅ API is ready for login requests');
-        } else {
-          console.warn('⚠️ API connection test failed on page load');
-        }
-      });
+      setTimeout(() => {
+        testApiConnection();
+      }, 1000);
+
+      // Show current API info
+      showAlert('info', `Connecting to: ${API_BASE_URL.replace('/api', '')}`, 4000);
 
       console.log('✅ Login form initialized successfully');
+      console.log('💡 Tip: Open browser console (F12) to see detailed logs');
     });
 
     // ========== Forgot Password Handler ==========
-    document.querySelector('.forgot-password').addEventListener('click', (e) => {
+    document.querySelector('.forgot-password')?.addEventListener('click', (e) => {
       e.preventDefault();
-      showAlert('error', 'Password reset feature coming soon. Please contact PSN Welfare office for assistance.');
+      showAlert('error', 'Password reset feature coming soon. Please contact PSN Welfare office for assistance.', 5000);
     });
 
     // ========== Enter Key Support ==========
-    document.getElementById('password').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        form.dispatchEvent(new Event('submit'));
-      }
+    if (passwordInput) {
+      passwordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          form.dispatchEvent(new Event('submit'));
+        }
+      });
+    }
+
+    // ========== Demo Credentials Helper ==========
+    document.querySelector('.alert-info')?.addEventListener('click', () => {
+      document.getElementById('email').value = 'demo@psntaraba.org';
+      document.getElementById('password').value = 'Demo@12345';
+      showAlert('info', 'Demo credentials filled. Click Login to test.', 3000);
     });
 
     // ========== Debug Helper ==========
     window.debugLogin = function() {
       console.log('🔧 Debug Information:');
+      console.log('- Current URL:', window.location.href);
       console.log('- API Base URL:', API_BASE_URL);
       console.log('- Test Connection URL:', `${API_BASE_URL}/test-connection`);
       console.log('- Login URL:', `${API_BASE_URL}/auth/login`);
@@ -921,13 +1035,41 @@
         user: getFromLocalStorage('psnUser'),
         rememberedEmail: getFromLocalStorage('psnRememberedEmail')
       });
+      console.log('- Form values:', {
+        email: document.getElementById('email')?.value,
+        password: '***',
+        rememberMe: document.getElementById('rememberMe')?.checked
+      });
       
       // Test the connection
-      testApiConnection();
+      testApiConnection().then(connected => {
+        if (connected) {
+          console.log('✅ Server is reachable');
+        } else {
+          console.log('❌ Server is not reachable');
+        }
+      });
     };
+
+    // ========== Error Reporting ==========
+    window.addEventListener('error', (event) => {
+      console.error('🛑 Global error caught:', event.error);
+    });
+
+    // ========== Connection Status Monitoring ==========
+    window.addEventListener('online', () => {
+      console.log('📶 Device is online');
+      showAlert('success', 'You are back online!', 3000);
+    });
+
+    window.addEventListener('offline', () => {
+      console.log('📶 Device is offline');
+      showAlert('error', 'You are offline. Please check your internet connection.', 5000);
+    });
 
     console.log('🚀 Login page loaded successfully');
     console.log('💡 Tip: Run debugLogin() in console for debug info');
+    console.log('🌐 API Base URL:', API_BASE_URL);
   </script>
 </body>
 </html>
