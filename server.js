@@ -1,4 +1,4 @@
-// server.js - FIXED FOR VERCEL DEPLOYMENT
+// server.js - FIXED FOR VERCEL DEPLOYMENT WITH CORRECT URL
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -22,10 +22,12 @@ const isProduction = process.env.NODE_ENV === 'production';
 // Configure CORS for production
 if (isProduction) {
   const allowedOrigins = [
-    'https://mafindi001-psn-taraba-welfare.vercel.app',
-    'https://mafindi001.github.io',
+    'https://psn-taraba-welfare-registry-git-main-mafindi001s-projects.vercel.app',
+    'https://psn-taraba-welfare-registry.vercel.app',
+    'https://*.vercel.app',
     'http://localhost:3000',
-    'http://localhost:5000'
+    'http://localhost:5000',
+    'http://localhost:5500'
   ];
   
   app.use(cors({
@@ -33,20 +35,44 @@ if (isProduction) {
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       
-      if (allowedOrigins.indexOf(origin) !== -1) {
+      // Check if origin is in allowed list
+      if (allowedOrigins.includes(origin)) {
         return callback(null, true);
-      } else {
-        console.log('🔒 CORS blocked origin:', origin);
-        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-        return callback(new Error(msg), false);
       }
+      
+      // Check if origin matches wildcard pattern
+      const originMatches = allowedOrigins.some(allowedOrigin => {
+        if (allowedOrigin.includes('*')) {
+          const pattern = allowedOrigin.replace('*', '.*');
+          return new RegExp(pattern).test(origin);
+        }
+        return false;
+      });
+      
+      if (originMatches) {
+        return callback(null, true);
+      }
+      
+      console.log('🔒 CORS blocked origin:', origin);
+      console.log('📋 Allowed origins:', allowedOrigins);
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
     },
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range']
   }));
 } else {
   // Local development - allow all
-  app.use(cors());
+  app.use(cors({
+    origin: true,
+    credentials: true
+  }));
 }
+
+// Handle preflight requests
+app.options('*', cors());
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -274,26 +300,32 @@ async function saveWelfarePackages(packages) {
 
 // ========== PAGE ROUTES ==========
 app.get('/', (req, res) => {
+  console.log(`🌐 Home page requested from: ${req.headers.origin || 'Unknown origin'}`);
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
 app.get('/register', (req, res) => {
+  console.log(`📝 Register page requested from: ${req.headers.origin || 'Unknown origin'}`);
   res.sendFile(path.join(__dirname, 'views', 'register.html'));
 });
 
 app.get('/login', (req, res) => {
+  console.log(`🔑 Login page requested from: ${req.headers.origin || 'Unknown origin'}`);
   res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 
 app.get('/admin-login', (req, res) => {
+  console.log(`👑 Admin login page requested from: ${req.headers.origin || 'Unknown origin'}`);
   res.sendFile(path.join(__dirname, 'views', 'admin-login.html'));
 });
 
 app.get('/dashboard', (req, res) => {
+  console.log(`📊 Dashboard requested from: ${req.headers.origin || 'Unknown origin'}`);
   res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
 });
 
 app.get('/admin-dashboard', (req, res) => {
+  console.log(`👑 Admin dashboard requested from: ${req.headers.origin || 'Unknown origin'}`);
   res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
 });
 
@@ -302,6 +334,7 @@ console.log('📂 Setting up API routes...');
 
 // Health check
 app.get('/api/health', (req, res) => {
+  console.log('🏥 Health check requested');
   res.json({
     success: true,
     status: 'healthy',
@@ -311,34 +344,43 @@ app.get('/api/health', (req, res) => {
     environment: process.env.NODE_ENV || 'development',
     isVercel: !!process.env.VERCEL,
     origin: req.headers.origin,
-    host: req.headers.host
+    host: req.headers.host,
+    cors: 'enabled',
+    url: process.env.VERCEL_URL || 'local'
   });
 });
 
 // Test connection endpoint
 app.get('/api/test-connection', (req, res) => {
+  console.log(`🔗 Test connection from: ${req.headers.origin || 'Unknown origin'}`);
   res.json({
     success: true,
     message: '✅ API connection successful!',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
     apiBase: 'Working correctly',
-    cors: 'Enabled'
+    cors: 'Enabled',
+    origin: req.headers.origin,
+    serverTime: new Date().toISOString()
   });
 });
 
 // Test endpoint
 app.get('/api/test', (req, res) => {
+  console.log(`🧪 Test endpoint from: ${req.headers.origin || 'Unknown origin'}`);
   res.json({
     success: true,
     message: 'API is working!',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    corsStatus: 'enabled',
+    origin: req.headers.origin
   });
 });
 
 // Get user by ID (public)
 app.get('/api/users/:id', async (req, res) => {
   try {
+    console.log(`👤 User data request for ID: ${req.params.id}`);
     const users = await getUsers();
     const user = users.find(u => u.id === req.params.id);
     
@@ -357,6 +399,7 @@ app.get('/api/users/:id', async (req, res) => {
       user: userWithoutPassword
     });
   } catch (error) {
+    console.error('❌ Error fetching user:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'
@@ -385,7 +428,7 @@ app.post('/api/auth/register', async (req, res) => {
       dataConsent
     } = req.body;
 
-    console.log('📝 Registration attempt for:', email);
+    console.log('📝 Registration attempt for:', email, 'from:', req.headers.origin);
 
     // Basic validation
     const errors = [];
@@ -501,7 +544,7 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log('🔑 Member login attempt:', email);
+    console.log('🔑 Member login attempt:', email, 'from:', req.headers.origin);
 
     // Validation
     if (!email || !password) {
@@ -568,7 +611,7 @@ app.post('/api/admin/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     
-    console.log('🔑 Admin login attempt:', username);
+    console.log('🔑 Admin login attempt:', username, 'from:', req.headers.origin);
     
     if (!username || !password) {
       return res.status(400).json({
@@ -689,6 +732,7 @@ app.post('/api/admin/change-password', async (req, res) => {
 // Get all members (admin only)
 app.get('/api/admin/members', async (req, res) => {
   try {
+    console.log('👥 Admin requested members list from:', req.headers.origin);
     const users = await getUsers();
     const usersWithoutPasswords = users.map(({ password, ...user }) => user);
     
@@ -707,6 +751,7 @@ app.get('/api/admin/members', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('❌ Error fetching members:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'
@@ -717,6 +762,7 @@ app.get('/api/admin/members', async (req, res) => {
 // Get member by ID (admin only)
 app.get('/api/admin/members/:id', async (req, res) => {
   try {
+    console.log(`👤 Admin requested member: ${req.params.id}`);
     const users = await getUsers();
     const user = users.find(u => u.id === req.params.id);
     
@@ -735,6 +781,7 @@ app.get('/api/admin/members/:id', async (req, res) => {
       member: userWithoutPassword
     });
   } catch (error) {
+    console.error('❌ Error fetching member:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'
@@ -747,6 +794,8 @@ app.put('/api/admin/members/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
+    
+    console.log(`✏️ Admin updating member: ${id}`);
     
     const users = await getUsers();
     const userIndex = users.findIndex(u => u.id === id);
@@ -770,6 +819,7 @@ app.put('/api/admin/members/:id', async (req, res) => {
       member: userWithoutPassword
     });
   } catch (error) {
+    console.error('❌ Error updating member:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'
@@ -781,6 +831,8 @@ app.put('/api/admin/members/:id', async (req, res) => {
 app.delete('/api/admin/members/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    
+    console.log(`🗑️ Admin deleting member: ${id}`);
     
     const users = await getUsers();
     const userIndex = users.findIndex(u => u.id === id);
@@ -796,7 +848,7 @@ app.delete('/api/admin/members/:id', async (req, res) => {
     const deletedUser = users.splice(userIndex, 1)[0];
     await saveUsers(users);
     
-    console.log('🗑️ Admin deleted member:', deletedUser.email);
+    console.log('✅ Admin deleted member:', deletedUser.email);
     
     res.json({
       success: true,
@@ -808,6 +860,7 @@ app.delete('/api/admin/members/:id', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('❌ Error deleting member:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'
@@ -819,6 +872,8 @@ app.delete('/api/admin/members/:id', async (req, res) => {
 app.post('/api/admin/members/:id/verify', async (req, res) => {
   try {
     const { id } = req.params;
+    
+    console.log(`✅ Admin verifying member: ${id}`);
     
     const users = await getUsers();
     const userIndex = users.findIndex(u => u.id === id);
@@ -847,6 +902,7 @@ app.post('/api/admin/members/:id/verify', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('❌ Error verifying member:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'
@@ -857,6 +913,7 @@ app.post('/api/admin/members/:id/verify', async (req, res) => {
 // Get system statistics
 app.get('/api/admin/stats', async (req, res) => {
   try {
+    console.log('📊 Admin requested system stats');
     const users = await getUsers();
     const admins = await getAdmins();
     const welfarePackages = await getWelfarePackages();
@@ -899,6 +956,7 @@ app.get('/api/admin/stats', async (req, res) => {
       updatedAt: new Date().toISOString()
     });
   } catch (error) {
+    console.error('❌ Error fetching stats:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'
@@ -929,6 +987,7 @@ app.post('/api/auth/logout', (req, res) => {
 // Get all welfare packages (admin only)
 app.get('/api/admin/welfare', async (req, res) => {
   try {
+    console.log('📦 Admin requested welfare packages');
     const packages = await getWelfarePackages();
     res.json({
       success: true,
@@ -936,6 +995,7 @@ app.get('/api/admin/welfare', async (req, res) => {
       count: packages.length
     });
   } catch (error) {
+    console.error('❌ Error fetching welfare packages:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
@@ -943,6 +1003,7 @@ app.get('/api/admin/welfare', async (req, res) => {
 // Get welfare package by ID (admin only)
 app.get('/api/admin/welfare/:id', async (req, res) => {
   try {
+    console.log(`📦 Admin requested welfare package: ${req.params.id}`);
     const packages = await getWelfarePackages();
     const packageItem = packages.find(p => p.id === req.params.id);
     
@@ -958,6 +1019,7 @@ app.get('/api/admin/welfare/:id', async (req, res) => {
       package: packageItem
     });
   } catch (error) {
+    console.error('❌ Error fetching welfare package:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
@@ -966,6 +1028,8 @@ app.get('/api/admin/welfare/:id', async (req, res) => {
 app.post('/api/admin/welfare', async (req, res) => {
   try {
     const { name, type, description, value, eligibility, distributionDate, status } = req.body;
+    
+    console.log(`📦 Admin creating welfare package: ${name}`);
     
     if (!name || !type || !description) {
       return res.status(400).json({
@@ -999,6 +1063,7 @@ app.post('/api/admin/welfare', async (req, res) => {
       package: newPackage
     });
   } catch (error) {
+    console.error('❌ Error creating welfare package:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
@@ -1008,6 +1073,8 @@ app.put('/api/admin/welfare/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
+    
+    console.log(`✏️ Admin updating welfare package: ${id}`);
     
     const packages = await getWelfarePackages();
     const packageIndex = packages.findIndex(p => p.id === id);
@@ -1028,6 +1095,7 @@ app.put('/api/admin/welfare/:id', async (req, res) => {
       package: packages[packageIndex]
     });
   } catch (error) {
+    console.error('❌ Error updating welfare package:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
@@ -1036,6 +1104,8 @@ app.put('/api/admin/welfare/:id', async (req, res) => {
 app.delete('/api/admin/welfare/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    
+    console.log(`🗑️ Admin deleting welfare package: ${id}`);
     
     const packages = await getWelfarePackages();
     const packageIndex = packages.findIndex(p => p.id === id);
@@ -1059,6 +1129,7 @@ app.delete('/api/admin/welfare/:id', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('❌ Error deleting welfare package:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
@@ -1066,6 +1137,7 @@ app.delete('/api/admin/welfare/:id', async (req, res) => {
 // Get welfare packages for members (public endpoint)
 app.get('/api/welfare', async (req, res) => {
   try {
+    console.log('📦 Public welfare packages request');
     const packages = await getWelfarePackages();
     
     // Filter out sensitive info for public view
@@ -1083,6 +1155,7 @@ app.get('/api/welfare', async (req, res) => {
       packages: publicPackages
     });
   } catch (error) {
+    console.error('❌ Error fetching public welfare packages:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
@@ -1090,17 +1163,19 @@ app.get('/api/welfare', async (req, res) => {
 // ========== ERROR HANDLERS ==========
 // API 404 handler
 app.use('/api/*', (req, res) => {
-  console.log(`❌ API endpoint not found: ${req.method} ${req.originalUrl}`);
+  console.log(`❌ API endpoint not found: ${req.method} ${req.originalUrl} from ${req.headers.origin}`);
   res.status(404).json({ 
     success: false, 
     message: 'API endpoint not found',
     path: req.originalUrl,
-    method: req.method
+    method: req.method,
+    origin: req.headers.origin
   });
 });
 
 // Global 404 handler
 app.use((req, res) => {
+  console.log(`❌ Page not found: ${req.originalUrl} from ${req.headers.origin}`);
   if (req.accepts('html')) {
     res.status(404).send(`
       <!DOCTYPE html>
@@ -1123,7 +1198,8 @@ app.use((req, res) => {
   } else {
     res.status(404).json({ 
       success: false, 
-      error: 'Not found' 
+      error: 'Not found',
+      path: req.originalUrl
     });
   }
 });
@@ -1131,9 +1207,11 @@ app.use((req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('❌ Server error:', err.message);
+  console.error('Stack:', err.stack);
   res.status(500).json({
     success: false,
-    message: 'Internal server error'
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 });
 
@@ -1142,6 +1220,19 @@ app.use((err, req, res, next) => {
 if (process.env.VERCEL) {
   // Export the app for Vercel serverless functions
   console.log('🚀 Configuring for Vercel serverless deployment...');
+  
+  // Initialize databases on cold start
+  (async () => {
+    try {
+      await initializeDatabase();
+      await initializeAdmins();
+      await initializeWelfare();
+      console.log('✅ Vercel serverless initialization complete');
+    } catch (error) {
+      console.error('❌ Vercel initialization error:', error);
+    }
+  })();
+  
   module.exports = app;
 } else {
   // Local development
@@ -1160,7 +1251,7 @@ if (process.env.VERCEL) {
       const admins = await getAdmins();
       const welfarePackages = await getWelfarePackages();
       
-      app.listen(PORT, () => {
+      const server = app.listen(PORT, () => {
         console.log('\n' + '='.repeat(60));
         console.log('✅ SERVER STARTED SUCCESSFULLY');
         console.log('='.repeat(60));
